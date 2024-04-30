@@ -7,11 +7,6 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from "@/Components/ui/button"
-
-
-
-
-
 export default function Login({ status, canResetPassword }: { status?: string, canResetPassword: boolean }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
@@ -30,7 +25,9 @@ export default function Login({ status, canResetPassword }: { status?: string, c
 
         post(route('login'));
     };
+// voila le truc qui ressemble a HTML CSS la
 
+    // mais c'est un peu different
     return (
         <GuestLayout>
             <Head title="Log in" />
