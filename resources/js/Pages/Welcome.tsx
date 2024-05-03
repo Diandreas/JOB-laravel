@@ -5,7 +5,7 @@ import {
     AccordionItem,
     AccordionTrigger,
   } from "@/Components/ui/accordion"
-  
+
 
 import { Link, Head } from '@inertiajs/react';
 import { PageProps } from '@/types';
@@ -24,12 +24,12 @@ export default function Welcome({ auth, laravelVersion, phpVersion }: PageProps<
             user={auth.user}
             // header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>}
 
-        > 
+        >
 
 
-        
+
                 <Head title="Welcome" />
-                <Accordion type="single" collapsible className="w-1/2 ">
+                <Accordion type="single" collapsible className="w-1/4">
         <AccordionItem value="item-1" >
             <AccordionTrigger>Qui sommes-nous?</AccordionTrigger>
             <AccordionContent>
@@ -39,7 +39,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }: PageProps<
         </Accordion>
 
 
-        
+
 
 
 
