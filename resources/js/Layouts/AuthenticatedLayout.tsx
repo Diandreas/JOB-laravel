@@ -126,7 +126,7 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                     <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{header}</div>
                 </header>
             )}
-            <div className="w-full px-4 py-2  text-white flex items-center justify-between">
+            <div className="w-full px-4 py-2  text-white flex  ">
             <aside className={`${
                 isSidebarOpen ? "block" : "hidden"
             } md:block md:w-64  text-black`}>
@@ -173,7 +173,6 @@ export default function Authenticated({ user, header, children }: PropsWithChild
             </aside>
 
             <main className="w-full p-4 text-black">
-                <div>center </div>
                 {children}
             </main>
 
