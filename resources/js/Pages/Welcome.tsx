@@ -26,9 +26,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }: PageProps<
 
         >
 
-
-
-                <Head title="Welcome" />
+          <Head title="Welcome" />
 
                 <Accordion type="single" collapsible className="w-1/4">
         <AccordionItem value="item-1" >
