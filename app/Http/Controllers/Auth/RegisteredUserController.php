@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Address;
+use App\Models\Profession;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -20,7 +22,13 @@ class RegisteredUserController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Auth/Register');
+        $professions = Profession::all();
+        $addresses = Address::all();
+
+        return Inertia::render('Auth/Register', [
+            'professions' => $professions,
+            'addresses' => $addresses,
+        ]);
     }
 
     /**
@@ -34,12 +42,16 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'address_id' => 'required|exists:addresses,id', // Assurez-vous que l'ID de l'adresse existe dans la table des adresses
+            'profession_id' => 'required|exists:professions,id', // Assurez-vous que l'ID de la profession existe dans la table des professions
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'address_id' => $request->address_id, // Ajoutez ceci
+            'profession_id' => $request->profession_id, // Ajoutez ceci
         ]);
 
         event(new Registered($user));
@@ -48,4 +60,5 @@ class RegisteredUserController extends Controller
 
         return redirect(route('dashboard', absolute: false));
     }
+
 }

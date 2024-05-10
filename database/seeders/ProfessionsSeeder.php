@@ -5,9 +5,9 @@ namespace Database\Seeders;
 use App\Models\Profession;
 use Illuminate\Database\Seeder;
 
-class ProfessionSeeder extends Seeder
+class ProfessionsSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
         Profession::factory()->count(20)->create();
     }

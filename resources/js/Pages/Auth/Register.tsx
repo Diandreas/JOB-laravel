@@ -1,4 +1,4 @@
-import { useEffect, FormEventHandler } from 'react';
+import {useEffect, FormEventHandler, useState} from 'react';
 import GuestLayout from '@/Layouts/GuestLayout';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
@@ -6,7 +6,8 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function Register() {
+// @ts-ignore
+export default function Register(props) {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         email: '',
@@ -16,6 +17,18 @@ export default function Register() {
         profession_id : '',
         surname: '',
     });
+
+    const [professions, setProfessions] = useState([]);
+    const [addresses, setAddresses] = useState([]);
+
+    useEffect(() => {
+        if (props.professions) {
+            setProfessions(props.professions);
+        }
+        if (props.addresses) {
+            setAddresses(props.addresses);
+        }
+    }, []);
 
     useEffect(() => {
         return () => {
@@ -29,6 +42,12 @@ export default function Register() {
         post(route('register'));
     };
 
+    // @ts-ignore
+    // @ts-ignore
+    // @ts-ignore
+    // @ts-ignore
+    // @ts-ignore
+    // @ts-ignore
     return (
         <GuestLayout>
             <Head title="Register" />
@@ -101,6 +120,51 @@ export default function Register() {
 
                     <InputError message={errors.password_confirmation} className="mt-2" />
                 </div>
+
+                {professions.length > 0 && (
+                    <div className="mt-4">
+                        <InputLabel htmlFor="profession_id" value="Profession" />
+
+                        <select
+                            id="profession_id"
+                            name="profession_id"
+                            value={data.profession_id}
+                            className="mt-1 block w-full"
+                            onChange={(e) => setData('profession_id', e.target.value)}
+                            required
+                        >
+                            <option value="">-- Select a profession --</option>
+                            {professions.map(profession => (
+                                //ts ignore
+                                <option key={profession.id} value={profession.id}>
+                                    {profession.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
+
+                {addresses.length > 0 && (
+                    <div className="mt-4">
+                        <InputLabel htmlFor="address_id" value="Address" />
+
+                        <select
+                            id="address_id"
+                            name="address_id"
+                            value={data.address_id}
+                            className="mt-1 block w-full"
+                            onChange={(e) => setData('address_id', e.target.value)}
+                            required
+                        >
+                            <option value="">-- Select an address --</option>
+                            {addresses.map(address => (
+                                <option key={address.id} value={address.id}>
+                                    {address.town}, {address.street}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
 
                 <div className="flex items-center justify-end mt-4">
                     <Link

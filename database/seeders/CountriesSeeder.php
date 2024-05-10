@@ -5,9 +5,9 @@ namespace Database\Seeders;
 use App\Models\Country;
 use Illuminate\Database\Seeder;
 
-class CountrySeeder extends Seeder
+class CountriesSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
         Country::factory()->count(10)->create();
     }

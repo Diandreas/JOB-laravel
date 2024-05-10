@@ -30,4 +30,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+use App\Http\Controllers\ProfessionController;
+use App\Http\Controllers\AddressController;
+
+Route::get('/register', [ProfessionController::class, 'index']);
+Route::get('/register', [AddressController::class, 'index']);
+
+
 require __DIR__.'/auth.php';
