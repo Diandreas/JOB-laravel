@@ -130,7 +130,7 @@ export default function Authenticated({ user, header, children }: PropsWithChild
             <aside className={`${
                 isSidebarOpen ? "block" : "hidden"
             } md:block md:w-64  text-black`}>
-              
+
             </aside>
 
             <main className={"w-full p-4 text-black"}>

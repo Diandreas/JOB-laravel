@@ -12,6 +12,9 @@ export default function Register() {
         email: '',
         password: '',
         password_confirmation: '',
+        address_id: '',
+        profession_id : '',
+        surname: '',
     });
 
     useEffect(() => {
