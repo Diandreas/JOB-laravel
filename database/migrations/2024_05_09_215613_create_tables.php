@@ -212,7 +212,7 @@ class CreateTables extends Migration
             $table->foreign('sommary_id')->references('id')->on('sommaries')->onDelete('no action')->onUpdate('no action');
         });
 
-        Schema::create('matrimoniale----revoir', function (Blueprint $table) {
+        Schema::create('matrimoniale', function (Blueprint $table) {
             $table->increments('id');
             $table->string('number_child', 45)->nullable();
             $table->tinyInteger('maried')->nullable();
@@ -229,7 +229,7 @@ class CreateTables extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('matrimoniale----revoir');
+        Schema::dropIfExists('matrimoniale');
         Schema::dropIfExists('user_sommary');
         Schema::dropIfExists('sommaries');
         Schema::dropIfExists('user_experience');
