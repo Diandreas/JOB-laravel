@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
 import { Textarea } from "@/Components/ui/textarea"
-
-
+import React, { useState, useEffect } from 'react';
 
 import {
     Select,
@@ -37,10 +35,10 @@ import {PageProps} from "@/types";
 import { useForm, usePage } from '@inertiajs/react';
 
 const CVForm = () => {
-    const { auth } = usePage().props;
+    const {auth} = usePage().props;
 
     // Set up form data
-    const { data, setData, post, processing, errors } = useForm({
+    const {data, setData, post, processing, errors} = useForm({
         surname: '',
         address: {
             town: '',
@@ -71,7 +69,7 @@ const CVForm = () => {
 
     // Set up functions for adding/removing competences, hobbies, experiences, and references
     const addCompetence = () => {
-        setData('competences', [...data.competences, { name: '', description: '' }]);
+        setData('competences', [...data.competences, {name: '', description: ''}]);
     };
     const removeCompetence = (index) => {
         setData('competences', data.competences.filter((_, i) => i !== index));
@@ -88,18 +86,25 @@ const CVForm = () => {
 
     // Render the form
     return (
-        <form onSubmit={onSelect} action="/cv" method="POST">
-            <div>
-                <label htmlFor="surname">Surname</label>
-                <Input id="surname" type="text" value={data.surname} onChange={(e) => setData('surname', e.target.value)} />
-            </div>
-            <div>
-                <label htmlFor="address_town">Town</label>
-                <Input id="address_town" type="text" value={data.address.town} onChange={(e) => setData('address.town', e.target.value)} />
-            </div>
-            {/* ... and so on for the rest of the fields */}
-            <Button type="submit" processing={processing}>Submit</Button>
-        </form>
+        <AuthenticatedLayout
+            user={auth.user}
+        >
+            <form onSubmit={onSubmit} action="/cv" method="POST">
+
+                <div>
+                    <label htmlFor="surname">Surname</label>
+                    <Input id="surname" type="text" value={data.surname}
+                           onChange={(e) => setData('surname', e.target.value)}/>
+                </div>
+                <div>
+                    <label htmlFor="address_town">Town</label>
+                    <Input id="address_town" type="text" value={data.address.town}
+                           onChange={(e) => setData('address.town', e.target.value)}/>
+                </div>
+                {/* ... and so on for the rest of the fields */}
+                <Button type="submit" processing={processing}>Submit</Button>
+            </form>
+        </AuthenticatedLayout>
     );
 };
 

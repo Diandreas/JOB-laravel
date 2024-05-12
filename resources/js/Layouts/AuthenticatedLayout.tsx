@@ -31,6 +31,9 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                                 <NavLink  href={route('dashboard')} active={route().current('dashboard')}>
                                     Home
                                 </NavLink>
+                                <ResponsiveNavLink href={route('cv.create')} active={route().current('cv.create')}>
+                                    CV
+                                </ResponsiveNavLink>
                             </div>
                         </div>
 
@@ -130,7 +133,38 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                 </header>
             )}
             <div className="w-full px-4 py-2  text-white flex  ">
+                <aside className={`${
+                    isSidebarOpen ? "block" : "hidden"
+                } md:block md:w-64  text-black`}>
+                    <ul className="space-y-2">
 
+                        <li className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-200">
+                            <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span>Mon CV</span>
+                        </li>
+                        <li className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-200">
+                            <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span>Export (pdf/Word)</span>
+                        </li>
+                        <li className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-200">
+                            <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span>Mes design</span>
+                        </li>
+                        <li className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-200">
+                            <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span>Modifier</span>
+                        </li>
+
+                    </ul>
+                </aside>
             <main className={"w-full p-4 text-black"}>
                 {children}
             </main>
