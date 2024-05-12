@@ -17,14 +17,14 @@ import {
     Form,
     FormControl,
     FormDescription,
-    FormField,Z
+    FormField,
     FormItem,
     FormLabel,
     FormMessage,
 } from "@/Components/ui/form"
 import {
     Card,
-    CardContent,Z
+    CardContent,
     CardDescription,
     CardFooter,
     CardHeader,
@@ -88,7 +88,7 @@ const CVForm = () => {
 
     // Render the form
     return (
-        <form onSubmit={onSelect}>
+        <form onSubmit={onSelect} action="/cv" method="POST">
             <div>
                 <label htmlFor="surname">Surname</label>
                 <Input id="surname" type="text" value={data.surname} onChange={(e) => setData('surname', e.target.value)} />

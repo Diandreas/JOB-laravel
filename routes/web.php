@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\CVController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProfessionController;
+use App\Http\Controllers\AddressController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -18,11 +21,9 @@ Route::get('/', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-
 Route::get('/dashboard', function () {
     return Inertia::render('announce.index');
 })->middleware(['auth', 'verified'])->name('dashboard');
-
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -30,11 +31,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-use App\Http\Controllers\ProfessionController;
-use App\Http\Controllers\AddressController;
-
 Route::get('/register', [ProfessionController::class, 'index']);
 Route::get('/register', [AddressController::class, 'index']);
 
+//cv information
+Route::resource('cv', CVController::class);
+Route::get('/cv/create', function () {
+    return Inertia::render('CvInfos/Create');
+})->name('cv.create');
 
 require __DIR__.'/auth.php';
