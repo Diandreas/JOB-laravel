@@ -21,6 +21,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }: PageProps<
     return (
         <>
 
+
         </>
     );
 }
