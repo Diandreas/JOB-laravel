@@ -22,7 +22,7 @@ Route::get('/', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/dashboard', function () {
-    return Inertia::render('announce.index');
+    return Inertia::render('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
