@@ -1,3 +1,4 @@
+"use client"
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
     Card,
@@ -9,14 +10,17 @@ import {
 } from "@/Components/ui/card"
 
 
-import { Head } from '@inertiajs/react';
+import {Head, Link} from '@inertiajs/react';
 import { PageProps } from '@/types';
 import { Button } from "@/Components/ui/button"
+import { useToast} from "@/Components/ui/use-toast";
 
 
 
 
 export default function Dashboard({ auth }: PageProps) {
+    const { toast } = useToast()
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -26,6 +30,9 @@ export default function Dashboard({ auth }: PageProps) {
             <Head title="Dashboard" />
             <div className="flex flex-wrap ">
                 <div className="w-full md:w-1/2 p-4">
+                    <Link href="/experience-categories">
+                        <Button>Go to Experience Categories Index</Button>
+                    </Link>
                     <Card >
                         <CardHeader>
                             <CardTitle>Announces</CardTitle>
@@ -92,6 +99,19 @@ export default function Dashboard({ auth }: PageProps) {
         </div>
 
 
+
+
+            <Button
+                variant="outline"
+                onClick={() => {
+                    toast({
+                        title: "Uh oh! Something went wrong.",
+                        description: "There was a problem with your request.",
+                    })
+                }}
+            >
+                Show Toast
+            </Button>
 
 
         </AuthenticatedLayout>
