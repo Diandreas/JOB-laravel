@@ -35,7 +35,7 @@ const ExperienceCategoriesCreate = ({ auth }: Props) => {
     // @ts-ignore
     // @ts-ignore
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <AuthenticatedLayout  user={auth.user}    >
             <Head title="Create Experience Category" />
             <div className="flex flex-wrap">
                 <div className="w-full md:w-1/2 p-4">
@@ -47,7 +47,6 @@ const ExperienceCategoriesCreate = ({ auth }: Props) => {
                                 name="name"
                                 value={data.name}
                                 className="block w-full"
-                                autoComplete="name"
                                 onChange={(event) => setData('name', event.target.value)}
                                 required
                             />

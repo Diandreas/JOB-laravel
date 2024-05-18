@@ -24,14 +24,14 @@ export default function Dashboard({ auth }: PageProps) {
     return (
         <AuthenticatedLayout
             user={auth.user}
-            // header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>}
+            header={999999}
 
         >
             <Head title="Dashboard" />
             <div className="flex flex-wrap ">
                 <div className="w-full md:w-1/2 p-4">
                     <Link href="/experience-categories">
-                        <Button>Go to Experience Categories Index</Button>
+                        <Button >Go to Experience Categories Index</Button>
                     </Link>
                     <Card >
                         <CardHeader>
