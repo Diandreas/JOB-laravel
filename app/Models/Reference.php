@@ -8,4 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 class Reference extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'function',
+        'email',
+        'telephone',
+    ];
+
+    public function experiences()
+    {
+        return $this->belongsToMany(Experience::class);
+    }
 }

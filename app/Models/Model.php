@@ -8,4 +8,17 @@ use Illuminate\Database\Eloquent\Model;
 class Model extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'description',
+        'viewPath',
+        'price',
+        'previewImagePath'
+    ];
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
 }

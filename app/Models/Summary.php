@@ -8,4 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Summary extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'description',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

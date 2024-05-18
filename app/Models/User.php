@@ -51,4 +51,39 @@ class User extends Authenticatable
     {
         return $this->hasMany(CvInfos::class);
     }
+    public function address()
+    {
+        return $this->belongsTo(Address::class);
+    }
+
+    public function profession()
+    {
+        return $this->belongsTo(Profession::class);
+    }
+
+    public function models()
+    {
+        return $this->belongsToMany(Model::class);
+    }
+
+    public function competences()
+    {
+        return $this->belongsToMany(Competence::class);
+    }
+
+    public function hobbies()
+    {
+        return $this->belongsToMany(Hobby::class);
+    }
+
+    public function experiences()
+    {
+        return $this->belongsToMany(Experience::class);
+    }
+
+    public function summary()
+    {
+        return $this->belongsTo(Summary::class);
+    }
+
 }
