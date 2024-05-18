@@ -7,26 +7,31 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProfessionCategory extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'name',
         'description',
-        'parent_id'
+        'parent_id',
     ];
-
-    public function professions()
-    {
-        return $this->hasMany(Profession::class);
-    }
 
     public function parent()
     {
-        return $this->belongsTo(ProfessionCategory::class, 'parent_id');
+        return $this->belongsTo(ProfessionCategory::class);
     }
 
     public function children()
     {
         return $this->hasMany(ProfessionCategory::class, 'parent_id');
+    }
+
+    public static function rules($id = null)
+    {
+        return [
+            'name' => [
+                'required',
+                Rule::unique('profession_categories')->ignore($id),
+            ],
+            'description' => 'nullable',
+            'parent_id' => 'nullable',
+        ];
     }
 }

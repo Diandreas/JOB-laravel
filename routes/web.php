@@ -27,4 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('experience-categories', ExperienceCategoryController::class);
 });
 
+Route::middleware(['auth'])->group(function () {
+    Route::resource('hobbies', HobbyController::class);
+});
 require __DIR__.'/auth.php';

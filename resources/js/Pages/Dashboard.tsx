@@ -30,19 +30,20 @@ export default function Dashboard({ auth }: PageProps) {
             <Head title="Dashboard" />
             <div className="flex flex-wrap ">
                 <div className="w-full md:w-1/2 p-4">
-                    <Link href="/experience-categories">
-                        <Button >Go to Experience Categories Index</Button>
-                    </Link>
+
+
                     <Card >
                         <CardHeader>
-                            <CardTitle>Announces</CardTitle>
-                            <CardDescription>Card Description</CardDescription>
+                            <CardTitle>Experience Categories</CardTitle>
+                            <CardDescription></CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <p>Card Content</p>
+                            <p>Create, update , manage </p>
                         </CardContent>
                         <CardFooter>
-                            <p>Card Footer</p>
+                            <Link href="/experience-categories">
+                                <Button > Lets Go </Button>
+                            </Link>
                         </CardFooter>
                     </Card>
             </div>
@@ -50,14 +51,16 @@ export default function Dashboard({ auth }: PageProps) {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Notification</CardTitle>
-                            <CardDescription>Card Description</CardDescription>
+                            <CardTitle>Professions Categories</CardTitle>
+                            <CardDescription></CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <p>Card Content</p>
+                            <p>Create, update , manage </p>
                         </CardContent>
                         <CardFooter>
-                            <p>Card Footer</p>
+                            <Link href="/profession_categories">
+                            <Button > Lets Go </Button>
+                        </Link>
                         </CardFooter>
                     </Card>
 
@@ -67,14 +70,16 @@ export default function Dashboard({ auth }: PageProps) {
     <div  className="w-full md:w-1/2 p-4">
         <Card >
             <CardHeader>
-                <CardTitle>My cv</CardTitle>
-                <CardDescription>Card Description</CardDescription>
+                <CardTitle>Profession missions </CardTitle>
+                <CardDescription></CardDescription>
             </CardHeader>
             <CardContent>
-                <p>Card Content</p>
+                <p>Create, update , manage </p>
             </CardContent>
             <CardFooter>
-                <p>Card Footer</p>
+                <Link href="/profession-missions">
+                    <Button > Lets Go </Button>
+                </Link>
             </CardFooter>
         </Card>
 
@@ -84,34 +89,38 @@ export default function Dashboard({ auth }: PageProps) {
 <div  className="w-full md:w-1/2 p-4">
     <Card>
         <CardHeader>
-            <CardTitle>Find a CV</CardTitle>
+            <CardTitle>Hobbies</CardTitle>
             <CardDescription>edit your information a download your cv ?</CardDescription>
         </CardHeader>
         <CardContent>
-            <p>Card Content</p>
+            <p>Create, update , manage </p>
         </CardContent>
         <CardFooter>
-            <p>Card Footer</p>
+            <Link href="/hobbies">
+                <Button > Lets Go </Button>
+            </Link>
         </CardFooter>
     </Card>
 </div>
+                <div  className="w-full md:w-1/2 p-4">
+                    <Card >
+                        <CardHeader>
+                            <CardTitle>Profession  </CardTitle>
+                            <CardDescription></CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p>Create, update , manage </p>
+                        </CardContent>
+                        <CardFooter>
+                            <Link href="/professions">
+                                <Button > Lets Go </Button>
+                            </Link>
+                        </CardFooter>
+                    </Card>
+
+                </div>
 
         </div>
-
-
-
-
-            <Button
-                variant="outline"
-                onClick={() => {
-                    toast({
-                        title: "Uh oh! Something went wrong.",
-                        description: "There was a problem with your request.",
-                    })
-                }}
-            >
-                Show Toast
-            </Button>
 
 
         </AuthenticatedLayout>

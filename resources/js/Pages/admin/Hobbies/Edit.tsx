@@ -5,31 +5,32 @@ import { Label } from '@/Components/ui/label';
 import { Button } from "@/Components/ui/button";
 import {PageProps} from "@/types";
 
-interface Props extends PageProps {
-    hobbies: any;
+interface Hobby {
+    id: number;
+    name: string;
 }
 
-export default function HobbiesCreate({ auth, hobbies }: Props) {
-    const { data, setData, post, processing, errors } = useForm({
-        name: '',
+interface Props extends PageProps {
+    hobby: Hobby;
+}
+
+export default function HobbiesEdit({ auth, hobby }: Props) {
+    const { data, setData, put, processing, errors } = useForm({
+        name: hobby.name || '',
     });
 
-    // Fonction pour soumettre le formulaire de création de hobby
+    // Fonction pour soumettre le formulaire de modification de hobby
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        post(route('hobbies.store'));
+        put(route('hobbies.update', hobby.id));
     };
 
-    // @ts-ignore
-    // @ts-ignore
-    // @ts-ignore
-    // @ts-ignore
     return (
         <AuthenticatedLayout
             user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Create New Hobby</h2>}
+            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Edit Hobby: {hobby.name}</h2>}
         >
-            <Head title="Create New Hobby" />
+            <Head title="Edit Hobby" />
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-xl sm:rounded-lg">
@@ -49,7 +50,7 @@ export default function HobbiesCreate({ auth, hobbies }: Props) {
                                 {errors.name && <div className="text-red-500">{errors.name}</div>}
                             </div>
                             <div className="p-4 flex justify-end">
-                                <Button type="submit" disabled={processing}>Create</Button>
+                                <Button type="submit" disabled={processing}>Update</Button>
                             </div>
                         </form>
                     </div>
