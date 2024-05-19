@@ -9,6 +9,7 @@ import {
 
 import { Link, Head } from '@inertiajs/react';
 import { PageProps } from '@/types';
+import image from '../../images/Barbara-A-Felix-1.jpg';
 
 export default function Welcome({ auth, laravelVersion, phpVersion }: PageProps<{ laravelVersion: string, phpVersion: string }>) {
     const handleImageError = () => {
@@ -19,11 +20,41 @@ export default function Welcome({ auth, laravelVersion, phpVersion }: PageProps<
     };
 
     return (
-        <>
+        <main className="p-4 grid grid-cols-11 gap-1">
+                <div className="col-start-1 col-end-3">
+                        <img src={image} alt="Description de l'image" className="w-full h-auto" onError={handleImageError} />
+                        <div className="bg-gray-800 text-white p-4">
+      <p className="text-right">
+        <span className="text-xl">PROFILE</span>
+      </p>
+
+      <hr className="border-white" />
+
+      <p>
+        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Corporis aperiam exercitationem quasi explicabo culpa, doloremque dolorum et mollitia nulla!
+      </p>
+    </div>
 
 
 
 
-        </>
+</div>
+                
+
+                <div className="col-start-4 col-end-12">
+                    <h2 className="text-xl text-blue-500">Services</h2>
+                    <ul className="list-disc list-inside">
+                        <li>Serviceci est un exemple de layout avec deux colonnes inégales, en utilisant la propriété CSS
+                            grid-template-columns avec Tailwind CSSeci est un exemple de layout avec deux colonnes inégales, en utilisant la propriété CSS
+                            grid-template-columns avec Tailwind CSSe 1</li>
+                        <li>Service 2</li>
+                        <li>Service 3</li>
+                    </ul>
+                </div>
+            </main>
+
+
+
+        
     );
 }

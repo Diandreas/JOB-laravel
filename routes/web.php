@@ -30,4 +30,10 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::resource('hobbies', HobbyController::class);
 });
+Route::get('/us', function () {
+    return Inertia::render('Welcome');
+})->middleware(['auth', 'verified'])->name('WELCOME');
+
 require __DIR__.'/auth.php';
+
+
