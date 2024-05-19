@@ -25,13 +25,35 @@ export default function Welcome({ auth, laravelVersion, phpVersion }: PageProps<
                         <img src={image} alt="Description de l'image" className="w-full h-auto" onError={handleImageError} />
                         <div className="bg-gray-800 text-white p-4">
       <p className="text-right">
-        <span className="text-xl">PROFILE</span>
+        <span className="text-xl"><b> PROFILE </b></span>
       </p>
 
       <hr className="border-white" />
 
       <p>
         Lorem, ipsum dolor sit amet consectetur adipisicing elit. Corporis aperiam exercitationem quasi explicabo culpa, doloremque dolorum et mollitia nulla!
+      </p>
+    </div>
+
+    <div className="bg-gray-300 text-black p-4">
+      <p className="text-right">
+        <span className="text-xl"> <b> EDUCATION </b></span>
+      </p>
+
+      <hr className="border-white" />
+
+      <p>
+        Lorem, ipsum dolor sit amet consectetur adipisicing elit. <br/>
+        <br/>
+
+        <b> ENTER YOUR DEGREE NAME </b>
+        Corporis aperiam exercitationem quasi explicabo culpa, doloremque dolorum et mollitia nulla!
+        <br/>
+
+        <b> ENTER YOUR DEGREE NAME </b>
+
+        Corporis aperiam exercitationem quasi explicabo culpa, doloremque dolorum et mollitia nulla!
+        <br/>
       </p>
     </div>
 
