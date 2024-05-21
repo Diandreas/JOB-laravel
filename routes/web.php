@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\ExperienceCategoryController;
 use App\Http\Controllers\CVController;
+use App\Http\Controllers\HobbyController;
+use App\Http\Controllers\ProfessionCategoryController;
+use App\Http\Controllers\ProfessionMissionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfessionController;
 use App\Http\Controllers\AddressController;
@@ -25,11 +28,20 @@ Route::middleware('auth')->group(function () {
     })->name('cv.create');
 
     Route::resource('experience-categories', ExperienceCategoryController::class);
+    Route::resource('hobbies', HobbyController::class);
+    Route::resource('profession-categories', ProfessionCategoryController::class);
+    Route::resource('professions', ProfessionController::class);
+    Route::resource('profession-missions', ProfessionMissionController::class);
+
+
+
+
+
+
+
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::resource('hobbies', HobbyController::class);
-});
+
 Route::get('/us', function () {
     return Inertia::render('Welcome');
 })->middleware(['auth', 'verified'])->name('WELCOME');

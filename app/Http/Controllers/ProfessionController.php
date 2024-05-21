@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Profession;
 use App\Models\ProfessionCategory;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ProfessionController extends Controller
 {
