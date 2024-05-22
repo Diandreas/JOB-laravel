@@ -67,23 +67,7 @@ export default function Dashboard({ auth }: PageProps) {
                 </div>
 
 
-    <div  className="w-full md:w-1/2 p-4">
-        <Card >
-            <CardHeader>
-                <CardTitle>Profession missions </CardTitle>
-                <CardDescription></CardDescription>
-            </CardHeader>
-            <CardContent>
-                <p>Create, update , manage </p>
-            </CardContent>
-            <CardFooter>
-                <Link href="/profession-missions">
-                    <Button > Lets Go </Button>
-                </Link>
-            </CardFooter>
-        </Card>
 
-    </div>
 
 
 <div  className="w-full md:w-1/2 p-4">
@@ -132,7 +116,7 @@ export default function Dashboard({ auth }: PageProps) {
                         <p>Create, update , manage </p>
                     </CardContent>
                     <CardFooter>
-                        <Link href="/professions">
+                        <Link href="/competences">
                             <Button > Lets Go </Button>
                         </Link>
                     </CardFooter>

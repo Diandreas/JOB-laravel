@@ -1,4 +1,6 @@
 <?php
+
+use App\Http\Controllers\CompetenceController;
 use App\Http\Controllers\ExperienceCategoryController;
 use App\Http\Controllers\CVController;
 use App\Http\Controllers\HobbyController;
@@ -26,6 +28,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('hobbies', HobbyController::class);
     Route::resource('profession-categories', ProfessionCategoryController::class);
     Route::resource('professions', ProfessionController::class);
+    Route::resource('competences', CompetenceController::class);
+
     Route::resource('profession-missions', ProfessionMissionController::class);
 });
 
