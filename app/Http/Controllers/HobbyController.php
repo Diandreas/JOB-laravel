@@ -1,59 +1,57 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Hobby;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreHobbyRequest;
+use App\Http\Requests\UpdateHobbyRequest;
 use Inertia\Inertia;
 
 class HobbyController extends Controller
 {
     public function index()
     {
-        $hobbies = Hobby::all();
-
-        return Inertia::render('Hobbies/Index', ['hobbies' => $hobbies]);
+        return Inertia::render('admin/Hobbies/Index', [
+            'hobbies' => Hobby::all(),
+        ]);
     }
 
     public function create()
     {
-        return Inertia::render('Hobbies/Create');
+        return Inertia::render('admin/Hobbies/Create');
     }
 
-    public function store(Request $request)
+    public function store(StoreHobbyRequest $request)
     {
-        $request->validate([
-            'name' => 'required',
-        ]);
+        Hobby::create($request->all());
+        return redirect()->route('hobbies.index')->with('message', 'Hobby created successfully');
+    }
 
-        Hobby::create([
-            'name' => $request->name,
+    public function show(Hobby $hobby)
+    {
+        return Inertia::render('admin/Hobbies/Show', [
+            'hobby' => $hobby,
         ]);
-
-        return redirect()->route('hobbies.index');
     }
 
     public function edit(Hobby $hobby)
     {
-        return Inertia::render('Hobbies/Edit', ['hobby' => $hobby]);
+        return Inertia::render('admin/Hobbies/Edit', [
+            'hobby' => $hobby,
+        ]);
     }
 
-    public function update(Request $request, Hobby $hobby)
+    public function update(UpdateHobbyRequest $request, Hobby $hobby)
     {
-        $request->validate([
-            'name' => 'required',
-        ]);
+        $hobby->update($request->all());
 
-        $hobby->update([
-            'name' => $request->name,
-        ]);
-
-        return redirect()->route('hobbies.index');
+        return response()->json(['message' => 'Hobby updated successfully']);
     }
 
     public function destroy(Hobby $hobby)
     {
         $hobby->delete();
 
-        return redirect()->route('hobbies.index');
+        return response()->json(['message' => 'Hobby deleted successfully']);
     }
 }

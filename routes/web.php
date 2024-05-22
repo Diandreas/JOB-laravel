@@ -1,5 +1,4 @@
 <?php
-
 use App\Http\Controllers\ExperienceCategoryController;
 use App\Http\Controllers\CVController;
 use App\Http\Controllers\HobbyController;
@@ -23,29 +22,15 @@ Route::middleware('auth')->group(function () {
 
     //cv information
     Route::resource('cv', CVController::class);
-    Route::get('/cv/create', function () {
-        return Inertia::render('CvInfos/Create');
-    })->name('cv.create');
-
     Route::resource('experience-categories', ExperienceCategoryController::class);
     Route::resource('hobbies', HobbyController::class);
     Route::resource('profession-categories', ProfessionCategoryController::class);
     Route::resource('professions', ProfessionController::class);
     Route::resource('profession-missions', ProfessionMissionController::class);
-
-
-
-
-
-
-
 });
-
 
 Route::get('/us', function () {
     return Inertia::render('Welcome');
 })->middleware(['auth', 'verified'])->name('WELCOME');
 
 require __DIR__.'/auth.php';
-
-

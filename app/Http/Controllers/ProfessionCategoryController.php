@@ -1,55 +1,60 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\ProfessionCategory;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreProfessionCategoryRequest;
+use App\Http\Requests\UpdateProfessionCategoryRequest;
 use Inertia\Inertia;
 
 class ProfessionCategoryController extends Controller
 {
     public function index()
     {
-        $profession_categories = ProfessionCategory::with('children')->whereNull('parent_id')->get();
-
-        return Inertia::render('ProfessionCategories/Index', ['profession_categories' => $profession_categories]);
+        return Inertia::render('admin/ProfessionCategories/Index', [
+            'profession_categories' => ProfessionCategory::with('children')->whereNull('parent_id')->get(),
+        ]);
     }
 
     public function create()
     {
         $parent_categories = ProfessionCategory::whereNull('parent_id')->get();
-
-        return Inertia::render('ProfessionCategories/Create', ['parent_categories' => $parent_categories]);
+        return Inertia::render('admin/ProfessionCategories/Create', ['parent_categories' => $parent_categories]);
     }
 
-    public function store(Request $request)
+    public function store(StoreProfessionCategoryRequest $request)
     {
-        $request->validate(ProfessionCategory::rules());
-
         ProfessionCategory::create($request->all());
-
-        return redirect()->route('profession-categories.index');
+        return redirect()->route('profession-categories.index')->with('message', 'Profession category created successfully');
     }
 
-    public function edit(ProfessionCategory $profession_category)
+    public function show(ProfessionCategory $professionCategory)
+    {
+        return Inertia::render('admin/ProfessionCategories/Show', [
+            'profession_category' => $professionCategory,
+        ]);
+    }
+
+    public function edit(ProfessionCategory $professionCategory)
     {
         $parent_categories = ProfessionCategory::whereNull('parent_id')->get();
-
-        return Inertia::render('ProfessionCategories/Edit', ['profession_category' => $profession_category, 'parent_categories' => $parent_categories]);
+        return Inertia::render('admin/ProfessionCategories/Edit', [
+            'profession_category' => $professionCategory,
+            'parent_categories' => $parent_categories,
+        ]);
     }
 
-    public function update(Request $request, ProfessionCategory $profession_category)
+    public function update(UpdateProfessionCategoryRequest $request, ProfessionCategory $professionCategory)
     {
-        $request->validate(ProfessionCategory::rules($profession_category->id));
+        $professionCategory->update($request->all());
 
-        $profession_category->update($request->all());
-
-        return redirect()->route('profession-categories.index');
+        return response()->json(['message' => 'Profession category updated successfully']);
     }
 
-    public function destroy(ProfessionCategory $profession_category)
+    public function destroy(ProfessionCategory $professionCategory)
     {
-        $profession_category->delete();
+        $professionCategory->delete();
 
-        return redirect()->route('profession-categories.index');
+        return response()->json(['message' => 'Profession category deleted successfully']);
     }
 }

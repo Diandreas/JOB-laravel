@@ -1,9 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Profession;
 use App\Models\ProfessionCategory;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreProfessionRequest;
+use App\Http\Requests\UpdateProfessionRequest;
 use Inertia\Inertia;
 
 class ProfessionController extends Controller
@@ -12,45 +14,48 @@ class ProfessionController extends Controller
     {
         $professions = Profession::with('category')->get();
 
-        return Inertia::render('Professions/Index', ['professions' => $professions]);
+        return Inertia::render('admin/Professions/Index', ['professions' => $professions]);
     }
 
     public function create()
     {
         $categories = ProfessionCategory::all();
 
-        return Inertia::render('Professions/Create', ['categories' => $categories]);
+        return Inertia::render('admin/Professions/Create', ['categories' => $categories]);
     }
 
-    public function store(Request $request)
+    public function store(StoreProfessionRequest $request)
     {
-        $request->validate(Profession::rules());
-
         Profession::create($request->all());
 
-        return redirect()->route('professions.index');
+        return redirect()->route('professions.index')->with('message', 'Profession created successfully');
+    }
+
+    public function show(Profession $profession)
+    {
+        return Inertia::render('admin/Professions/Show', [
+            'profession' => $profession,
+        ]);
     }
 
     public function edit(Profession $profession)
     {
         $categories = ProfessionCategory::all();
 
-        return Inertia::render('Professions/Edit', ['profession' => $profession, 'categories' => $categories]);
+        return Inertia::render('admin/Professions/Edit', ['profession' => $profession, 'categories' => $categories]);
     }
 
-    public function update(Request $request, Profession $profession)
+    public function update(UpdateProfessionRequest $request, Profession $profession)
     {
-        $request->validate(Profession::rules($profession->id));
-
         $profession->update($request->all());
 
-        return redirect()->route('professions.index');
+        return response()->json(['message' => 'Profession updated successfully']);
     }
 
     public function destroy(Profession $profession)
     {
         $profession->delete();
 
-        return redirect()->route('professions.index');
+        return response()->json(['message' => 'Profession deleted successfully']);
     }
 }

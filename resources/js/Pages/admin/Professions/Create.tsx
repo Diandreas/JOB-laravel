@@ -1,25 +1,25 @@
 import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
-import { Button } from '@/Components/ui/button';
 import { useForm } from '@inertiajs/react';
 import InputLabel from "@/Components/InputLabel";
 import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
-
+import { Button } from '@/Components/ui/button';
 interface Props {
     auth: any;
 }
 
-const HobbiesCreate = ({ auth }: Props) => {
+const ProfessionCreate = ({ auth }: Props) => {
     const { data, setData, post, processing, errors } = useForm({
         name: '',
+        description: '',
     });
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        post(route('hobbies.store'), {
+        post(route('professions.store'), {
             onSuccess: () => {
                 // TODO: handle success
             },
@@ -31,7 +31,7 @@ const HobbiesCreate = ({ auth }: Props) => {
 
     return (
         <AuthenticatedLayout user={auth.user}>
-            <Head title="Create Hobby" />
+            <Head title="Create Profession" />
             <div className="flex flex-wrap">
                 <div className="w-full md:w-1/2 p-4">
                     <form onSubmit={handleSubmit}>
@@ -47,6 +47,19 @@ const HobbiesCreate = ({ auth }: Props) => {
                             />
                             <InputError message={errors.name} />
                         </div>
+                        <div className="mb-4">
+                            <InputLabel htmlFor="description" value="Description" />
+                            <TextInput
+                                id="description"
+                                name="description"
+                                value={data.description}
+                                className="block w-full"
+                                autoComplete="description"
+                                onChange={(event) => setData('description', event.target.value)}
+                                required
+                            />
+                            <InputError message={errors.description} />
+                        </div>
                         <Button type="submit" disabled={processing}>
                             Create
                         </Button>
@@ -57,4 +70,4 @@ const HobbiesCreate = ({ auth }: Props) => {
     );
 };
 
-export default HobbiesCreate;
+export default ProfessionCreate;

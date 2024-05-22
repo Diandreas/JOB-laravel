@@ -9,15 +9,17 @@ import { useToast } from "@/Components/ui/use-toast";
 
 interface Props {
     auth: any;
-    hobby: {
+    profession: {
         id: number;
         name: string;
+        description: string;
     };
 }
 
-export default function HobbiesEdit({ auth, hobby }: Props) {
+export default function ProfessionEdit({ auth, profession }: Props) {
     const [formData, setFormData] = useState({
-        name: hobby.name,
+        name: profession.name,
+        description: profession.description,
     });
 
     const { toast } = useToast();
@@ -29,14 +31,13 @@ export default function HobbiesEdit({ auth, hobby }: Props) {
         });
     };
 
-    // @ts-ignore
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        axios.put(`/hobbies/${hobby.id}`, formData)
+        axios.put(`/professions/${profession.id}`, formData)
             .then((response) => {
                 toast({
-                    title: 'Hobby updated successfully',
+                    title: 'Profession updated successfully',
                     description: 'Your changes have been saved.'
                 });
             })
@@ -47,13 +48,17 @@ export default function HobbiesEdit({ auth, hobby }: Props) {
 
     return (
         <AuthenticatedLayout user={auth.user}>
-            <Head title="Edit Hobby" />
+            <Head title="Edit Profession" />
             <div className="p-4">
-                <h1 className="text-2xl font-semibold mb-4">Edit Hobby</h1>
+                <h1 className="text-2xl font-semibold mb-4">Edit Profession</h1>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <Label htmlFor="name">Name</Label>
                         <Input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required />
+                    </div>
+                    <div className="mb-4">
+                        <Label htmlFor="description">Description</Label>
+                        <Input type="text" id="description" name="description" value={formData.description} onChange={handleChange} required />
                     </div>
                     <Button type="submit">Save Changes</Button>
                 </form>
