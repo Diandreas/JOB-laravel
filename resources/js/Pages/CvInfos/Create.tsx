@@ -1,334 +1,267 @@
-'use client'
-import { Textarea } from "@/Components/ui/textarea"
-import React, { useState, useEffect } from 'react';
-import { zodResolver } from "@hookform/resolvers/zod"
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
-
-import { z } from "zod"
-
-import { cn } from "@/lib/utils"
-import { Calendar } from "@/Components/ui/calendar"
-
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/Components/ui/popover"
-import { toast } from "@/Components/ui/toast"
-
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/Components/ui/select"
-
-import { Input } from "@/Components/ui/input"
-import { Button } from "@/Components/ui/button"
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/Components/ui/form"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/Components/ui/card"
-
+import React, {useEffect, useState} from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import {PageProps} from "@/types";
+import {Head, usePage} from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
+import InputLabel from "@/Components/InputLabel";
+import TextInput from "@/Components/TextInput";
+import InputError from "@/Components/InputError";
+import { Button } from '@/Components/ui/button';
+import RepeatableForm from "@/Pages/CvInfos/RepeatableForm";
+import { Select } from '@/Components/ui/select';
+interface Props {
+    auth: any;
+}
 
-import { useForm, usePage } from '@inertiajs/react';
 
-const CVForm = () => {
-    const { auth } = usePage().props;
 
-    // Set up form data
-    const { data, setData, post, processing, errors } = useForm({
+
+
+const CvInfosCreate = ({ auth }: Props) => {
+    const {data, setData, post, processing, errors, reset} = useForm({
         surname: '',
-        address: {
-            town: '',
-            street: '',
-            country_id: '',
-        },
-        profession: {
-            name: '',
-            description: '',
-            category_id: '',
-        },
+        address_id: '',
+        profession_id: '',
         competences: [],
         hobbies: [],
+        summaries: [],
         experiences: [],
-        references: [],
-        attachments: [],
-        summaries: '',
-        matrimonial_status: {
-            number_child: '',
-            maried: '',
-        },
     });
 
-    // Fetch initial data (countries, profession categories, etc.)
-    const [countries, setCountries] = useState([]);
-    const [professionCategories, setProfessionCategories] = useState([]);
+    const {addresses, professions, competences: allCompetences, hobbies: allHobbies} = usePage().props;
     useEffect(() => {
-        // Fetch countries and profession categories from the server and set them in state
-    }, []);
+        setData('addresses', addresses);
+        setData('professions', professions);
+        setData('allCompetences', allCompetences);
+        setData('allHobbies', allHobbies);
+    }, [addresses, professions, allCompetences, allHobbies]);
 
-    // Set up functions for adding/removing competences, hobbies, experiences, and references
-    const addCompetence = () => {
-        setData('competences', [...data.competences, { name: '', description: '' }]);
-    };
-    const removeCompetence = (index) => {
-        setData('competences', data.competences.filter((_, i) => i !== index));
-    };
-
-    const addHobby = () => {
-        setData('hobbies', [...data.hobbies, { name: '', category_id: '' }]);
-    };
-    const removeHobby = (index) => {
-        setData('hobbies', data.hobbies.filter((_, i) => i !== index));
-    };
-
-    const addExperience = () => {
-        // @ts-ignore
-        setData('experiences', [...data.experiences, {
+    const [summariesState, setSummariesState] = useState([{name: '', description: ''}]);
+    const [experiencesState, setExperiencesState] = useState([
+        {
             name: '',
             description: '',
             date_start: '',
             date_end: '',
             output: '',
-            experience_categorie_id: '',
-            output_id: '',
-            organisation_id: '',
-            attachement_id: '',
-            reference_id: '',
-        }]);
-    };
-    // @ts-ignore
-    const removeExperience = (index) => {
-        setData('experiences', data.experiences.filter((_, i) => i !== index));
+            experience_category_id: '',
+            comment: '',
+            institution_name: '',
+            attachment_id: '',
+        },
+    ]);
+
+    const handleSummariesChange = (index, event) => {
+        const values = [...summariesState];
+        if (event.target.name === 'name') {
+            values[index].name = event.target.value;
+        } else if (event.target.name === 'description') {
+            values[index].description = event.target.value;
+        }
+        setSummariesState(values);
     };
 
-    const addReference = () => {
-        setData('references', [...data.references, { name: '', fonction: '', email: '', telephone: '' }]);
-    };
-    const removeReference = (index) => {
-        setData('references', data.references.filter((_, i) => i !== index));
+    const handleExperiencesChange = (index, event) => {
+        const values = [...experiencesState];
+        values[index][event.target.name] = event.target.value;
+        setExperiencesState(values);
     };
 
-    // Set up function for handling form submission
-    const onSubmit = (e) => {
-        e.preventDefault();
-        post('/cv', {
-            // ... include all form data here
+    const addForm = (type) => {
+        if (type === 'summary') {
+            setSummariesState([...summariesState, {name: '', description: ''}]);
+        } else if (type === 'experience') {
+            setExperiencesState([
+                ...experiencesState,
+                {
+                    name: '',
+                    description: '',
+                    date_start: '',
+                    date_end: '',
+                    output: '',
+                    experience_category_id: '',
+                    comment: '',
+                    institution_name: '',
+                    attachment_id: '',
+                },
+            ]);
+        }
+    };
+
+    const removeForm = (index, type) => {
+        if (type === 'summary') {
+            const values = [...summariesState];
+            values.splice(index, 1);
+            setSummariesState(values);
+        } else if (type === 'experience') {
+            const values = [...experiencesState];
+            values.splice(index, 1);
+            setExperiencesState(values);
+        }
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        setData('summaries', summariesState);
+        setData('experiences', experiencesState);
+
+        post(route('cv-infos.store'), {
+            onSuccess: () => {
+                reset();
+                setSummariesState([{name: '', description: ''}]);
+                setExperiencesState([
+                    {
+                        name: '',
+                        description: '',
+                        date_start: '',
+                        date_end: '',
+                        output: '',
+                        experience_category_id: '',
+                        comment: '',
+                        institution_name: '',
+                        attachment_id: '',
+                    },
+                ]);
+            },
+            onError: () => {
+                // TODO: Handle the error
+            },
         });
     };
-    const [date, setDate] = React.useState<Date>()
-    // Render the form
-    // @ts-ignore
+
+
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">EDIT YOUR CV INFORMATION </h2>}
-        >
-            <h1> EDIT YOUR CV INFORMATION </h1>
-            <form onSubmit={onSubmit} action="/cv" method="POST">
-                {/* Competences */}
-                <div>
-                    <h3>Competences</h3>
-                    {data.competences.map((competence, index) => (
-                        <div key={index}>
-                            <Input
-                                type="text"
-                                value={competence.name}
-                                onChange={(e) => {
-                                    const newCompetences = [...data.competences];
-                                    newCompetences[index].name = e.target.value;
-                                    setData('competences', newCompetences);
-                                }}
+        <AuthenticatedLayout  user={auth.user}>
+            <Head title="Create CvInfo"/>
+            <div className="flex flex-wrap">
+                <div className="w-full md:w-1/2 p-4">
+                    <form onSubmit={handleSubmit}>
+                        {/* Surname field */}
+                        <div className="mb-4">
+                            <InputLabel htmlFor="surname" value="Surname"/>
+                            <TextInput
+                                id="surname"
+                                name="surname"
+                                value={data.surname}
+                                className="block w-full"
+                                onChange={(event) => setData('surname', event.target.value)}
+                                required
                             />
-                            <Input
-                                type="text"
-                                value={competence.description}
-                                onChange={(e) => {
-                                    const newCompetences = [...data.competences];
-                                    newCompetences[index].description = e.target.value;
-                                    setData('competences', newCompetences);
-                                }}
+                            <InputError message={errors.surname}/>
+
+                        </div>
+
+                        {/* Address field */}
+                        <div className="mb-4">
+                            <InputLabel htmlFor="address_id" value="Address"/>
+                            <Select
+                                id="address_id"
+                                name="address_id"
+                                value={data.address_id}
+                                className="block w-full"
+                                onChange={(event) => setData('address_id', event.target.value)}
+                                required
+                            >
+                                <option value="">Select an address</option>
+                                {data.addresses.map((address) => (
+                                    <option key={address.id} value={address.id}>
+                                        {address.town}, {address.street}
+                                    </option>
+                                ))}
+                            </Select>
+                            <InputError message={errors.address_id}/>
+                        </div>
+
+                        {/* Profession field */}
+                        <div className="mb-4">
+                            <InputLabel htmlFor="profession_id" value="Profession"/>
+                            <Select
+                                id="profession_id"
+                                name="profession_id"
+                                value={data.profession_id}
+                                className="block w-full"
+                                onChange={(event) => setData('profession_id', event.target.value)}
+                                required
+                            >
+                                <option value="">Select a profession</option>
+                                {data.professions.map((profession) => (
+                                    <option key={profession.id} value={profession.id}>
+                                        {profession.name}
+                                    </option>
+                                ))}
+                            </Select>
+                            <InputError message={errors.profession_id}/>
+                        </div>
+
+                        {/* Competences field */}
+                        <div className="mb-4">
+                            <InputLabel htmlFor="competences" value="Competences"/>
+                            <MultiSelect
+                                id="competences"
+                                name="competences"
+                                value={data.competences}
+                                className="block w-full"
+                                onChange={(event) => setData('competences', event.target.value)}
+                            >
+                                {data.allCompetences.map((competence) => (
+                                    <option key={competence.id} value={competence.id}>
+                                        {competence.name}
+                                    </option>
+                                ))}
+                            </MultiSelect>
+                            <InputError message={errors.competences}/>
+                        </div>
+
+                        {/* Hobbies field */}
+                        <div className="mb-4">
+                            <InputLabel htmlFor="hobbies" value="Hobbies"/>
+                            <MultiSelect
+                                id="hobbies"
+                                name="hobbies"
+                                value={data.hobbies}
+                                className="block w-full"
+                                onChange={(event) => setData('hobbies', event.target.value)}
+                            >
+                                {data.allHobbies.map((hobby) => (
+                                    <option key={hobby.id} value={hobby.id}>
+                                        {hobby.name}
+                                    </option>
+                                ))}
+                            </MultiSelect>
+                            <InputError message={errors.hobbies}/>
+                        </div>
+
+                        {/* Summaries field */}
+                        <div className="mb-4">
+                            <RepeatableForm
+                                values={summariesState}
+                                onValueChange={handleSummariesChange}
+                                onAdd={addForm}
+                                onRemove={removeForm}
+                                type="summary"
                             />
-                            <Button variant="destructive" style={{ marginLeft: 'auto' }} onClick={() => removeCompetence(index)}>Remove Competence</Button>
+                            <InputError message={errors.summaries}/>
                         </div>
-                    ))}
-                    <Button onClick={addCompetence}>+</Button>
-                </div>
 
-                {/* Hobbies */}
-                <div>
-                    <h3>Hobbies</h3>
-                    {data.hobbies.map((hobby, index) => (
-                        <div key={index}>
-                            <Input
-                                type="text"
-                                value={hobby.name}
-                                onChange={(e) => {
-                                    const newHobbies = [...data.hobbies];
-                                    newHobbies[index].name = e.target.value;
-                                    setData('hobbies', newHobbies);
-                                }}
+                        {/* Experiences field */}
+                        <div className="mb-4">
+                            <RepeatableForm
+                                values={experiencesState}
+                                onValueChange={handleExperiencesChange}
+                                onAdd={addForm}
+                                onRemove={removeForm}
+                                type="experience"
                             />
-                            <Button variant="destructive" onClick={() => removeHobby(index)}>-</Button>
+                            <InputError message={errors.experiences}/>
                         </div>
-                    ))}
-                    <Button onClick={addHobby}>+</Button>
+
+                        {/* Submit button */}
+                        <Button type="submit" disabled={processing}>
+                            Create
+                        </Button>
+                    </form>
                 </div>
-
-                {/* Experiences */}
-                <div>
-                    <h3>Experiences  <Button onClick={addExperience}>+</Button></h3>
-                    {data.experiences.map((experience, index) => (
-                        <div key={index}>
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Période</CardTitle>
-                                    <CardDescription> <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <Popover style={{ width: '45%' }}>
-                                            <PopoverTrigger asChild>
-                                                <Button
-                                                    variant={"outline"}
-                                                    className={cn(
-                                                        "w-[280px] justify-start text-left font-normal",
-                                                        !date && "text-muted-foreground"
-                                                    )}
-                                                >
-                                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                                    {date ? format(date, "PPP") : <span>Pick a date</span>}
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0">
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={date}
-                                                    onSelect={setDate}
-                                                    initialFocus
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
-                                        --
-                                        <Popover style={{ width: '45%' }}>
-                                            <PopoverTrigger asChild>
-                                                <Button
-                                                    variant={"outline"}
-                                                    className={cn(
-                                                        "w-[280px] justify-start text-left font-normal",
-                                                        !date && "text-muted-foreground"
-                                                    )}
-                                                >
-                                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                                    {date ? format(date, "PPP") : <span>Pick a date</span>}
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0">
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={date}
-                                                    onSelect={setDate}
-                                                    initialFocus
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
-
-
-
-                                    </div></CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <p><Input
-                                        type="text"
-                                        value={experience.name}
-                                        onChange={(e) => {
-                                            const newExperiences = [...data.experiences];
-                                            newExperiences[index].name = e.target.value;
-                                            setData('experiences', newExperiences);
-                                        }}
-                                    /></p>
-                                    <p>INSTITUT : <Input
-                                        type="text"
-                                        value={experience.organisation_id}
-                                        onChange={(e) => {
-                                            const newExperiences = [...data.experiences];
-                                            newExperiences[index].organisation_id = e.target.value;
-                                            setData('experiences', newExperiences);
-                                        }}
-                                    /></p>
-                                    {/* References */}
-                                    <div>
-                                        <h3>References <Button onClick={(e) => { e.preventDefault(); addReference(); }}>+</Button></h3>
-                                        {data.references.map((reference, index) => (
-                                            <div key={index}>
-                                                name : <Input
-                                                type="text"
-                                                value={references.name}
-                                                onChange={(e) => {
-                                                    const newExperiences = [...data.experiences];
-                                                    newExperiences[index].name = e.target.value;
-                                                    setData('experiences', newExperiences);
-                                                }}
-                                            />
-                                                tel : <Input
-                                                type="text"
-                                                value={references.name}
-                                                onChange={(e) => {
-                                                    const newExperiences = [...data.experiences];
-                                                    newExperiences[index].name = e.target.value;
-                                                    setData('experiences', newExperiences);
-                                                }}
-                                            />
-                                                <Button variant="destructive" onClick={() => removeReference(index)}>X</Button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <p>Commentaire:<Textarea id="summaries" value={experience.description} onChange={(e) => {
-                                        const newExperiences = [...data.experiences];
-                                        newExperiences[index].description = e.target.value;
-                                        setData('experiences', newExperiences);
-                                    }} /></p>
-                                </CardContent>
-                                <CardFooter>
-                                    <Button variant="destructive" onClick={() => removeExperience(index)}>X</Button>
-                                </CardFooter>
-                            </Card>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Summaries */}
-                <div>
-                    <label htmlFor="summaries">Summaries</label>
-                    <Textarea id="summaries" value={data.summaries} onChange={(e) => setData('summaries', e.target.value)} />
-                </div>
-
-                {/* Matrimonial Status */}
-                <div>
-                    <label htmlFor="number_child">Number of Children</label>
-                    <Input id="number_child" type="text" value={data.matrimonial_status.number_child} onChange={(e) => setData('matrimonial_status.number_child', e.target.value)} />
-                </div>
-
-                {/* Submit Button */}
-                <Button type="submit" processing={processing}>Submit</Button>
-            </form>
+            </div>
         </AuthenticatedLayout>
     );
 };
-
-export default CVForm;

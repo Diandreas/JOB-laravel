@@ -21,10 +21,6 @@ class Experience extends Model
         'attachment_id'
     ];
 
-    public function category()
-    {
-        return $this->belongsTo(ExperienceCategory::class, 'experience_categories_id');
-    }
 
     public function attachment()
     {
@@ -34,5 +30,9 @@ class Experience extends Model
     public function users()
     {
         return $this->belongsToMany(User::class);
+    }
+    public function category()
+    {
+        return $this->belongsTo(ExperienceCategory::class);
     }
 }

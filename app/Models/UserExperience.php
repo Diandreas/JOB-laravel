@@ -26,6 +26,6 @@ class UserExperience extends Model
     // Relation avec CvInfos
     public function cvInfos()
     {
-        return $this->belongsTo(CvInfos::class, 'cv_infos_id');
+        return $this->belongsTo(CvInfo::class, 'cv_infos_id');
     }
 }

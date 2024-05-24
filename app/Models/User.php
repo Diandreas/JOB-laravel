@@ -49,7 +49,7 @@ class User extends Authenticatable
 
     public function cvInfos()
     {
-        return $this->hasMany(CvInfos::class);
+        return $this->hasMany(CvInfo::class);
     }
     public function address()
     {
