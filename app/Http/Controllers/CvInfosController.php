@@ -8,84 +8,91 @@ use App\Models\Address;
 use App\Models\Profession;
 use App\Models\Competence;
 use App\Models\Hobby;
+use Inertia\Inertia;
+use Inertia\Response;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
 
 class CvInfosController extends Controller
 {
-public function index(): View
-{
-// TODO: Implement the index method
-}
+    public function index(): Response
+    {
 
-public function create(): View
-{
-$addresses = Address::all();
-$professions = Profession::all();
-$competences = Competence::all();
-$hobbies = Hobby::all();
 
-return view('cv-infos.create', [
-'addresses' => $addresses,
-'professions' => $professions,
-'competences' => $competences,
-'hobbies' => $hobbies,
-]);
-}
+        return Inertia::render('CvInfos/Index');
+    }
 
-public function store(StoreCvInfoRequest $request): RedirectResponse
-{
-// Create a new CvInfo instance
-$cvInfo = CvInfo::create($request->validated());
+    public function create(): Response
+    {
+        $addresses = Address::all();
+        $professions = Profession::all();
+        $competences = Competence::all();
+        $hobbies = Hobby::all();
 
-// Sync the competences, hobbies, summaries, and experiences
-$cvInfo->competences()->sync($request->input('competences', []));
-$cvInfo->hobbies()->sync($request->input('hobbies', []));
-$cvInfo->summaries()->saveMany($request->input('summaries', []));
-$cvInfo->experiences()->saveMany($request->input('experiences', []));
+        return Inertia::render('CvInfos/Create', [
+            'addresses' => $addresses,
+            'professions' => $professions,
+            'competences' => $competences,
+            'hobbies' => $hobbies,
+        ]);
+    }
 
-// Redirect to the CvInfos index page with a success message
-return redirect()->route('cv-infos.index')->with('success', 'CvInfo has been created successfully.');
-}
+    public function store(StoreCvInfoRequest $request): RedirectResponse
+    {
+        // Create a new CvInfo instance
+        $cvInfo = CvInfo::create($request->validated());
 
-public function show(CvInfo $cvInfo): View
-{
-// TODO: Implement the show method
-}
+        // Sync the competences, hobbies, summaries, and experiences
+        $cvInfo->competences()->sync($request->input('competences', []));
+        $cvInfo->hobbies()->sync($request->input('hobbies', []));
+        $cvInfo->summaries()->saveMany($request->input('summaries', []));
+        $cvInfo->experiences()->saveMany($request->input('experiences', []));
 
-public function edit(CvInfo $cvInfo): View
-{
-$addresses = Address::all();
-$professions = Profession::all();
-$competences = Competence::all();
-$hobbies = Hobby::all();
+        // Redirect to the CvInfos index page with a success message
+        return redirect()->route('cv-infos.index')->with('success', 'CvInfo has been created successfully.');
+    }
 
-return view('cv-infos.edit', [
-'cvInfo' => $cvInfo,
-'addresses' => $addresses,
-'professions' => $professions,
-'competences' => $competences,
-'hobbies' => $hobbies,
-]);
-}
+    public function show(CvInfo $cvInfo): Response
+    {
+        return Inertia::render('CvInfos/Show', ['cvInfo' => $cvInfo->load(['address', 'profession', 'competences', 'hobbies', 'summaries', 'experiences'])]);
+    }
 
-public function update(UpdateCvInfoRequest $request, CvInfo $cvInfo): RedirectResponse
-{
-// Update the CvInfo instance
-$cvInfo->update($request->validated());
+    public function edit(CvInfo $cvInfo): Response
+    {
+        $addresses = Address::all();
+        $professions = Profession::all();
+        $competences = Competence::all();
+        $hobbies = Hobby::all();
 
-// Sync the competences, hobbies, summaries, and experiences
-$cvInfo->competences()->sync($request->input('competences', []));
-$cvInfo->hobbies()->sync($request->input('hobbies', []));
-$cvInfo->summaries()->saveMany($request->input('summaries', []));
-$cvInfo->experiences()->saveMany($request->input('experiences', []));
+        return Inertia::render('CvInfos/Edit', [
+            'cvInfo' => $cvInfo->load(['address', 'profession', 'competences', 'hobbies', 'summaries', 'experiences']),
+            'addresses' => $addresses,
+            'professions' => $professions,
+            'competences' => $competences,
+            'hobbies' => $hobbies,
+        ]);
+    }
 
-// Redirect to the CvInfos index page with a success message
-return redirect()->route('cv-infos.index')->with('success', 'CvInfo has been updated successfully.');
-}
+    public function update(UpdateCvInfoRequest $request, CvInfo $cvInfo): RedirectResponse
+    {
+        // Update the CvInfo instance
+        $cvInfo->update($request->validated());
 
-public function destroy(CvInfo $cvInfo): RedirectResponse
-{
-// TODO: Implement the destroy method
-}
+        // Sync the competences, hobbies, summaries, and experiences
+        $cvInfo->competences()->sync($request->input('competences', []));
+        $cvInfo->hobbies()->sync($request->input('hobbies', []));
+        $cvInfo->summaries()->saveMany($request->input('summaries', []));
+        $cvInfo->experiences()->saveMany($request->input('experiences', []));
+
+        // Redirect to the CvInfos index page with a success message
+        return redirect()->route('cv-infos.index')->with('success', 'CvInfo has been updated successfully.');
+    }
+
+    public function destroy(CvInfo $cvInfo): RedirectResponse
+    {
+        // Delete the CvInfo instance
+        $cvInfo->delete();
+
+        // Redirect to the CvInfos index page with a success message
+        return redirect()->route('cv-infos.index')->with('success', 'CvInfo has been deleted successfully.');
+    }
 }

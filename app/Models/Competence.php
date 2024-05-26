@@ -16,6 +16,6 @@ class Competence extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class,'user_competence', 'user_id', 'competence_id');
     }
 }

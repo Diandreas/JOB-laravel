@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
 
-import { Head } from '@inertiajs/react';
+import {Head, Link} from '@inertiajs/react';
 import { PageProps } from '@/types';
 import { Button } from "@/Components/ui/button"
 
@@ -15,9 +15,16 @@ export default function index({ auth }: PageProps) {
             // header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>}
 
         >
+
             <Head title="CV information" />
 
-
+            <Link href={route('user-hobbies.index')}>
+                Go to User Hobbies Index
+            </Link>
+            <br/>
+            <Link href={route('user-competences.index')}>
+                Go to User Competences Index
+            </Link>
 
 
 

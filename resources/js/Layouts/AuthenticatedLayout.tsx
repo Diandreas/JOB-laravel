@@ -32,7 +32,7 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                                 <NavLink  href={route('dashboard')} active={route().current('dashboard')}>
                                     ADMIN PART
                                 </NavLink>
-                                <NavLink href={route('cv.create')} active={route().current('cv.create')}>
+                                <NavLink href={route('cv-infos.index')} active={route().current('cv.create')}>
                                     CV
                                 </NavLink>
                             </div>
