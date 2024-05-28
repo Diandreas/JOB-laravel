@@ -1,20 +1,22 @@
-import { useState, PropsWithChildren, ReactNode } from 'react';
+import {useState, PropsWithChildren, ReactNode} from 'react';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link } from '@inertiajs/react';
-import { User } from '@/types';
+import {Link} from '@inertiajs/react';
+import {User} from '@/types';
 import {Toaster} from "@/Components/ui/toaster";
+import {Trash2, Edit2, FileText, Download, Folder} from 'lucide-react';
 
-export default function Authenticated({ user, header, children }: PropsWithChildren<{ user: User, header?: ReactNode }>) {
+
+export default function Authenticated({user, header, children}: PropsWithChildren<{ user: User, header?: ReactNode }>) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
         <div className="min-h-screen bg-gray-100">
-            <nav className="bg-violet-900 border-b border-gray-100" >
+            <nav className="bg-violet-900 border-b border-gray-100">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
                         <div className="flex">
@@ -22,17 +24,15 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                                 {/*<Link href="/">*/}
                                 {/*    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />*/}
                                 {/*</Link>*/}
-                                <h1 className="font-bold text-white" >JOB PORTAL</h1>
+                                <h1 className="font-bold text-white">JOB PORTAL</h1>
                             </div>
 
 
-
-
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex ">
-                                <NavLink  href={route('dashboard')} active={route().current('dashboard')}>
+                                <NavLink href={route('dashboard')} active={route().current('dashboard')}>
                                     ADMIN PART
                                 </NavLink>
-                                <NavLink href={route('cv-infos.index')} active={route().current('cv.create')}>
+                                <NavLink href={route('cv-infos.index')} active={route().current('cv-infos')}>
                                     CV
                                 </NavLink>
                             </div>
@@ -119,7 +119,8 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                         </div>
 
                         <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink className="text-white" href={route('profile.edit')}>Profile</ResponsiveNavLink>
+                            <ResponsiveNavLink className="text-white"
+                                               href={route('profile.edit')}>Profile</ResponsiveNavLink>
                             <ResponsiveNavLink className="text-white" method="post" href={route('logout')} as="button">
                                 Log Out
                             </ResponsiveNavLink>
@@ -138,38 +139,36 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                     isSidebarOpen ? "block" : "hidden"
                 } md:block md:w-64  text-black`}>
                     <ul className="space-y-2">
-
+                        <Link href={route('cv-infos.index')}>
+                            <li className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-200">
+                                <Folder className="h-6 w-6 text-gray-500"/>
+                                Mon CV
+                            </li>
+                        </Link>
+                        <Link href={route('cv-infos.index')}>
                         <li className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-200">
-                            <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <span>Mon CV</span>
+                            <Download className="h-6 w-6 text-gray-500"/>
+                            Export (pdf/Word)
                         </li>
+                    </Link>
+                        <Link href={route('cv-infos.index')}>
                         <li className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-200">
-                            <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <span>Export (pdf/Word)</span>
+                            <FileText className="h-6 w-6 text-gray-500"/>
+                            Mes design
                         </li>
-                        <li className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-200">
-                            <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <span>Mes design</span>
-                        </li>
-                        <li className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-200">
-                            <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <span>Modifier</span>
-                        </li>
-
+                    </Link>
+                        <Link href={route('cv-infos.index')}>
+                            <li className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-200">
+                                <Edit2 className="h-6 w-6 text-gray-500"/>
+                                Modifier
+                            </li>
+                        </Link>
                     </ul>
                 </aside>
-            <main className={"w-full p-4 text-black"}>
-                {children}
-            </main>
-                <Toaster />
+                <main className={"w-full p-4 text-black"}>
+                    {children}
+                </main>
+                <Toaster/>
 
             </div>
         </div>

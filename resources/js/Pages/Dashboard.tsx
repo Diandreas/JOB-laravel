@@ -24,7 +24,7 @@ export default function Dashboard({ auth }: PageProps) {
     return (
         <AuthenticatedLayout
             user={auth.user}
-            header={999999}
+            header={'ADMIN PART'}
 
         >
             <Head title="Dashboard" />
