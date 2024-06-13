@@ -127,7 +127,7 @@ $table->date('date_end')->nullable();
 $table->string('output', 45)->nullable();
 $table->foreignId('experience_categories_id')->constrained('experience_categories')->onDelete('cascade');
 $table->text('comment')->nullable();
-$table->integer('InstitutionName')->nullable();
+$table->string('InstitutionName')->nullable();
 $table->foreignId('attachment_id')->nullable()->constrained('attachments')->onDelete('cascade');
 $table->timestamps();
 });

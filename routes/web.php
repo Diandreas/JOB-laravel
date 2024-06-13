@@ -4,6 +4,7 @@ use App\Http\Controllers\CompetenceController;
 use App\Http\Controllers\CvInfosController;
 use App\Http\Controllers\ExperienceCategoryController;
 use App\Http\Controllers\CVController;
+use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\HobbyController;
 use App\Http\Controllers\ProfessionCategoryController;
 use App\Http\Controllers\ProfessionMissionController;
@@ -40,6 +41,15 @@ Route::middleware('auth')->group(function () {
     Route::resource('user-competences', UserCompetenceController::class)->except(['edit', 'update', 'show']);
     Route::delete('/user-competences/{user_id}/{competence_id}', [UserCompetenceController::class, 'destroy'])->name('user-competences.destroy');
 
+
+
+    // experience
+    Route::get('/experiences', [ExperienceController::class, 'index'])->name('experiences.index');
+    Route::get('/experiences/create', [ExperienceController::class, 'create'])->name('experiences.create');
+    Route::post('/experiences', [ExperienceController::class, 'store'])->name('experiences.store');
+    Route::get('/experiences/{experience}/edit', [ExperienceController::class, 'edit'])->name('experiences.edit');
+    Route::put('/experiences/{experience}', [ExperienceController::class, 'update'])->name('experiences.update');
+    Route::delete('/experiences/{experience}', [ExperienceController::class, 'destroy'])->name('experiences.destroy');
 
 });
 

@@ -83,12 +83,19 @@ class User extends Authenticatable
 
     public function experiences()
     {
-        return $this->belongsToMany(Experience::class);
+        return $this->belongsToMany(Experience::class, 'user_experience','user_id','experience_id');
     }
 
     public function summary()
     {
         return $this->belongsTo(Summary::class);
+    }
+// Dans votre modèle User
+
+// Dans votre modèle Experience
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
     }
 
 }
