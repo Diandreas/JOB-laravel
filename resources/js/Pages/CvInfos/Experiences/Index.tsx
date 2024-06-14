@@ -6,6 +6,7 @@ import { Button } from '@/Components/ui/button';
 // @ts-ignore
 const ExperienceIndex = ({ auth, experiences }) => {
     // @ts-ignore
+    // @ts-ignore
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="Mes expériences" />
@@ -19,7 +20,9 @@ const ExperienceIndex = ({ auth, experiences }) => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {experiences.map((experience) => (
+                    {
+                        // @ts-ignore
+                        experiences.map((experience) => (
                         <div key={experience.id} className="bg-white rounded-md shadow-md p-4">
                             <h2 className="text-lg font-semibold mb-2">{experience.name}</h2>
                             <p className="text-gray-600 mb-2">

@@ -6,11 +6,13 @@ use App\Http\Controllers\ExperienceCategoryController;
 use App\Http\Controllers\CVController;
 use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\HobbyController;
+use App\Http\Controllers\PersonalInformationController;
 use App\Http\Controllers\ProfessionCategoryController;
 use App\Http\Controllers\ProfessionMissionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfessionController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\SummaryController;
 use App\Http\Controllers\UserCompetenceController;
 use App\Http\Controllers\UserHobbyController;
 use Illuminate\Foundation\Application;
@@ -50,6 +52,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/experiences/{experience}/edit', [ExperienceController::class, 'edit'])->name('experiences.edit');
     Route::put('/experiences/{experience}', [ExperienceController::class, 'update'])->name('experiences.update');
     Route::delete('/experiences/{experience}', [ExperienceController::class, 'destroy'])->name('experiences.destroy');
+    //summary
+    Route::resource('summaries', SummaryController::class);
+
+    //Personnal nformation
+    Route::get('/personal-information', [PersonalInformationController::class, 'index'])->name('personal-information.index');
+    Route::get('/personal-information/edit', [PersonalInformationController::class, 'edit'])->name('personal-information.edit');
+    Route::put('/personal-information', [PersonalInformationController::class, 'update'])->name('personal-information.update');
 
 });
 

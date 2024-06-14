@@ -57,9 +57,9 @@ class User extends Authenticatable
         return $this->belongsTo(Address::class);
     }
 
-    public function profession()
+    public function professions()
     {
-        return $this->belongsTo(Profession::class);
+        return $this->belongsToMany(Profession::class,'user_profession');
     }
 
     public function models()
@@ -89,6 +89,10 @@ class User extends Authenticatable
     public function summary()
     {
         return $this->belongsTo(Summary::class);
+    }
+    public function summaries(): BelongsToMany
+    {
+        return $this->belongsToMany(Summary::class, 'user_summary');
     }
 // Dans votre modèle User
 
