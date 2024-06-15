@@ -91,7 +91,7 @@ export default function index({ auth }: PageProps) {
                             <p>Create, update, manage</p>
                         </CardContent>
                         <CardFooter>
-                            <Link href={route('user-competences.index')}>
+                            <Link href={route('user-professions.index')}>
                                 <Button>
                                     Lets Go
                                 </Button>

@@ -15,6 +15,7 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\SummaryController;
 use App\Http\Controllers\UserCompetenceController;
 use App\Http\Controllers\UserHobbyController;
+use App\Http\Controllers\UserProfessionsController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -60,6 +61,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/personal-information/edit', [PersonalInformationController::class, 'edit'])->name('personal-information.edit');
     Route::put('/personal-information', [PersonalInformationController::class, 'update'])->name('personal-information.update');
 
+    //user profession
+    Route::get('/user-professions', [UserProfessionsController::class, 'index'])->name('user-professions.index');
+    Route::get('/user-professions/create', [UserProfessionsController::class, 'create'])->name('user-professions.create');
+    Route::post('/user-professions', [UserProfessionsController::class, 'store'])->name('user-professions.store');
+    Route::delete('/user-professions/{user}/{profession}', [UserProfessionsController::class, 'destroy'])->name('user-professions.destroy');
 });
 
 Route::get('/us', function () {
