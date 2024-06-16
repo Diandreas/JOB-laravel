@@ -9,7 +9,7 @@ import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/Co
 
 
 
-export default function index({ auth }: PageProps) {
+export default function about({ auth }: PageProps) {
     return (
         <AuthenticatedLayout
             user={auth.user}

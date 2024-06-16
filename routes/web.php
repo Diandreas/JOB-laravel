@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CompetenceController;
+use App\Http\Controllers\CvGalleryController;
 use App\Http\Controllers\CvInfosController;
 use App\Http\Controllers\ExperienceCategoryController;
 use App\Http\Controllers\CVController;
@@ -66,6 +67,17 @@ Route::middleware('auth')->group(function () {
     Route::get('/user-professions/create', [UserProfessionsController::class, 'create'])->name('user-professions.create');
     Route::post('/user-professions', [UserProfessionsController::class, 'store'])->name('user-professions.store');
     Route::delete('/user-professions/{user}/{profession}', [UserProfessionsController::class, 'destroy'])->name('user-professions.destroy');
+
+    //cv - gallery
+//    Route::get('/cv-gallery', [CvGalleryController::class, 'index'])->name('cv-gallery.index');
+//    Route::get('/cv-gallery/{modelViewPath}', [CvGalleryController::class, 'show'])->name('cv-gallery.show');
+
+    //
+    Route::get('/cv-gallery/canadian', function () {
+        return Inertia::render('CvGallery/Canadian');
+    });
+
+
 });
 
 Route::get('/us', function () {
