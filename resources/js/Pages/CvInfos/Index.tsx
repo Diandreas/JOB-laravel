@@ -20,7 +20,7 @@ export default function index({ auth }: PageProps) {
     return (
         <AuthenticatedLayout
             user={auth.user}
-            // header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>}
+             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Mes Informations</h2>}
 
         >
 
@@ -30,7 +30,7 @@ export default function index({ auth }: PageProps) {
                 <div className="w-full md:w-1/2 p-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle>User Hobbies Index</CardTitle>
+                            <CardTitle>Hobby</CardTitle>
                             <CardDescription></CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -48,7 +48,7 @@ export default function index({ auth }: PageProps) {
                 <div className="w-full md:w-1/2 p-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle>User Competences Index</CardTitle>
+                            <CardTitle>Competences</CardTitle>
                             <CardDescription></CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -66,7 +66,7 @@ export default function index({ auth }: PageProps) {
                 <div className="w-full md:w-1/2 p-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Experiences Index</CardTitle>
+                            <CardTitle>Experiences</CardTitle>
                             <CardDescription></CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -84,7 +84,7 @@ export default function index({ auth }: PageProps) {
                 <div className="w-full md:w-1/2 p-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Professions Index</CardTitle>
+                            <CardTitle>Profession</CardTitle>
                             <CardDescription></CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -102,7 +102,7 @@ export default function index({ auth }: PageProps) {
                 <div className="w-full md:w-1/2 p-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Summaries Index</CardTitle>
+                            <CardTitle>Mes Sommaire</CardTitle>
                             <CardDescription></CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -120,7 +120,7 @@ export default function index({ auth }: PageProps) {
                 <div className="w-full md:w-1/2 p-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Personal Information</CardTitle>
+                            <CardTitle>Nom, Prenom</CardTitle>
                             <CardDescription>edit your information and download your cv ?</CardDescription>
                         </CardHeader>
                         <CardContent>
