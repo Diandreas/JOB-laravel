@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     //cv information
+    Route::get('/cv-infos/show', [CvInfosController::class, 'show'])->name('cv-infos.show');
     Route::resource('cv-infos', CvInfosController::class);
     Route::resource('experience-categories', ExperienceCategoryController::class);
     Route::resource('hobbies', HobbyController::class);

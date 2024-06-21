@@ -8,7 +8,7 @@ import {
     CardTitle,
 } from "@/Components/ui/card"
 
-
+import { Trash2, Edit2 } from "lucide-react";
 import {Head, Link} from '@inertiajs/react';
 import { PageProps } from '@/types';
 import { Button } from "@/Components/ui/button"
@@ -39,7 +39,7 @@ export default function index({ auth }: PageProps) {
                         <CardFooter>
                             <Link href={route('user-hobbies.index')}>
                                 <Button>
-                                    Lets Go
+                                    <Edit2 size={18} />
                                 </Button>
                             </Link>
                         </CardFooter>
@@ -57,7 +57,7 @@ export default function index({ auth }: PageProps) {
                         <CardFooter>
                             <Link href={route('user-competences.index')}>
                                 <Button>
-                                    Lets Go
+                                    <Edit2 size={18} />
                                 </Button>
                             </Link>
                         </CardFooter>
@@ -75,7 +75,7 @@ export default function index({ auth }: PageProps) {
                         <CardFooter>
                             <Link href={route('experiences.index')}>
                                 <Button>
-                                    Lets Go
+                                    <Edit2 size={18} />
                                 </Button>
                             </Link>
                         </CardFooter>
@@ -93,7 +93,7 @@ export default function index({ auth }: PageProps) {
                         <CardFooter>
                             <Link href={route('user-professions.index')}>
                                 <Button>
-                                    Lets Go
+                                    <Edit2 size={18} />
                                 </Button>
                             </Link>
                         </CardFooter>
@@ -111,7 +111,7 @@ export default function index({ auth }: PageProps) {
                         <CardFooter>
                             <Link href={route('summaries.index')}>
                                 <Button>
-                                    Lets Go
+                                    <Edit2 size={18} />
                                 </Button>
                             </Link>
                         </CardFooter>
@@ -129,7 +129,7 @@ export default function index({ auth }: PageProps) {
                         <CardFooter>
                             <Link href={route('personal-information.index')}>
                                 <Button>
-                                    Lets Go
+                                    <Edit2 size={18} />
                                 </Button>
                             </Link>
                         </CardFooter>

@@ -32,9 +32,9 @@ class Profession extends Model
         ];
     }
 
-
-    public function users()
+    public function users() // Plural form for one-to-many
     {
         return $this->hasMany(User::class);
     }
+
 }

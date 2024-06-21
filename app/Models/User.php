@@ -95,9 +95,7 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Summary::class, 'user_summary');
     }
-// Dans votre modèle User
 
-// Dans votre modèle Experience
     public function users()
     {
         return $this->belongsToMany(User::class);
