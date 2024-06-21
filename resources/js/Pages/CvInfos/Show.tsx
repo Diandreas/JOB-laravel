@@ -33,19 +33,19 @@ export default function Show({ auth, cvInformation , }: CvInformationProps) {
         >
             <Head title="CV Information" />
             <div className="">
-                <h1 className="font-semibold text-xl text-gray-800 leading-tight">Personal Information</h1>
+                <h1 className="font-semibold text-xl text-gray-800 leading-tight"> Nom Complet</h1>
                 <PersonalInfoCard item={personalInformation} linkRoute="personal-information.edit" />
 
-                <h1 className="font-semibold text-xl text-gray-800 leading-tight">Professions</h1>
+                <h1 className="font-semibold text-xl text-gray-800 leading-tight">Profession/Travail</h1>
                 <CvInfoListSection items={professions} linkRoute="user-professions.index" />
 
-                <h1 className="font-semibold text-xl text-gray-800 leading-tight">Hobbies</h1>
+                <h1 className="font-semibold text-xl text-gray-800 leading-tight">Hobby</h1>
                 <CvInfoListSection items={hobbies} linkRoute="user-hobbies.index" />
 
                 <h1 className="font-semibold text-xl text-gray-800 leading-tight">Competences</h1>
                 <CvInfoListSection items={competences} linkRoute="user-competences.index" />
 
-                <h1 className="font-semibold text-xl text-gray-800 leading-tight">Summaries</h1>
+                <h1 className="font-semibold text-xl text-gray-800 leading-tight">Sommaires</h1>
                 <CvInfoSummarySection items={summaries} linkRoute="summaries.index" />
                 <h1 className="font-semibold text-xl text-gray-800 leading-tight" >Experiences</h1>
                 <CvInfoExperienceSection items={experiences} linkRoute="experiences.index" />
