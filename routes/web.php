@@ -83,6 +83,6 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/', function () {
     return Inertia::render('Welcome');
-})->middleware(['auth', 'verified'])->name('WELCOME');
+})->name('WELCOME');
 
 require __DIR__.'/auth.php';
