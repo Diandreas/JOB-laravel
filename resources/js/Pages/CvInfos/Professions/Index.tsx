@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
 
+// @ts-ignore
 const UserProfessions = ({ auth, user_profession }) => {
     const handleRemoveProfession = () => {
         // Logique pour supprimer la profession (mettre à jour profession_id à null)

@@ -1,0 +1,18 @@
+@media print {
+    #exportable-cv {
+        font-size: 12pt;
+        line-height: 1.2;
+    }
+
+    #exportable-cv h1 {
+        font-size: 18pt;
+    }
+
+    #exportable-cv h2 {
+        font-size: 14pt;
+    }
+
+    @page {
+        margin: 1cm;
+    }
+}
