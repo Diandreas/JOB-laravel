@@ -21,7 +21,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
+Route::get('/Dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -81,7 +81,7 @@ Route::middleware('auth')->group(function () {
 
 });
 
-Route::get('/us', function () {
+Route::get('/', function () {
     return Inertia::render('Welcome');
 })->middleware(['auth', 'verified'])->name('WELCOME');
 
