@@ -19,10 +19,11 @@ export default function Authenticated({ user, header, children }: PropsWithChild
             <nav className="bg-white shadow-md">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
+                        <Link   href={}>
                         <div className="flex items-center">
                             <h1 className="font-bold text-indigo-600 text-2xl">JOB PORTAL</h1>
                         </div>
-
+                    </Link>
                         <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                             <NavLink href={route('dashboard')} active={route().current('dashboard')}>
                                 ADMIN PART
