@@ -30,10 +30,10 @@ interface CvInformationProps {
 const exportToPdf = () => {
     const element = document.getElementById('exportable-cv');
     const opt = {
-        margin: 10,
+        // margin: 10,
         filename: 'mon_cv.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
+        html2canvas: { scale: 1 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 

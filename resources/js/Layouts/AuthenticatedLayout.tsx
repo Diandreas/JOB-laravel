@@ -14,6 +14,7 @@ export default function Authenticated({ user, header, children }: PropsWithChild
     const toggleNavigationDropdown = () => setShowingNavigationDropdown(prevState => !prevState);
     const toggleSidebar = () => setIsSidebarOpen(prevState => !prevState);
 
+    // @ts-ignore
     return (
         <div className="min-h-screen bg-gray-50">
             <nav className="bg-white shadow-md">
@@ -101,6 +102,7 @@ export default function Authenticated({ user, header, children }: PropsWithChild
             )}
 
             <div className="flex">
+                {/*@ts-ignore*/}
                 {['cv-infos.show', 'cv-infos.index'].includes(route().current()) && (
                     <aside className={`${isSidebarOpen ? 'block' : 'hidden'} md:block w-64 bg-white shadow-lg`}>
                         <ul className="space-y-2 py-4">
