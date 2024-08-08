@@ -10,6 +10,7 @@ import TextInput from "@/Components/TextInput";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/Components/ui/card";
 import { Textarea } from "@/Components/ui/textarea";
 
+// @ts-ignore
 const ExperienceCreate = ({ auth, categories }) => {
     const { toast } = useToast();
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -21,7 +22,7 @@ const ExperienceCreate = ({ auth, categories }) => {
         experience_categories_id: '',
         comment: '',
         InstitutionName: '',
-        attachment_id: null,
+        attachment: null,
     });
 
     const handleSubmit = (event) => {
@@ -45,6 +46,8 @@ const ExperienceCreate = ({ auth, categories }) => {
         });
     };
 
+    // @ts-ignore
+    // @ts-ignore
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="Créer une expérience" />
@@ -162,14 +165,14 @@ const ExperienceCreate = ({ auth, categories }) => {
                             </div>
 
                             <div>
-                                <InputLabel htmlFor="attachment_id" value="Pièce jointe" />
+                                <InputLabel htmlFor="attachment" value="Pièce jointe" />
                                 <TextInput
-                                    id="attachment_id"
+                                    id="attachment"
                                     type="file"
-                                    onChange={(e) => setData('attachment_id', e.target.files[0])}
+                                    onChange={(e) => setData('attachment', e.target.files[0])}
                                     className="mt-1 block w-full"
                                 />
-                                <InputError message={errors.attachment_id} className="mt-2" />
+                                <InputError message={errors.attachment} className="mt-2" />
                             </div>
                         </form>
                     </CardContent>

@@ -21,8 +21,16 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'address_id', // Ajoutez ceci
-        'profession_id', // Ajoutez ceci
+        'address_id',
+        'profession_id',
+        'surname',
+        'create_time',
+        'numberOfChild',
+        'maritalStatus',
+        'github',
+        'linkedin',
+        'address',
+        'phone_number',
     ];
 
     /**
@@ -52,6 +60,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(CvInfo::class);
     }
+
     public function address()
     {
         return $this->belongsTo(Address::class);
@@ -62,7 +71,6 @@ class User extends Authenticatable
         return $this->belongsTo(Profession::class);
     }
 
-
     public function models()
     {
         return $this->belongsToMany(Model::class);
@@ -70,13 +78,9 @@ class User extends Authenticatable
 
     public function competences()
     {
-        return $this->belongsToMany(Competence::class,'user_competence', 'user_id', 'competence_id');
+        return $this->belongsToMany(Competence::class, 'user_competence', 'user_id', 'competence_id');
     }
 
-//    public function hobbies()
-//    {
-//        return $this->belongsToMany(Hobby::class);
-//    }
     public function hobbies()
     {
         return $this->belongsToMany(Hobby::class, 'user_hobby', 'user_id', 'hobby_id');
@@ -84,13 +88,14 @@ class User extends Authenticatable
 
     public function experiences()
     {
-        return $this->belongsToMany(Experience::class, 'user_experience','user_id','experience_id');
+        return $this->belongsToMany(Experience::class, 'user_experience', 'user_id', 'experience_id');
     }
 
     public function summary()
     {
         return $this->belongsTo(Summary::class);
     }
+
     public function summaries(): BelongsToMany
     {
         return $this->belongsToMany(Summary::class, 'user_summary');
@@ -100,4 +105,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(User::class);
     }
+    public function selected_summary()
+    {
+        return $this->belongsTo(Summary::class, 'selected_summary_id');
+    }
+
 }

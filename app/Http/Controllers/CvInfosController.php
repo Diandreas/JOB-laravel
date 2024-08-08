@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCvInfoRequest;
@@ -8,6 +9,7 @@ use App\Models\Address;
 use App\Models\Profession;
 use App\Models\Competence;
 use App\Models\Hobby;
+use App\Models\Summary;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -21,25 +23,31 @@ class CvInfosController extends Controller
         $user = auth()->user();
 
         $cvInformation = [
-            'hobbies' => $user->hobbies()->select('id', 'name')->take(3)->get()->toArray(),
-            'competences' => $user->competences()->select('id', 'name')->take(3)->get()->toArray(),
-            'experiences' => $user->experiences()->select('id', 'name', 'InstitutionName', 'date_start', 'date_end')->take(2)->get()->toArray(),
-            'professions' => $user->profession()->select('id', 'name')->take(2)->get()->toArray(),
-            'summaries' => $user->summaries()->select('id', 'description')->take(1)->get()->toArray(),
-            'personalInformation' => [ // No relationship needed, just use the User model directly
+            'hobbies' => $user->hobbies()->take(3)->get()->toArray(),
+            'competences' => $user->competences()->take(3)->get()->toArray(),
+            'experiences' => $user->experiences()
+                ->join('experience_categories', 'experiences.experience_categories_id', '=', 'experience_categories.id')
+                ->select('experiences.*', 'experience_categories.name as category_name')
+                ->orderBy('experience_categories.ranking', 'asc')
+                ->get()
+                ->toArray(),
+            'professions' => $user->profession()->take(2)->get()->toArray(),
+            'summaries' => $user->selected_summary ? [$user->selected_summary->toArray()] : [],
+            'personalInformation' => [
                 'id' => $user->id,
-                'firstName' => $user->name, // Assuming the 'name' field in User is the full name
-                // You can split the name into first and last if needed
-            ], // Assuming you have personal information
+                'firstName' => $user->name,
+                'email' => $user->email,
+                'github' => $user->github,
+                'linkedin' => $user->linkedin,
+                'address' => $user->address,
+                'phone' => $user->phone_number,
+            ],
         ];
 
         return Inertia::render('CvInfos/Index', [
             'cvInformation' => $cvInformation,
         ]);
     }
-
-
-
 
     public function show()
     {
@@ -49,44 +57,32 @@ class CvInfosController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        $experiences = $user->experiences()->with('category')->get();
-
-        $experiences = $experiences->map(function ($experience) {
-            return [
-                'id' => $experience->id,
-                'name' => $experience->name,
-                'description' => $experience->description,
-                'date_start' => $experience->date_start,
-                'date_end' => $experience->date_end,
-                'output' => $experience->output,
-                'experience_categories_id' => $experience->experience_categories_id,
-                'comment' => $experience->comment,
-                'InstitutionName' => $experience->InstitutionName,
-                'attachment_id' => $experience->attachment_id,
-                'category_name' => $experience->experience_category_id,
-            ];
-        })->toArray();
-
-
+        // Réutiliser le code de la méthode index
         $cvInformation = [
-            'hobbies' => $user->hobbies()->select('id', 'name')->take(3)->get()->toArray(),
-            'competences' => $user->competences()->select('id', 'name')->take(3)->get()->toArray(),
-            'professions' => $user->profession ? [$user->profession] : [],
-            'summaries' => $user->summaries()->select('id', 'description')->take(1)->get()->toArray(),
+            'hobbies' => $user->hobbies()->take(3)->get()->toArray(),
+            'competences' => $user->competences()->take(3)->get()->toArray(),
+            'experiences' => $user->experiences()
+                ->join('experience_categories', 'experiences.experience_categories_id', '=', 'experience_categories.id')
+                ->select('experiences.*', 'experience_categories.name as category_name')
+                ->orderBy('experience_categories.ranking', 'asc')
+                ->get()
+                ->toArray(),
+            'professions' => $user->profession()->take(2)->get()->toArray(),
+            'summaries' => $user->selected_summary ? [$user->selected_summary->toArray()] : [],
             'personalInformation' => [
                 'id' => $user->id,
                 'firstName' => $user->name,
+                'email' => $user->email,
+                'github' => $user->github,
+                'linkedin' => $user->linkedin,
+                'address' => $user->address,
+                'phone' => $user->phone_number,
             ],
-            'experiences' => $experiences,
         ];
-        Log::info($cvInformation); // Optional: Log to see if data is correct
 
         return Inertia::render('CvInfos/Show', [
             'cvInformation' => $cvInformation,
         ]);
     }
-
-
-
-
 }
+

@@ -11,7 +11,11 @@ const PersonalInformationIndex = ({ auth, user }) => {
             <div className="p-4">
                 <h1 className="text-2xl font-semibold mb-4">Informations personnelles</h1>
                 <p>Nom : {user.name}</p>
-                {/* ... autres informations personnelles ... */}
+                <p>Email : {user.email}</p>
+                <p>GitHub : {user.github}</p>
+                <p>LinkedIn : {user.linkedin}</p>
+                <p>Adresse : {user.address}</p>
+                <p>Numéro de téléphone : {user.phone_number}</p>
                 <Link href={route('personal-information.edit')}>
                     <Button>Modifier</Button>
                 </Link>

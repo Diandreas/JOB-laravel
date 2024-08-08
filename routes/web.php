@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('experience-categories', ExperienceCategoryController::class);
     Route::resource('hobbies', HobbyController::class);
     Route::resource('profession-categories', ProfessionCategoryController::class);
+    Route::resource('experiences', ExperienceController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy', 'show']);
     Route::resource('professions', ProfessionController::class);
     Route::resource('competences', CompetenceController::class);
     Route::resource('profession-missions', ProfessionMissionController::class);
@@ -57,6 +58,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/experiences/{experience}', [ExperienceController::class, 'destroy'])->name('experiences.destroy');
     //summary
     Route::resource('summaries', SummaryController::class);
+    Route::post('summaries/{summary}/select', [SummaryController::class, 'select'])->name('summaries.select');
 
     //Personnal nformation
     Route::get('/personal-information', [PersonalInformationController::class, 'index'])->name('personal-information.index');

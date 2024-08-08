@@ -1,15 +1,13 @@
-
+import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
 import { useToast } from '@/Components/ui/use-toast';
 
-// @ts-ignore
 const SummaryIndex = ({ auth, summaries }) => {
     const { toast } = useToast();
-    const { delete: destroy } = useForm();
+    const { delete: destroy, post } = useForm();
 
-    // @ts-ignore
     const handleDelete = (summaryId) => {
         if (confirm('Êtes-vous sûr de vouloir supprimer ce résumé ?')) {
             destroy(route('summaries.destroy', summaryId), {
@@ -28,6 +26,22 @@ const SummaryIndex = ({ auth, summaries }) => {
         }
     };
 
+    const handleSelect = (summaryId) => {
+        post(route('summaries.select', summaryId), {
+            onSuccess: () => {
+                toast({
+                    title: 'Résumé sélectionné avec succès',
+                });
+            },
+            onError: () => {
+                toast({
+                    title: 'Erreur lors de la sélection du résumé',
+                    variant: 'destructive',
+                });
+            }
+        });
+    };
+
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="Mes Résumés" />
@@ -42,9 +56,7 @@ const SummaryIndex = ({ auth, summaries }) => {
 
                 {summaries && summaries.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {
-                            //@ts-ignore
-                            summaries.map((summary) => (
+                        {summaries.map((summary) => (
                             <div key={summary.id} className="bg-white rounded-md shadow-md p-4">
                                 <h2 className="text-lg font-semibold mb-2">{summary.name}</h2>
                                 <p className="text-gray-800 mb-4">{summary.description}</p>
@@ -54,6 +66,7 @@ const SummaryIndex = ({ auth, summaries }) => {
                                         <Button variant="outline">Modifier</Button>
                                     </Link>
                                     <Button variant="destructive" onClick={() => handleDelete(summary.id)}>Supprimer</Button>
+                                    <Button variant="primary" onClick={() => handleSelect(summary.id)}>Sélectionner</Button>
                                 </div>
                             </div>
                         ))}

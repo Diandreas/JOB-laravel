@@ -4,15 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Experience;
 use App\Models\ExperienceCategory;
+use App\Models\Attachment;
 use Illuminate\Http\Request;
-use Illuminate\Mail\Attachment;
 use Inertia\Inertia;
 
 class ExperienceController extends Controller
 {
     public function index()
     {
-        $experiences = Experience::with('category')->get();
+        $experiences = auth()->user()->experiences()->with('category')->get();
         return Inertia::render('CvInfos/Experiences/Index', [
             'experiences' => $experiences
         ]);
@@ -43,7 +43,13 @@ class ExperienceController extends Controller
         // Gestion de la pièce jointe (si nécessaire)
         if ($request->hasFile('attachment')) {
             $path = $request->file('attachment')->store('attachments', 'public'); // Stockez le fichier
-            $validatedData['attachment_id'] = Attachment::create(['path' => $path])->id; // Créez un enregistrement Attachment et récupérez son ID
+            $attachment = Attachment::create([
+                'name' => $request->file('attachment')->getClientOriginalName(),
+                'path' => $path,
+                'format' => $request->file('attachment')->getClientOriginalExtension(),
+                'size' => $request->file('attachment')->getSize(),
+            ]);
+            $validatedData['attachment_id'] = $attachment->id; // Créez un enregistrement Attachment et récupérez son ID
         }
 
         // Créez l'expérience avec les données validées
@@ -55,6 +61,13 @@ class ExperienceController extends Controller
         return redirect()->route('experiences.index');
     }
 
+    public function show(Experience $experience)
+    {
+        $experience->load('category', 'attachment');
+        return Inertia::render('CvInfos/Experiences/Show', [
+            'experience' => $experience,
+        ]);
+    }
 
     public function edit(Experience $experience)
     {
@@ -64,7 +77,6 @@ class ExperienceController extends Controller
             'categories' => $categories,
         ]);
     }
-
 
     public function update(Request $request, Experience $experience)
     {
@@ -78,7 +90,20 @@ class ExperienceController extends Controller
             'comment' => 'nullable|string',
             'InstitutionName' => 'nullable|string|max:255',
             'attachment_id' => 'nullable|exists:attachments,id', // Validation de l'attachment
+            'attachment' => 'nullable|file', // Valider le fichier si présent
         ]);
+
+        // Gestion de la pièce jointe (si nécessaire)
+        if ($request->hasFile('attachment')) {
+            $path = $request->file('attachment')->store('attachments', 'public'); // Stockez le fichier
+            $attachment = Attachment::create([
+                'name' => $request->file('attachment')->getClientOriginalName(),
+                'path' => $path,
+                'format' => $request->file('attachment')->getClientOriginalExtension(),
+                'size' => $request->file('attachment')->getSize(),
+            ]);
+            $validated['attachment_id'] = $attachment->id; // Créez un enregistrement Attachment et récupérez son ID
+        }
 
         $experience->update($validated);
 

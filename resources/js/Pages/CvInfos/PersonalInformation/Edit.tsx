@@ -10,6 +10,11 @@ import InputError from "@/Components/InputError";
 const PersonalInformationEdit = ({ auth, user }) => {
     const { data, setData, put, processing, errors, reset } = useForm({
         name: user.name,
+        email: user.email,
+        github: user.github,
+        linkedin: user.linkedin,
+        address: user.address,
+        phone_number: user.phone_number,
     });
 
     // @ts-ignore
@@ -17,7 +22,7 @@ const PersonalInformationEdit = ({ auth, user }) => {
         e.preventDefault();
         put(route('personal-information.update'), {
             onSuccess: () => {
-                reset('name');
+                reset('name', 'email', 'github', 'linkedin', 'address', 'phone_number');
             },
             onError: (errors) => {
                 console.error(errors);
@@ -35,6 +40,31 @@ const PersonalInformationEdit = ({ auth, user }) => {
                         <InputLabel htmlFor="name" value="Nom" />
                         <TextInput id="name" type="text" value={data.name} onChange={(e) => setData('name', e.target.value)} className="mt-1 block w-full" />
                         <InputError message={errors.name} className="mt-2" />
+                    </div>
+                    <div>
+                        <InputLabel htmlFor="email" value="Email" />
+                        <TextInput id="email" type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} className="mt-1 block w-full" />
+                        <InputError message={errors.email} className="mt-2" />
+                    </div>
+                    <div>
+                        <InputLabel htmlFor="github" value="GitHub" />
+                        <TextInput id="github" type="text" value={data.github} onChange={(e) => setData('github', e.target.value)} className="mt-1 block w-full" />
+                        <InputError message={errors.github} className="mt-2" />
+                    </div>
+                    <div>
+                        <InputLabel htmlFor="linkedin" value="LinkedIn" />
+                        <TextInput id="linkedin" type="text" value={data.linkedin} onChange={(e) => setData('linkedin', e.target.value)} className="mt-1 block w-full" />
+                        <InputError message={errors.linkedin} className="mt-2" />
+                    </div>
+                    <div>
+                        <InputLabel htmlFor="address" value="Address" />
+                        <TextInput id="address" type="text" value={data.address} onChange={(e) => setData('address', e.target.value)} className="mt-1 block w-full" />
+                        <InputError message={errors.address} className="mt-2" />
+                    </div>
+                    <div>
+                        <InputLabel htmlFor="phone_number" value="Phone Number" />
+                        <TextInput id="phone_number" type="text" value={data.phone_number} onChange={(e) => setData('phone_number', e.target.value)} className="mt-1 block w-full" />
+                        <InputError message={errors.phone_number} className="mt-2" />
                     </div>
                     <div className="flex items-center gap-2">
                         <Button type="submit" disabled={processing}>Enregistrer les modifications</Button>

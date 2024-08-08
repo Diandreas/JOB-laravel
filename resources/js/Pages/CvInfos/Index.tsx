@@ -89,7 +89,10 @@ function PersonalInfoCard({ item, linkRoute }: { item: any, linkRoute: string })
         <Card className="mb-8 rounded-lg">
             <CardHeader className="bg-gray-100 py-4 px-6">
                 <CardTitle className="text-3xl font-bold">{item.firstName} {item.lastName}</CardTitle>
-                <p className="text-xl text-gray-600">Développeur Web Full Stack</p>
+                <p className="text-xl text-gray-600">Développeur Web Full Stack
+                </p>
+
+
             </CardHeader>
             <CardContent className="p-6">
                 <div className="grid grid-cols-2 gap-4">
@@ -107,15 +110,11 @@ function PersonalInfoCard({ item, linkRoute }: { item: any, linkRoute: string })
                     </div>
                     <div className="flex items-center">
                         <Linkedin className="w-5 h-5 mr-2" />
-                        <a href={item.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                            LinkedIn
-                        </a>
+                        <span className="text-gray-600">{item.linkedin}</span>
                     </div>
                     <div className="flex items-center">
                         <Github className="w-5 h-5 mr-2" />
-                        <a href={item.github} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                            GitHub
-                        </a>
+                        <span className="text-gray-600">{item.github}</span>
                     </div>
                 </div>
             </CardContent>

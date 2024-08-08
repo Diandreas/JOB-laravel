@@ -3,10 +3,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
 
-// @ts-ignore
 const ExperienceIndex = ({ auth, experiences }) => {
-    // @ts-ignore
-    // @ts-ignore
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="Mes expériences" />
@@ -20,9 +17,7 @@ const ExperienceIndex = ({ auth, experiences }) => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {
-                        // @ts-ignore
-                        experiences.map((experience) => (
+                    {experiences.map((experience) => (
                         <div key={experience.id} className="bg-white rounded-md shadow-md p-4">
                             <h2 className="text-lg font-semibold mb-2">{experience.name}</h2>
                             <p className="text-gray-600 mb-2">
@@ -31,6 +26,9 @@ const ExperienceIndex = ({ auth, experiences }) => {
                             <p className="text-gray-800 mb-4">{experience.description}</p>
 
                             <div className="flex justify-end space-x-2">
+                                <Link href={route('experiences.show', experience.id)}>
+                                    <Button variant="outline">Voir</Button>
+                                </Link>
                                 <Link href={route('experiences.edit', experience.id)}>
                                     <Button variant="outline">Modifier</Button>
                                 </Link>
