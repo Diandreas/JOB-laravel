@@ -35,7 +35,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ title, description, href, I
     </Card>
 );
 
-export default function Dashboard({ auth }: PageProps) {
+    export default function Dashboard({ auth }: PageProps) {
     const { toast } = useToast()
 
     const categories = [
@@ -44,6 +44,7 @@ export default function Dashboard({ auth }: PageProps) {
         { title: "Hobbies", description: "Create, update, and manage hobbies", href: "/hobbies", Icon: Heart },
         { title: "Professions", description: "Create, update, and manage professions", href: "/professions", Icon: Briefcase },
         { title: "Competences", description: "Create, update, and manage competences", href: "/competences", Icon: Trophy },
+        { title: "Models", description: "Create, update, and manage models", href: "/CvModels", Icon: Trophy },
     ];
 
     return (

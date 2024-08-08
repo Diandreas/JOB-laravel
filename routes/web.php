@@ -3,6 +3,7 @@
 use App\Http\Controllers\CompetenceController;
 use App\Http\Controllers\CvGalleryController;
 use App\Http\Controllers\CvInfosController;
+use App\Http\Controllers\CvModelController;
 use App\Http\Controllers\ExperienceCategoryController;
 use App\Http\Controllers\CVController;
 use App\Http\Controllers\ExperienceController;
@@ -46,7 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/user-hobbies/{user_id}/{hobby_id}', [UserHobbyController::class, 'destroy'])->name('user-hobbies.destroy');
     Route::resource('user-competences', UserCompetenceController::class)->except(['edit', 'update', 'show']);
     Route::delete('/user-competences/{user_id}/{competence_id}', [UserCompetenceController::class, 'destroy'])->name('user-competences.destroy');
-
+    Route::resource('CvModels', CvModelController::class);
 
 
     // experience
@@ -64,7 +65,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/personal-information', [PersonalInformationController::class, 'index'])->name('personal-information.index');
     Route::get('/personal-information/edit', [PersonalInformationController::class, 'edit'])->name('personal-information.edit');
     Route::put('/personal-information', [PersonalInformationController::class, 'update'])->name('personal-information.update');
-
     //user profession
     Route::get('/user-professions', [UserProfessionsController::class, 'index'])->name('user-professions.index');
     Route::get('/user-professions/create', [UserProfessionsController::class, 'create'])->name('user-professions.create');

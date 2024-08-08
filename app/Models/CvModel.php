@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use trIlluminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class CvModel extends Model
