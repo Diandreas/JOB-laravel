@@ -1,48 +1,61 @@
+import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/Components/ui/card";
 import { Head, Link } from '@inertiajs/react';
 import { Button } from "@/Components/ui/button";
-import { Mail, Phone, MapPin, Linkedin, Github, Briefcase, GraduationCap, Heart } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Github, Briefcase, GraduationCap, Heart, Download } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/Components/ui/tooltip";
+import { Badge } from "@/Components/ui/badge";
 import ExportableCv from './ExportableCv';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
 
-interface CvInformationProps {
-    cvInformation: {
-        hobbies: { id: number, name: string }[];
-        competences: { id: number, name: string }[];
-        experiences: { id: number, title: string, company_name: string, date_start: string, date_end: string | null, category_name: string, description: string, output: string }[];
-        professions: { id: number, name: string }[];
-        summaries: { id: number, description: string }[];
-        personalInformation: {
-            id: number,
-            firstName: string;
-            lastName: string;
-            email: string;
-            phone: string;
-            address: string;
-            linkedin: string;
-            github: string;
-        };
+interface CvInformation {
+    hobbies: { id: number; name: string }[];
+    competences: { id: number; name: string }[];
+    experiences: {
+        id: number;
+        title: string;
+        company_name: string;
+        date_start: string;
+        date_end: string | null;
+        category_name: string;
+        description: string;
+        output: string;
+    }[];
+    professions: { id: number; name: string }[];
+    summaries: { id: number; description: string }[];
+    personalInformation: {
+        id: number;
+        firstName: string;
+        lastName: string;
+        email: string;
+        phone: string;
+        address: string;
+        linkedin: string;
+        github: string;
     };
+}
+
+interface Props {
+    auth: any;
+    cvInformation: CvInformation;
 }
 
 const exportToPdf = () => {
     const element = document.getElementById('exportable-cv');
     const opt = {
-        // margin: 10,
         filename: 'mon_cv.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 1 },
+        html2canvas: { scale: 2 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
     html2pdf().from(element).set(opt).save();
 };
-// @ts-ignore
-export default function Show({ auth, cvInformation }: CvInformationProps) {
-    const { hobbies, competences, experiences, professions, summaries, personalInformation } = cvInformation;
 
+export default function Show({ auth, cvInformation }: Props) {
+    const { hobbies, competences, experiences, professions, summaries, personalInformation } = cvInformation;
 
     return (
         <AuthenticatedLayout
@@ -51,31 +64,49 @@ export default function Show({ auth, cvInformation }: CvInformationProps) {
         >
             <Head title="CV Professionnel" />
             <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-                <div className="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                    <PersonalInfoCard item={personalInformation} linkRoute="personal-information.edit" />
+                <Card className="mb-8">
+                    <CardContent className="p-6">
+                        <div id="exportable-cv">
+                            <PersonalInfoCard item={personalInformation} linkRoute="personal-information.edit" />
 
-                    <SectionHeader icon={<Briefcase className="w-6 h-6" />} title="Résumé Professionnel" />
-                    <CvInfoSummarySection items={summaries} linkRoute="summaries.index" />
+                            <SectionHeader icon={<Briefcase className="w-6 h-6" />} title="Résumé Professionnel" />
+                            <CvInfoSummarySection items={summaries} linkRoute="summaries.index" />
 
-                    <SectionHeader icon={<Briefcase className="w-6 h-6" />} title="Expériences Professionnelles" />
-                    <CvInfoExperienceSection items={experiences} linkRoute="experiences.index" />
+                            <SectionHeader icon={<Briefcase className="w-6 h-6" />} title="Expériences Professionnelles" />
+                            <CvInfoExperienceSection items={experiences} linkRoute="experiences.index" />
 
-                    <SectionHeader icon={<GraduationCap className="w-6 h-6" />} title="Compétences" />
-                    <CvInfoListSection items={competences} linkRoute="user-competences.index" />
+                            <SectionHeader icon={<GraduationCap className="w-6 h-6" />} title="Compétences" />
+                            <CvInfoListSection items={competences} linkRoute="user-competences.index" />
 
-                    <SectionHeader icon={<GraduationCap className="w-6 h-6" />} title="Formations" />
-                    <CvInfoListSection items={professions} linkRoute="user-professions.index" />
+                            <SectionHeader icon={<GraduationCap className="w-6 h-6" />} title="Formations" />
+                            <CvInfoListSection items={professions} linkRoute="user-professions.index" />
 
-                    <SectionHeader icon={<Heart className="w-6 h-6" />} title="Centres d'Intérêt" />
-                    <CvInfoListSection items={hobbies} linkRoute="user-hobbies.index" />
-                </div>
-
-
+                            <SectionHeader icon={<Heart className="w-6 h-6" />} title="Centres d'Intérêt" />
+                            <CvInfoListSection items={hobbies} linkRoute="user-hobbies.index" />
+                        </div>
+                    </CardContent>
+                    <CardFooter className="flex justify-end">
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button onClick={exportToPdf} variant="outline">
+                                        <Download className="w-4 h-4 mr-2" />
+                                        Exporter en PDF
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>Télécharger votre CV en format PDF</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                    </CardFooter>
+                </Card>
             </div>
         </AuthenticatedLayout>
     );
 }
-function SectionHeader({ icon, title }: { icon: React.ReactNode, title: string }) {
+
+function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }) {
     return (
         <div className="flex items-center space-x-2 font-bold text-2xl text-gray-800 mt-8 mb-4">
             {icon}
@@ -84,41 +115,30 @@ function SectionHeader({ icon, title }: { icon: React.ReactNode, title: string }
     );
 }
 
-function PersonalInfoCard({ item, linkRoute }: { item: any, linkRoute: string }) {
+function PersonalInfoCard({ item, linkRoute }: { item: CvInformation['personalInformation']; linkRoute: string }) {
     return (
-        <Card className="mb-8 rounded-lg">
-            <CardHeader className="bg-gray-100 py-4 px-6">
+        <Card className="mb-8">
+            <CardHeader className="bg-gray-100">
                 <CardTitle className="text-3xl font-bold">{item.firstName} {item.lastName}</CardTitle>
-                <p className="text-xl text-gray-600">Développeur Web Full Stack
-                </p>
-
-
+                <p className="text-xl text-gray-600">Développeur Web Full Stack</p>
             </CardHeader>
             <CardContent className="p-6">
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center">
-                        <Mail className="w-5 h-5 mr-2" />
-                        <span className="text-gray-600">{item.email}</span>
-                    </div>
-                    <div className="flex items-center">
-                        <Phone className="w-5 h-5 mr-2" />
-                        <span className="text-gray-600">{item.phone}</span>
-                    </div>
-                    <div className="flex items-center">
-                        <MapPin className="w-5 h-5 mr-2" />
-                        <span className="text-gray-600">{item.address}</span>
-                    </div>
-                    <div className="flex items-center">
-                        <Linkedin className="w-5 h-5 mr-2" />
-                        <span className="text-gray-600">{item.linkedin}</span>
-                    </div>
-                    <div className="flex items-center">
-                        <Github className="w-5 h-5 mr-2" />
-                        <span className="text-gray-600">{item.github}</span>
-                    </div>
+                    {[
+                        { icon: Mail, value: item.email },
+                        { icon: Phone, value: item.phone },
+                        { icon: MapPin, value: item.address },
+                        { icon: Linkedin, value: item.linkedin },
+                        { icon: Github, value: item.github },
+                    ].map(({ icon: Icon, value }, index) => (
+                        <div key={index} className="flex items-center">
+                            <Icon className="w-5 h-5 mr-2 text-gray-500" />
+                            <span className="text-gray-600">{value}</span>
+                        </div>
+                    ))}
                 </div>
             </CardContent>
-            <CardFooter className="bg-gray-100 py-4 px-6">
+            <CardFooter className="bg-gray-100">
                 <Link href={route(linkRoute, item.id)}>
                     <Button variant="outline" className="w-full">Modifier</Button>
                 </Link>
@@ -127,22 +147,23 @@ function PersonalInfoCard({ item, linkRoute }: { item: any, linkRoute: string })
     );
 }
 
-function CvInfoExperienceSection({ items, linkRoute }: { items: any[], linkRoute: string }) {
+function CvInfoExperienceSection({ items, linkRoute }: { items: CvInformation['experiences']; linkRoute: string }) {
     return (
         <div className="space-y-6">
             {items.map((item) => (
-                <Card key={item.id} className="rounded-lg">
-                    <CardHeader className="bg-gray-100 py-4 px-6">
-                        <CardTitle className="text-xl font-bold">{item.name}</CardTitle>
-                        <p className="text-gray-600">{item.InstitutionName}</p>
+                <Card key={item.id}>
+                    <CardHeader className="bg-gray-100">
+                        <CardTitle className="text-xl font-bold">{item.title}</CardTitle>
+                        <p className="text-gray-600">{item.company_name}</p>
                     </CardHeader>
                     <CardContent className="p-6">
                         <p className="text-sm text-gray-500 mb-2">{item.date_start} - {item.date_end || 'Present'}</p>
-                        <p className="mb-2"><span className="font-semibold">Catégorie:</span> {item.category_name}</p>
-                        <p className="mb-2"><span className="font-semibold">Description:</span> {item.description}</p>
-                        <p><span className="font-semibold">Réalisations:</span> {item.output}</p>
+                        <Badge className="mb-2">{item.category_name}</Badge>
+                        <p className="mb-2">{item.description}</p>
+                        <p className="font-semibold">Réalisations:</p>
+                        <p>{item.output}</p>
                     </CardContent>
-                    <CardFooter className="bg-gray-100 py-4 px-6">
+                    <CardFooter className="bg-gray-100">
                         <Link href={route(linkRoute, item.id)}>
                             <Button variant="outline" className="w-full">Détails</Button>
                         </Link>
@@ -156,14 +177,14 @@ function CvInfoExperienceSection({ items, linkRoute }: { items: any[], linkRoute
     );
 }
 
-function CvInfoListSection({ items, linkRoute }: { items: any[], linkRoute: string }) {
+function CvInfoListSection({ items, linkRoute }: { items: Array<{ id: number; name: string }>; linkRoute: string }) {
     return (
         <div className="space-y-4">
             <div className="flex flex-wrap gap-2 mb-4">
                 {items.map((item) => (
-                    <span key={item.id} className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm">
-                        {item.name || item.title}
-                    </span>
+                    <Badge key={item.id} variant="secondary">
+                        {item.name}
+                    </Badge>
                 ))}
             </div>
             <Link href={route(linkRoute)}>
@@ -173,7 +194,7 @@ function CvInfoListSection({ items, linkRoute }: { items: any[], linkRoute: stri
     );
 }
 
-function CvInfoSummarySection({ items, linkRoute }: { items: any[], linkRoute: string }) {
+function CvInfoSummarySection({ items, linkRoute }: { items: CvInformation['summaries']; linkRoute: string }) {
     return (
         <div>
             {items.map((item) => (
