@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/Componen
 import { Head, Link } from '@inertiajs/react';
 import { Button } from "@/Components/ui/button";
 import { Mail, Phone, MapPin, Linkedin, Github, Briefcase, GraduationCap, Heart } from 'lucide-react';
+// @ts-ignore
 import html2pdf from 'html2pdf.js';
 import printJS from "print-js";
 
@@ -38,199 +39,17 @@ interface CvInformationProps {
         viewPath: string;
     } | null;
 }
-const exportToPrint = () => {
-    printJS({
-        printable: 'exportable-cv',
-        type: 'html',
-        css: [
-           '@\\resources\\css\\app.css'
-        ],
-        scanStyles: true, // Active le scan des styles pour inclure les styles internes de Bootstrap et Tailwind
-        style: `
-           /* ExportableCv.css */
 
-.cv-container {
-
-    
-    background-color: #fff;
-
-    font-family: Arial, sans-serif;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-}
-
-.cv-header {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.avatar-container {
-    width: 96px;
-    height: 96px;
-    margin: 0 auto 16px;
-    border-radius: 50%;
-    overflow: hidden;
-}
-
-.avatar {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.cv-title {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 8px;
-    color: #007bff;
-}
-
-.professions-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
-.profession-tag {
-    background-color: #f0f0f0;
-    color: #333;
-    font-size: 0.875rem;
-    font-weight: 500;
-    padding: 4px 10px;
-    border-radius: 4px;
-}
-
-.contact-info {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 16px;
-    color: #6c757d;
-    font-size: 0.875rem;
-}
-
-.contact-item {
-    display: flex;
-    align-items: center;
-}
-
-.icon {
-    width: 16px;
-    height: 16px;
-    margin-right: 4px;
-}
-
-.cv-divider {
-    border: none;
-    border-top: 1px solid #e9ecef;
-    margin: 20px 0;
-}
-
-.cv-main {
-    display: flex;
-    gap: 20px;
-}
-
-.cv-section {
-    flex: 2;
-}
-
-.cv-aside {
-    flex: 1;
-}
-
-.experience-category {
-    background-color: #f8f9fa;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-}
-
-.category-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin-bottom: 16px;
-    color: #007bff;
-}
-
-.experience-item {
-    margin-bottom: 16px;
-}
-
-.experience-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #007bff;
-}
-
-.experience-meta {
-    font-size: 0.875rem;
-    color: #6c757d;
-}
-
-.experience-description {
-    font-size: 0.875rem;
-    margin-top: 4px;
-}
-
-.experience-output {
-    font-size: 0.875rem;
-    margin-top: 4px;
-}
-
-.aside-section {
-    background-color: #f8f9fa;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-}
-
-.aside-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    margin-bottom: 16px;
-}
-
-.aside-content {
-    font-size: 0.875rem;
-    color: #6c757d;
-}
-
-.tags-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.tag {
-    background-color: #f0f0f0;
-    color: #333;
-    font-size: 0.875rem;
-    font-weight: 500;
-    padding: 4px 10px;
-    border-radius: 4px;
-}
-
-        `,
-        documentTitle: 'CV Professionnel'
-    });
-};
 const exportToPdf = () => {
     const element = document.getElementById('exportable-cv');
     const opt = {
-        margin: [10, 10, 10, 10], // top, right, bottom, left
+        margin: [0, 10, 10, 0], // top, right, bottom, left
         filename: 'cv.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
+        image: { type: 'jpeg', quality: 2 },
         html2canvas: { scale: 2, useCORS: true },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
-    html2pdf().from(element).set(opt).save();
+    html2pdf().set(opt).from(element).save();
 };
 
 export default function Show({ auth, cvInformation, selectedCvModel }: CvInformationProps) {
@@ -268,7 +87,7 @@ export default function Show({ auth, cvInformation, selectedCvModel }: CvInforma
                                 Visualisez votre CV professionnel et exportez-le en format PDF pour le partager facilement.
                             </p>
                             <Button
-                                onClick={exportToPrint}
+                                onClick={exportToPdf}
                                 className="mb-6"
                                 size="lg"
 

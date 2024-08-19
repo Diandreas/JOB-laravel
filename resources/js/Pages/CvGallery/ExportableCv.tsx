@@ -1,5 +1,8 @@
 import React from 'react';
-import { Mail, Phone, MapPin, Linkedin, Github, Briefcase, GraduationCap, Heart } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
+import { Badge } from "@/Components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
+import { Separator } from "@/Components/ui/separator";
 
 export default function ExportableCv({ cvInformation, experiencesByCategory }) {
     const { hobbies, competences, professions, summaries, personalInformation } = cvInformation;
@@ -9,79 +12,98 @@ export default function ExportableCv({ cvInformation, experiencesByCategory }) {
     }
 
     return (
-        <div id="exportable-cv" className="cv-container">
-            <div className="cv-header">
-                <div className="avatar-container">
-                    <img src={personalInformation.avatar} alt={`${personalInformation.firstName} ${personalInformation.lastName}`} className="avatar" />
-                </div>
-                <h1 className="cv-title">{personalInformation.firstName} {personalInformation.lastName}</h1>
-                <div className="professions-container">
+        <div id="exportable-cv" className="max-w-4xl mx-auto bg-white p-8 font-sans shadow-lg rounded-lg">
+            <header className="mb-6 text-center">
+                <Avatar className="w-24 h-24 mx-auto mb-4">
+                    <AvatarImage src={personalInformation.avatar} alt={`${personalInformation.firstName} ${personalInformation.firstName}`} />
+                    <AvatarFallback>{personalInformation.firstName[0]}{personalInformation.firstName[0]}</AvatarFallback>
+                </Avatar>
+                <h1 className="text-4xl font-bold mb-2 text-primary">{personalInformation.firstName} {personalInformation.firstName}</h1>
+                <div className="flex flex-wrap justify-center gap-2 mb-4">
                     {professions.map(prof => (
-                        <span key={prof.id} className="profession-tag">{prof.name}</span>
+                        <Badge key={prof.id} variant="secondary">{prof.name}</Badge>
                     ))}
                 </div>
-                <div className="contact-info">
-                    <div className="contact-item"><Mail className="icon" /> {personalInformation.email}</div>
-                    <div className="contact-item"><Phone className="icon" /> {personalInformation.phone}</div>
-                    <div className="contact-item"><MapPin className="icon" /> {personalInformation.address}</div>
-                    <div className="contact-item"><Linkedin className="icon" /> {personalInformation.linkedin}</div>
-                    <div className="contact-item"><Github className="icon" />{personalInformation.github}</div>
+                <div className="flex flex-wrap justify-center text-sm text-muted-foreground gap-4">
+                    <div>{personalInformation.email}</div>
+                    <div>{personalInformation.phone}</div>
+                    <div>{personalInformation.address}</div>
+                    <div>{personalInformation.linkedin}</div>
+                    <div>{personalInformation.github}</div>
                 </div>
-            </div>
+            </header>
 
-            <hr className="cv-divider" />
+            <Separator className="my-6" />
 
-            <div className="cv-main">
-                <div className="cv-section">
+            <main className="grid grid-cols-3 gap-6">
+                <section className="col-span-2">
+                    <Card className="mb-6">
+                        <CardHeader>
+                            <CardTitle className="text-2xl font-semibold text-primary">Résumé</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-sm text-muted-foreground italic">{summaries[0]?.description}</p>
+                        </CardContent>
+                    </Card>
+
                     {Object.entries(experiencesByCategory).map(([category, experiences]) => (
-                        <div key={category} className="experience-category">
-                            <h2 className="category-title">{category}</h2>
-                            {experiences.map((exp) => (
-                                <div key={exp.id} className="experience-item">
-                                    <h4 className="experience-title">{exp.title}</h4>
-                                    <p className="experience-meta">{exp.company_name} | {exp.date_start} - {exp.date_end || 'Present'}</p>
-                                    <p className="experience-description">{exp.description}</p>
-                                    <p className="experience-output"><strong>Réalisations:</strong> {exp.output}</p>
-                                </div>
-                            ))}
-                        </div>
+                        <Card key={category} className="mb-6">
+                            <CardHeader>
+                                <CardTitle className="text-2xl font-semibold text-primary">{category}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                {experiences.map((exp) => (
+                                    <div key={exp.id} className="mb-4 last:mb-0">
+                                        <h4 className="font-semibold text-primary">{exp.title}</h4>
+                                        <p className="text-sm text-muted-foreground italic">{exp.company_name} | {exp.date_start} - {exp.date_end || 'Present'}</p>
+                                        <p className="text-sm mt-1">{exp.description}</p>
+                                        <p className="text-sm mt-1"><strong>Réalisations:</strong> {exp.output}</p>
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
                     ))}
-                </div>
+                </section>
 
-                <div className="cv-aside">
-                    <div className="aside-section">
-                        <h2 className="aside-title"><Heart className="icon" /> Résumé</h2>
-                        <p className="aside-content">{summaries[0]?.description}</p>
-                    </div>
+                <aside className="col-span-1">
+                    <Card className="mb-6">
+                        <CardHeader>
+                            <CardTitle className="text-xl font-semibold">Compétences</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex flex-wrap gap-2">
+                                {competences.map(comp => (
+                                    <Badge key={comp.id} variant="outline">{comp.name}</Badge>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
 
-                    <div className="aside-section">
-                        <h2 className="aside-title"><GraduationCap className="icon" /> Compétences</h2>
-                        <div className="tags-container">
-                            {competences.map(comp => (
-                                <span key={comp.id} className="tag">{comp.name}</span>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="aside-section">
-                        <h2 className="aside-title"><GraduationCap className="icon" /> Formations</h2>
-                        <div className="tags-container">
+                    <Card className="mb-6">
+                        <CardHeader>
+                            <CardTitle className="text-xl font-semibold">Formations</CardTitle>
+                        </CardHeader>
+                        <CardContent>
                             {professions.map(prof => (
-                                <span key={prof.id} className="tag">{prof.name}</span>
+                                <Badge key={prof.id} variant="secondary" className="mb-2 mr-2">{prof.name}</Badge>
                             ))}
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
 
-                    <div className="aside-section">
-                        <h2 className="aside-title"><Heart className="icon" /> Centres d'Intérêt</h2>
-                        <div className="tags-container">
-                            {hobbies.map(hobby => (
-                                <span key={hobby.id} className="tag">{hobby.name}</span>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-xl font-semibold">Centres d'Intérêt</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex flex-wrap gap-2">
+                                {hobbies.map(hobby => (
+                                    <Badge key={hobby.id} variant="outline">{hobby.name}</Badge>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                </aside>
+            </main>
         </div>
     );
 }
