@@ -47,8 +47,9 @@ class CvModelController extends Controller
         }
 
         // Créer le fichier dans le dossier cvgallery
-        $viewPath = 'cvgallery/' . $request->name . '.tsx';
-        Storage::disk('public')->put($viewPath, '');
+        $viewPath = 'CvGallery/' . $request->name . '.tsx';
+        $viewContent = "import React from 'react';\n\nconst " . ucfirst($request->name) . " = () => {\n    return (\n        <div>\n            <!-- Contenu de la vue -->\n        </div>\n    );\n};\n\nexport default " . ucfirst($request->name) . ";";
+        Storage::disk('public')->put($viewPath, $viewContent);
         $cvModel->viewPath = $viewPath;
 
         $cvModel->save();

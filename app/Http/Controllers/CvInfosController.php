@@ -80,9 +80,14 @@ class CvInfosController extends Controller
             ],
         ];
 
+        // Ajouter le modèle CV sélectionné
+        $selectedCvModel = $user->selected_cv_model ? $user->selected_cv_model->toArray() : null;
+
         return Inertia::render('CvInfos/Show', [
             'cvInformation' => $cvInformation,
+            'selectedCvModel' => $selectedCvModel,
         ]);
     }
+
 }
 

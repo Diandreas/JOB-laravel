@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -44,17 +43,14 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
 
     public function cvInfos()
     {
@@ -105,12 +101,19 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(User::class);
     }
+
     public function selected_summary()
     {
         return $this->belongsTo(Summary::class, 'selected_summary_id');
     }
+
     public function cvModels()
     {
         return $this->belongsToMany(CvModel::class, 'user_cv_model');
+    }
+
+    public function selected_cv_model()
+    {
+        return $this->belongsTo(CvModel::class, 'selected_cv_model_id');
     }
 }

@@ -1,107 +1,75 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
-import { Button } from "@/Components/ui/button";
+import React from 'react';
 
-interface CvInformationProps {
-    cvInformation: {
-        hobbies: { id: number, name: string }[];
-        competences: { id: number, name: string }[];
-        experiences: { id: number, title: string, company_name: string, date_start: string, date_end: string | null, category_name: string, description: string, output: string }[];
-        professions: { id: number, name: string }[];
-        summaries: { id: number, description: string }[];
-        personalInformation: {
-            id: number,
-            firstName: string;
-            lastName: string;
-            email: string;
-            phone: string;
-            address: string;
-        };
-    };
-}
+export default function ExportableCv({ cvInformation, experiencesByCategory }) {
+    const { hobbies, competences, professions, summaries, personalInformation } = cvInformation;
 
-export default function Show({ auth, cvInformation }: CvInformationProps) {
-    const { hobbies, competences, experiences, professions, summaries, personalInformation } = cvInformation;
+    if (!experiencesByCategory || Object.keys(experiencesByCategory).length === 0) {
+        return <p>Aucune expérience à afficher.</p>;
+    }
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Mon CV</h2>}
-        >
-            <Head title="CV Professionnel" />
-            <div className="max-w-6xl mx-auto p-8">
-                <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden">
-                    {/* Sidebar */}
-                    <div className="w-full md:w-1/3 bg-gray-100 p-8">
-                        <div className="text-center mb-8">
-                            <h1 className="text-2xl font-bold text-gray-900">{personalInformation.firstName} {personalInformation.lastName}</h1>
-                            <p className="text-xl text-gray-600 mt-2">{professions[0]?.name}</p>
-                        </div>
+        <div id="exportable-cv" style={{ width: '800px', margin: 'auto', fontFamily: 'Arial, sans-serif', backgroundColor: 'white', padding: '20px', border: '1px solid #ccc', borderRadius: '10px' }}>
 
-                        <div className="mb-8">
-                            <h2 className="text-lg font-semibold mb-4 text-gray-700">Contact</h2>
-                            <p className="text-gray-600 mb-2">{personalInformation.email}</p>
-                            <p className="text-gray-600 mb-2">{personalInformation.phone}</p>
-                            <p className="text-gray-600">{personalInformation.address}</p>
-                            <Link href={route('personal-information.edit', personalInformation.id)} className="text-blue-600 hover:underline mt-2 inline-block">
-                                Modifier
-                            </Link>
-                        </div>
+            <header style={{ textAlign: 'center', marginBottom: '20px' }}>
+                <div style={{ width: '100px', height: '100px', margin: 'auto', marginBottom: '10px', borderRadius: '50%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '40px', color: '#555' }}>
+                    {personalInformation.firstName[0]}{personalInformation.firstName[0]}
+                </div>
+                <h1 style={{ fontSize: '24px', fontWeight: 'bold', color: '#333', marginBottom: '10px' }}>{personalInformation.firstName} {personalInformation.firstName}</h1>
+                <p style={{ fontSize: '12px', color: '#777' }}>{personalInformation.email} | {personalInformation.phone} | {personalInformation.address}</p>
+            </header>
 
-                        <div className="mb-8">
-                            <h2 className="text-lg font-semibold mb-4 text-gray-700">Compétences</h2>
-                            <div className="flex flex-wrap gap-2">
-                                {competences.map((comp) => (
-                                    <span key={comp.id} className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">
-                                        {comp.name}
-                                    </span>
-                                ))}
+            <div style={{ display: 'flex', marginBottom: '20px' }}>
+                <div style={{ flex: 1, paddingRight: '20px' }}>
+                    <h2 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', borderBottom: '1px solid #555' }}>Profile</h2>
+                    <p style={{ fontSize: '12px', color: '#555' }}>{summaries[0]?.description}</p>
+
+                    <h2 style={{ fontSize: '16px', fontWeight: 'bold', marginTop: '20px', marginBottom: '10px', borderBottom: '1px solid #555' }}>Skills</h2>
+                    <ul style={{ listStyleType: 'none', padding: 0, margin: 0, color: '#555', fontSize: '12px' }}>
+                        {competences.map(comp => (
+                            <li key={comp.id} style={{ marginBottom: '5px' }}>{comp.name}</li>
+                        ))}
+                    </ul>
+
+                    <h2 style={{ fontSize: '16px', fontWeight: 'bold', marginTop: '20px', marginBottom: '10px', borderBottom: '1px solid #555' }}>Languages</h2>
+                    <ul style={{ listStyleType: 'none', padding: 0, margin: 0, color: '#555', fontSize: '12px' }}>
+                        {/*{cvInformation.languages.map(lang => (*/}
+                        {/*    <li key={lang.id} style={{ marginBottom: '5px' }}>{lang.name} ({lang.level})</li>*/}
+                        {/*))}*/}
+                    </ul>
+
+                    <h2 style={{ fontSize: '16px', fontWeight: 'bold', marginTop: '20px', marginBottom: '10px', borderBottom: '1px solid #555' }}>Hobbies</h2>
+                    <ul style={{ listStyleType: 'none', padding: 0, margin: 0, color: '#555', fontSize: '12px' }}>
+                        {hobbies.map(hobby => (
+                            <li key={hobby.id} style={{ marginBottom: '5px' }}>{hobby.name}</li>
+                        ))}
+                    </ul>
+                </div>
+
+                <div style={{ flex: 2 }}>
+                    <h2 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', borderBottom: '1px solid #555' }}>Education</h2>
+                    <div style={{ marginBottom: '20px' }}>
+                        {professions.map(prof => (
+                            <div key={prof.id} style={{ marginBottom: '10px' }}>
+                                <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#333' }}>{prof.name}</p>
+                                <p style={{ fontSize: '12px', color: '#777' }}>{prof.institution} | {prof.date_start} - {prof.date_end || 'Present'}</p>
                             </div>
-                            <Link href={route('user-competences.index')} className="text-blue-600 hover:underline mt-2 inline-block">
-                                Gérer les compétences
-                            </Link>
-                        </div>
-
-                        <div>
-                            <h2 className="text-lg font-semibold mb-4 text-gray-700">Centres d'intérêt</h2>
-                            <ul className="list-disc list-inside text-gray-600">
-                                {hobbies.map((hobby) => (
-                                    <li key={hobby.id}>{hobby.name}</li>
-                                ))}
-                            </ul>
-                            <Link href={route('user-hobbies.index')} className="text-blue-600 hover:underline mt-2 inline-block">
-                                Gérer les centres d'intérêt
-                            </Link>
-                        </div>
+                        ))}
                     </div>
 
-                    {/* Main Content */}
-                    <div className="w-full md:w-2/3 p-8">
-                        <section className="mb-8">
-                            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Profil</h2>
-                            <p className="text-gray-700">{summaries[0]?.description}</p>
-                            <Link href={route('summaries.index')} className="text-blue-600 hover:underline mt-2 inline-block">
-                                Gérer les résumés
-                            </Link>
-                        </section>
-
-                        <section className="mb-8">
-                            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Expérience professionnelle</h2>
-                            {experiences.map((exp) => (
-                                <div key={exp.id} className="mb-6">
-                                    <h3 className="text-xl font-medium text-gray-800">{exp.title}</h3>
-                                    <p className="text-gray-600 italic">{exp.company_name} | {exp.date_start} - {exp.date_end || 'Présent'}</p>
-                                    <p className="text-gray-700 mt-2">{exp.description}</p>
-                                    <p className="text-gray-700 mt-1"><strong>Réalisations:</strong> {exp.output}</p>
+                    <h2 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '10px', borderBottom: '1px solid #555' }}>Experience</h2>
+                    {Object.entries(experiencesByCategory).map(([category, experiences]) => (
+                        <div key={category} style={{ marginBottom: '20px' }}>
+                            {experiences.map(exp => (
+                                <div key={exp.id} style={{ marginBottom: '10px' }}>
+                                    <p style={{ fontSize: '12px', fontWeight: 'bold', color: '#333' }}>{exp.title} at {exp.company_name}</p>
+                                    <p style={{ fontSize: '12px', color: '#777' }}>{exp.date_start} - {exp.date_end || 'Present'}</p>
+                                    <p style={{ fontSize: '12px', color: '#555' }}>{exp.description}</p>
                                 </div>
                             ))}
-                            <Link href={route('experiences.index')}>
-                                <Button variant="outline" size="sm">Gérer les expériences</Button>
-                            </Link>
-                        </section>
-                    </div>
+                        </div>
+                    ))}
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </div>
     );
 }
