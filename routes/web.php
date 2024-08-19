@@ -70,7 +70,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/user-professions/create', [UserProfessionsController::class, 'create'])->name('user-professions.create');
     Route::post('/user-professions', [UserProfessionsController::class, 'store'])->name('user-professions.store');
     Route::delete('/user-professions/{user}/{profession}', [UserProfessionsController::class, 'destroy'])->name('user-professions.destroy');
-
+    Route::post('/user-cv-models/select-active', [CvModelController::class, 'selectActiveModel']);
+    Route::post('/user-cv-models', [CvModelController::class, 'addCvModel']);
+    Route::get('/user-cv-models', [CvModelController::class, 'userCvModels'])->name('userCvModels.index');
     //cv - gallery
 //    Route::get('/cv-gallery', [CvGalleryController::class, 'index'])->name('cv-gallery.index');
 //    Route::get('/cv-gallery/{modelViewPath}', [CvGalleryController::class, 'show'])->name('cv-gallery.show');

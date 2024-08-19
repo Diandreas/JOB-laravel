@@ -103,7 +103,7 @@ export default function Authenticated({ user, header, children }: PropsWithChild
 
             <div className="flex">
                 {/*@ts-ignore*/}
-                {['cv-infos.show', 'cv-infos.index'].includes(route().current()) && (
+                {['cv-infos.show', 'cv-infos.index','userCvModels.index'].includes(route().current()) && (
                     <aside className={`${isSidebarOpen ? 'block' : 'hidden'} md:block w-64 bg-white shadow-lg`}>
                         <ul className="space-y-2 py-4">
                             <Link href={route('cv-infos.index')}>
@@ -113,7 +113,7 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                                 </li>
                             </Link>
 
-                            <Link href={route('cv-infos.index')}>
+                            <Link href={route('userCvModels.index')}>
                                 <li className="flex items-center space-x-2 p-3 rounded-md hover:bg-indigo-50 transition-colors duration-200">
                                     <FileText className="h-5 w-5 text-indigo-500" />
                                     <span className="text-gray-700">Mes designs</span>

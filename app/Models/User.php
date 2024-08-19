@@ -109,5 +109,8 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Summary::class, 'selected_summary_id');
     }
-
+    public function cvModels()
+    {
+        return $this->belongsToMany(CvModel::class, 'user_cv_model');
+    }
 }

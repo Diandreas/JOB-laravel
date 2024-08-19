@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCvModelRequest;
 use App\Http\Requests\UpdateCvModelRequest;
 use App\Models\CvModel;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -16,7 +17,17 @@ class CvModelController extends Controller
             'cvModels' => CvModel::all(),
         ]);
     }
+    public function userCvModels()
+    {
+        $user = auth()->user();
+        $userCvModels = $user->cvModels;
+        $availableCvModels = CvModel::whereNotIn('id', $userCvModels->pluck('id'))->get();
 
+        return Inertia::render('CvInfos/CvModels/Index', [
+            'userCvModels' => $userCvModels,
+            'availableCvModels' => $availableCvModels,
+        ]);
+    }
     public function create()
     {
         return Inertia::render('admin/CvModels/Create');
@@ -101,4 +112,21 @@ class CvModelController extends Controller
 
         return response()->json(['message' => 'CV Model deleted successfully']);
     }
+    public function selectActiveModel(Request $request)
+    {
+        $user = auth()->user();
+        $user->selected_cv_model_id = $request->cv_model_id;
+        $user->save();
+
+        return response()->json(['message' => 'Active CV model updated successfully']);
+    }
+
+    public function addCvModel(Request $request)
+    {
+        $user = auth()->user();
+        $user->cvModels()->attach($request->cv_model_id);
+
+        return response()->json(['message' => 'CV model added successfully']);
+    }
+
 }
