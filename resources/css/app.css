@@ -73,4 +73,18 @@
     body {
       @apply bg-background text-foreground;
     }
+
   }
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #printable-cv, #printable-cv * {
+        visibility: visible;
+    }
+    #printable-cv {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+}

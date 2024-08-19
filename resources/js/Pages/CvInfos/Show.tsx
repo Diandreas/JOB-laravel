@@ -4,7 +4,6 @@ import { Head, Link } from '@inertiajs/react';
 import { Button } from "@/Components/ui/button";
 import { Mail, Phone, MapPin, Linkedin, Github, Briefcase, GraduationCap, Heart } from 'lucide-react';
 import ExportableCv from './ExportableCv';
-// @ts-ignore
 import html2pdf from 'html2pdf.js';
 
 interface CvInformationProps {
@@ -80,9 +79,9 @@ export default function Show({ auth, cvInformation }: CvInformationProps) {
                                 onClick={exportToPdf}
                                 className="mb-6"
                                 size="lg"
-                                leftIcon={<GraduationCap className="mr-2 h-4 w-4" />}
+
                             >
-                                Exporter en PDF
+                                <GraduationCap className="mr-2 h-4 w-4" /> Exporter en PDF
                             </Button>
                             <div className=" w-full border rounded-lg p-6 bg-white shadow-sm">
                                 {Object.keys(experiencesByCategory).length > 0 ? (
