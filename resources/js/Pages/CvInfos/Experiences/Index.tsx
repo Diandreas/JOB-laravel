@@ -3,9 +3,22 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
 
-const ExperienceIndex = ({ auth, experiences }) => {
+interface Experience {
+    id: number;
+    name: string;
+    date_start: string;
+    date_end: string | null;
+    description: string;
+}
+
+interface ExperienceIndexProps {
+    auth: any;
+    experiences: Experience[];
+}
+
+const ExperienceIndex = ({ auth, experiences }: ExperienceIndexProps) => {
     return (
-        <AuthenticatedLayout user={auth.user}>
+        <div>
             <Head title="Mes expériences" />
             <div className="p-4">
                 <h1 className="text-2xl font-semibold mb-4">Mes expériences</h1>
@@ -38,7 +51,7 @@ const ExperienceIndex = ({ auth, experiences }) => {
                     ))}
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </div>
     );
 };
 

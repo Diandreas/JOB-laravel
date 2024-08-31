@@ -38,6 +38,37 @@ class PersonalInformationController extends Controller
         $user = Auth::user();
         $user->update($validatedData);
 
-        return redirect()->route('personal-information.index');
-    }
+        // Fetch updated CV information
+        $cvInformation = [
+            'hobbies' => $user->hobbies()->take(3)->get()->toArray(),
+            'competences' => $user->competences()->take(3)->get()->toArray(),
+            'experiences' => $user->experiences()
+                ->join('experience_categories', 'experiences.experience_categories_id', '=', 'experience_categories.id')
+                ->select('experiences.*', 'experience_categories.name as category_name')
+                ->orderBy('experience_categories.ranking', 'asc')
+                ->get()
+                ->toArray(),
+            'professions' => $user->profession()->take(2)->get()->toArray(),
+            'summaries' => $user->selected_summary ? [$user->selected_summary->toArray()] : [],
+            'personalInformation' => [
+                'id' => $user->id,
+                'firstName' => $user->name,
+                'email' => $user->email,
+                'github' => $user->github,
+                'linkedin' => $user->linkedin,
+                'address' => $user->address,
+                'phone' => $user->phone_number,
+            ],
+        ];
+
+        return Inertia::render('CvInfos/Index', [
+            'message' => 'Personal information updated successfully',
+            'editMode' => false,
+            'cvInformation' => $cvInformation, // Include all CV information
+        ])->with([
+            'message' => 'Personal information updated successfully',
+            'editMode' => false
+        ]);}
+
+
 }

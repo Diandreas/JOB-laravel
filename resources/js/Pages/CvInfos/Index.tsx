@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/Components/ui/card";
 import { Head, Link } from '@inertiajs/react';
@@ -7,8 +7,14 @@ import { Mail, Phone, MapPin, Linkedin, Github, Briefcase, GraduationCap, Heart,
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/Components/ui/tooltip";
 import { Badge } from "@/Components/ui/badge";
 import ExportableCv from './ExportableCv';
-// @ts-ignore
 import html2pdf from 'html2pdf.js';
+import Modal from '@/Components/ui/Modal';
+import ExperienceIndex from '@/Pages/CvInfos/Experiences/Index';
+import UserCompetences from '@/Pages/CvInfos/Competences/Index';
+import UserHobbies from '@/Pages/CvInfos/Hobbies/Index';
+import UserProfessions from '@/Pages/CvInfos/Professions/Index';
+import UserSummaries from '@/Pages/CvInfos/Summaries/Index';
+import PersonalInformationEdit from './PersonalInformation/Edit'; // Import the edit component
 
 interface CvInformation {
     hobbies: { id: number; name: string }[];
@@ -42,20 +48,50 @@ interface Props {
     cvInformation: CvInformation;
 }
 
-const exportToPdf = () => {
-    const element = document.getElementById('exportable-cv');
-    const opt = {
-        filename: 'mon_cv.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    html2pdf().from(element).set(opt).save();
-};
-
 export default function Show({ auth, cvInformation }: Props) {
+    const [isEditing, setIsEditing] = useState(false);
+    const [personalInfo, setPersonalInfo] = useState(cvInformation.personalInformation);
+
+    const handleEdit = () => setIsEditing(true);
+    const handleCancel = () => setIsEditing(false);
+    const handleUpdate = (updatedInfo) => {
+        setPersonalInfo(updatedInfo);
+        setIsEditing(false);
+    };
     const { hobbies, competences, experiences, professions, summaries, personalInformation } = cvInformation;
+    // const [isEditing, setIsEditing] = useState(false); // Add state to manage editing mode
+    const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
+    const [isCompetenceModalOpen, setIsCompetenceModalOpen] = useState(false);
+    const [isHobbyModalOpen, setIsHobbyModalOpen] = useState(false);
+    const [isProfessionModalOpen, setIsProfessionModalOpen] = useState(false);
+    const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
+
+    const openExperienceModal = () => setIsExperienceModalOpen(true);
+    const closeExperienceModal = () => setIsExperienceModalOpen(false);
+
+    const openCompetenceModal = () => setIsCompetenceModalOpen(true);
+    const closeCompetenceModal = () => setIsCompetenceModalOpen(false);
+
+    const openHobbyModal = () => setIsHobbyModalOpen(true);
+    const closeHobbyModal = () => setIsHobbyModalOpen(false);
+
+    const openProfessionModal = () => setIsProfessionModalOpen(true);
+    const closeProfessionModal = () => setIsProfessionModalOpen(false);
+
+    const openSummaryModal = () => setIsSummaryModalOpen(true);
+    const closeSummaryModal = () => setIsSummaryModalOpen(false);
+
+    const exportToPdf = () => {
+        const element = document.getElementById('exportable-cv');
+        const opt = {
+            filename: 'mon_cv.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf().from(element).set(opt).save();
+    };
 
     return (
         <AuthenticatedLayout
@@ -67,22 +103,30 @@ export default function Show({ auth, cvInformation }: Props) {
                 <Card className="mb-8">
                     <CardContent className="p-6">
                         <div id="exportable-cv">
-                            <PersonalInfoCard item={personalInformation} linkRoute="personal-information.edit" />
+                            {isEditing ? (
+                                <PersonalInformationEdit
+                                    user={personalInfo}
+                                    onUpdate={handleUpdate}
+                                    onCancel={handleCancel}
+                                />
+                            ) : (
+                                <PersonalInfoCard item={personalInfo} onEdit={handleEdit} />
+                            )}
 
                             <SectionHeader icon={<Briefcase className="w-6 h-6" />} title="Résumé Professionnel" />
-                            <CvInfoSummarySection items={summaries} linkRoute="summaries.index" />
+                            <CvInfoSummarySection items={summaries} linkRoute="summaries.index" openModal={openSummaryModal} />
 
                             <SectionHeader icon={<Briefcase className="w-6 h-6" />} title="Expériences Professionnelles" />
-                            <CvInfoExperienceSection items={experiences} linkRoute="experiences.index" />
+                            <CvInfoExperienceSection items={experiences} linkRoute="experiences.index" openModal={openExperienceModal} />
 
                             <SectionHeader icon={<GraduationCap className="w-6 h-6" />} title="Compétences" />
-                            <CvInfoListSection items={competences} linkRoute="user-competences.index" />
+                            <CvInfoListSection items={competences} linkRoute="user-competences.index" openModal={openCompetenceModal} />
 
                             <SectionHeader icon={<GraduationCap className="w-6 h-6" />} title="Formations" />
-                            <CvInfoListSection items={professions} linkRoute="user-professions.index" />
+                            <CvInfoListSection items={professions} linkRoute="user-professions.index" openModal={openProfessionModal} />
 
                             <SectionHeader icon={<Heart className="w-6 h-6" />} title="Centres d'Intérêt" />
-                            <CvInfoListSection items={hobbies} linkRoute="user-hobbies.index" />
+                            <CvInfoListSection items={hobbies} linkRoute="user-hobbies.index" openModal={openHobbyModal} />
                         </div>
                     </CardContent>
                     <CardFooter className="flex justify-end">
@@ -102,6 +146,26 @@ export default function Show({ auth, cvInformation }: Props) {
                     </CardFooter>
                 </Card>
             </div>
+
+            <Modal isOpen={isExperienceModalOpen} onClose={closeExperienceModal} title="Expériences Professionnelles" description="Détails des expériences professionnelles">
+                <ExperienceIndex auth={auth} experiences={experiences} />
+            </Modal>
+
+            <Modal isOpen={isCompetenceModalOpen} onClose={closeCompetenceModal} title="Compétences" description="Détails des compétences">
+                <UserCompetences auth={auth} user_competences={competences} />
+            </Modal>
+
+            <Modal isOpen={isHobbyModalOpen} onClose={closeHobbyModal} title="Centres d'Intérêt" description="Détails des centres d'intérêt">
+                <UserHobbies auth={auth} user_hobbies={hobbies} />
+            </Modal>
+
+            <Modal isOpen={isProfessionModalOpen} onClose={closeProfessionModal} title="Formations" description="Détails des formations">
+                <UserProfessions auth={auth} user_professions={professions} />
+            </Modal>
+
+            <Modal isOpen={isSummaryModalOpen} onClose={closeSummaryModal} title="Résumé Professionnel" description="Détails du résumé professionnel">
+                <UserSummaries auth={auth} user_summaries={summaries} />
+            </Modal>
         </AuthenticatedLayout>
     );
 }
@@ -115,7 +179,7 @@ function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }
     );
 }
 
-function PersonalInfoCard({ item, linkRoute }: { item: CvInformation['personalInformation']; linkRoute: string }) {
+function PersonalInfoCard({ item, onEdit }: { item: CvInformation['personalInformation']; onEdit: () => void }) {
     return (
         <Card className="mb-8">
             <CardHeader className="bg-gray-100">
@@ -139,15 +203,14 @@ function PersonalInfoCard({ item, linkRoute }: { item: CvInformation['personalIn
                 </div>
             </CardContent>
             <CardFooter className="bg-gray-100">
-                <Link href={route(linkRoute, item.id)}>
-                    <Button variant="outline" className="w-full">Modifier</Button>
-                </Link>
+                <Button variant="outline" className="w-full" onClick={onEdit}>Modifier</Button>
+
             </CardFooter>
         </Card>
     );
 }
 
-function CvInfoExperienceSection({ items, linkRoute }: { items: CvInformation['experiences']; linkRoute: string }) {
+function CvInfoExperienceSection({ items, linkRoute, openModal }: { items: CvInformation['experiences']; linkRoute: string; openModal: () => void }) {
     return (
         <div className="space-y-6">
             {items.map((item) => (
@@ -164,20 +227,16 @@ function CvInfoExperienceSection({ items, linkRoute }: { items: CvInformation['e
                         <p>{item.output}</p>
                     </CardContent>
                     <CardFooter className="bg-gray-100">
-                        <Link href={route(linkRoute, item.id)}>
-                            <Button variant="outline" className="w-full">Détails</Button>
-                        </Link>
+                        <Button onClick={openModal} variant="outline" className="w-full">Détails</Button>
                     </CardFooter>
                 </Card>
             ))}
-            <Link href={route(linkRoute)}>
-                <Button className="w-full">Voir Plus</Button>
-            </Link>
+            <Button onClick={openModal} className="w-full">Voir Plus</Button>
         </div>
     );
 }
 
-function CvInfoListSection({ items, linkRoute }: { items: Array<{ id: number; name: string }>; linkRoute: string }) {
+function CvInfoListSection({ items, linkRoute, openModal }: { items: Array<{ id: number; name: string }>; linkRoute: string; openModal: () => void }) {
     return (
         <div className="space-y-4">
             <div className="flex flex-wrap gap-2 mb-4">
@@ -187,14 +246,12 @@ function CvInfoListSection({ items, linkRoute }: { items: Array<{ id: number; na
                     </Badge>
                 ))}
             </div>
-            <Link href={route(linkRoute)}>
-                <Button variant="outline" className="w-full">Gérer</Button>
-            </Link>
+            <Button onClick={openModal} variant="outline" className="w-full">Gérer</Button>
         </div>
     );
 }
 
-function CvInfoSummarySection({ items, linkRoute }: { items: CvInformation['summaries']; linkRoute: string }) {
+function CvInfoSummarySection({ items, linkRoute, openModal }: { items: CvInformation['summaries']; linkRoute: string; openModal: () => void }) {
     return (
         <div>
             {items.map((item) => (
@@ -204,9 +261,7 @@ function CvInfoSummarySection({ items, linkRoute }: { items: CvInformation['summ
                     </CardContent>
                 </Card>
             ))}
-            <Link href={route(linkRoute)}>
-                <Button variant="outline">Modifier</Button>
-            </Link>
+            <Button onClick={openModal} variant="outline">Modifier</Button>
         </div>
     );
 }
