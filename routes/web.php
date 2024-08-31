@@ -34,6 +34,8 @@ Route::middleware('auth')->group(function () {
     //cv information
     Route::get('/cv-infos/show', [CvInfosController::class, 'show'])->name('cv-infos.show');
     Route::resource('cv-infos', CvInfosController::class);
+    Route::put('/cv-infos', [PersonalInformationController::class, 'update'])->name('personal-information.update');
+
     Route::resource('experience-categories', ExperienceCategoryController::class);
     Route::resource('hobbies', HobbyController::class);
     Route::resource('profession-categories', ProfessionCategoryController::class);
@@ -64,7 +66,6 @@ Route::middleware('auth')->group(function () {
     //Personnal nformation
     Route::get('/personal-information', [PersonalInformationController::class, 'index'])->name('personal-information.index');
     Route::get('/personal-information/edit', [PersonalInformationController::class, 'edit'])->name('personal-information.edit');
-    Route::put('/personal-information', [PersonalInformationController::class, 'update'])->name('personal-information.update');
     //user profession
     Route::get('/user-professions', [UserProfessionsController::class, 'index'])->name('user-professions.index');
     Route::get('/user-professions/create', [UserProfessionsController::class, 'create'])->name('user-professions.create');

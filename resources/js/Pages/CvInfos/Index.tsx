@@ -10,10 +10,6 @@ import ExportableCv from './ExportableCv';
 import html2pdf from 'html2pdf.js';
 import Modal from '@/Components/ui/Modal';
 import ExperienceIndex from '@/Pages/CvInfos/Experiences/Index';
-import UserCompetences from '@/Pages/CvInfos/Competences/Index';
-import UserHobbies from '@/Pages/CvInfos/Hobbies/Index';
-import UserProfessions from '@/Pages/CvInfos/Professions/Index';
-import UserSummaries from '@/Pages/CvInfos/Summaries/Index';
 import PersonalInformationEdit from './PersonalInformation/Edit'; // Import the edit component
 
 interface CvInformation {
@@ -61,25 +57,9 @@ export default function Show({ auth, cvInformation }: Props) {
     const { hobbies, competences, experiences, professions, summaries, personalInformation } = cvInformation;
     // const [isEditing, setIsEditing] = useState(false); // Add state to manage editing mode
     const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
-    const [isCompetenceModalOpen, setIsCompetenceModalOpen] = useState(false);
-    const [isHobbyModalOpen, setIsHobbyModalOpen] = useState(false);
-    const [isProfessionModalOpen, setIsProfessionModalOpen] = useState(false);
-    const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
 
     const openExperienceModal = () => setIsExperienceModalOpen(true);
     const closeExperienceModal = () => setIsExperienceModalOpen(false);
-
-    const openCompetenceModal = () => setIsCompetenceModalOpen(true);
-    const closeCompetenceModal = () => setIsCompetenceModalOpen(false);
-
-    const openHobbyModal = () => setIsHobbyModalOpen(true);
-    const closeHobbyModal = () => setIsHobbyModalOpen(false);
-
-    const openProfessionModal = () => setIsProfessionModalOpen(true);
-    const closeProfessionModal = () => setIsProfessionModalOpen(false);
-
-    const openSummaryModal = () => setIsSummaryModalOpen(true);
-    const closeSummaryModal = () => setIsSummaryModalOpen(false);
 
     const exportToPdf = () => {
         const element = document.getElementById('exportable-cv');
@@ -114,19 +94,19 @@ export default function Show({ auth, cvInformation }: Props) {
                             )}
 
                             <SectionHeader icon={<Briefcase className="w-6 h-6" />} title="Résumé Professionnel" />
-                            <CvInfoSummarySection items={summaries} linkRoute="summaries.index" openModal={openSummaryModal} />
+                            <CvInfoSummarySection items={summaries} linkRoute="summaries.index" openModal={openExperienceModal} />
 
                             <SectionHeader icon={<Briefcase className="w-6 h-6" />} title="Expériences Professionnelles" />
                             <CvInfoExperienceSection items={experiences} linkRoute="experiences.index" openModal={openExperienceModal} />
 
                             <SectionHeader icon={<GraduationCap className="w-6 h-6" />} title="Compétences" />
-                            <CvInfoListSection items={competences} linkRoute="user-competences.index" openModal={openCompetenceModal} />
+                            <CvInfoListSection items={competences} linkRoute="user-competences.index" openModal={openExperienceModal} />
 
                             <SectionHeader icon={<GraduationCap className="w-6 h-6" />} title="Formations" />
-                            <CvInfoListSection items={professions} linkRoute="user-professions.index" openModal={openProfessionModal} />
+                            <CvInfoListSection items={professions} linkRoute="user-professions.index" openModal={openExperienceModal} />
 
                             <SectionHeader icon={<Heart className="w-6 h-6" />} title="Centres d'Intérêt" />
-                            <CvInfoListSection items={hobbies} linkRoute="user-hobbies.index" openModal={openHobbyModal} />
+                            <CvInfoListSection items={hobbies} linkRoute="user-hobbies.index" openModal={openExperienceModal} />
                         </div>
                     </CardContent>
                     <CardFooter className="flex justify-end">
@@ -149,22 +129,6 @@ export default function Show({ auth, cvInformation }: Props) {
 
             <Modal isOpen={isExperienceModalOpen} onClose={closeExperienceModal} title="Expériences Professionnelles" description="Détails des expériences professionnelles">
                 <ExperienceIndex auth={auth} experiences={experiences} />
-            </Modal>
-
-            <Modal isOpen={isCompetenceModalOpen} onClose={closeCompetenceModal} title="Compétences" description="Détails des compétences">
-                <UserCompetences auth={auth} user_competences={competences} />
-            </Modal>
-
-            <Modal isOpen={isHobbyModalOpen} onClose={closeHobbyModal} title="Centres d'Intérêt" description="Détails des centres d'intérêt">
-                <UserHobbies auth={auth} user_hobbies={hobbies} />
-            </Modal>
-
-            <Modal isOpen={isProfessionModalOpen} onClose={closeProfessionModal} title="Formations" description="Détails des formations">
-                <UserProfessions auth={auth} user_professions={professions} />
-            </Modal>
-
-            <Modal isOpen={isSummaryModalOpen} onClose={closeSummaryModal} title="Résumé Professionnel" description="Détails du résumé professionnel">
-                <UserSummaries auth={auth} user_summaries={summaries} />
             </Modal>
         </AuthenticatedLayout>
     );
