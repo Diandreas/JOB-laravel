@@ -22,6 +22,11 @@ class CvInfosController extends Controller
     public function index()
     {
         $user = auth()->user();
+        $availableCompetences = Competence::all();
+        $myProfession=  $user->profession;
+        $availableHobbies = Hobby::all();
+        $availableProfessions = Profession::all();
+        $availableSummaries = $user->summary()->get();
 
         $cvInformation = [
             'hobbies' => $user->hobbies()->take(3)->get()->toArray(),
@@ -43,13 +48,18 @@ class CvInfosController extends Controller
                 'address' => $user->address,
                 'phone' => $user->phone_number,
             ],
+            'availableCompetences' => $availableCompetences->toArray(),
+            'availableHobbies' => $availableHobbies->toArray(),
+            'availableProfessions' => $availableProfessions->toArray(),
+            'availableSummaries' => $availableSummaries->toArray(),
+            'myProfession' => $myProfession->toArray(),
+
         ];
 
         return Inertia::render('CvInfos/Index', [
             'cvInformation' => $cvInformation,
         ]);
     }
-
     public function show()
     {
         $user = Auth::user();

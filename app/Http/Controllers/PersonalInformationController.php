@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Competence;
+use App\Models\Hobby;
+use App\Models\Profession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -39,6 +42,12 @@ class PersonalInformationController extends Controller
         $user->update($validatedData);
 
         // Fetch updated CV information
+        $availableCompetences = Competence::all();
+        $myProfession=  $user->profession;
+        $availableHobbies = Hobby::all();
+        $availableProfessions = Profession::all();
+        $availableSummaries = $user->summary()->get();
+
         $cvInformation = [
             'hobbies' => $user->hobbies()->take(3)->get()->toArray(),
             'competences' => $user->competences()->take(3)->get()->toArray(),
@@ -59,8 +68,13 @@ class PersonalInformationController extends Controller
                 'address' => $user->address,
                 'phone' => $user->phone_number,
             ],
-        ];
+            'availableCompetences' => $availableCompetences->toArray(),
+            'availableHobbies' => $availableHobbies->toArray(),
+            'availableProfessions' => $availableProfessions->toArray(),
+            'availableSummaries' => $availableSummaries->toArray(),
+            'myProfession' => $myProfession->toArray(),
 
+        ];
         return Inertia::render('CvInfos/Index', [
             'message' => 'Personal information updated successfully',
             'editMode' => false,

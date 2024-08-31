@@ -78,7 +78,14 @@ Route::middleware('auth')->group(function () {
 //    Route::get('/cv-gallery', [CvGalleryController::class, 'index'])->name('cv-gallery.index');
 //    Route::get('/cv-gallery/{modelViewPath}', [CvGalleryController::class, 'show'])->name('cv-gallery.show');
 
-    //
+    Route::get('/summaries', [SummaryController::class, 'index'])->name('summaries.index');
+    Route::get('/summaries/create', [SummaryController::class, 'create'])->name('summaries.create');
+    Route::post('/summaries', [SummaryController::class, 'store'])->name('summaries.store');
+    Route::get('/summaries/{summary}/edit', [SummaryController::class, 'edit'])->name('summaries.edit');
+    Route::put('/summaries/{summary}', [SummaryController::class, 'update'])->name('summaries.update');
+    Route::delete('/summaries/{summary}', [SummaryController::class, 'destroy'])->name('summaries.destroy');
+    Route::post('/summaries/{summary}/select', [SummaryController::class, 'select'])->name('summaries.select');
+    Route::post('/summaries/deselect', [SummaryController::class, 'deselect'])->name('summaries.deselect');
     Route::get('/cv-gallery/canadian', function () {
         return Inertia::render('CvGallery/Canadian');
     });

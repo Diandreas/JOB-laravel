@@ -10,10 +10,15 @@ class SummaryController extends Controller
 {
     public function index()
     {
-        $summaries = auth()->user()->summaries; // Récupérer les résumés de l'utilisateur connecté
+        $user = auth()->user();
+        $summaries = $user->summaries; // Récupérer les résumés de l'utilisateur connecté
+        $availableSummaries = Summary::all(); // Récupérer tous les résumés disponibles
+        $selectedSummary = $user->selected_summary; // Récupérer le résumé sélectionné par l'utilisateur
 
         return Inertia::render('CvInfos/Summaries/Index', [
             'summaries' => $summaries,
+            'availableSummaries' => $availableSummaries,
+            'selectedSummary' => $selectedSummary,
         ]);
     }
 
@@ -79,10 +84,20 @@ class SummaryController extends Controller
 
         abort(403, 'Unauthorized');
     }
+
     public function select(Summary $summary)
     {
         $user = auth()->user();
         $user->selected_summary_id = $summary->id;
+        $user->save();
+
+        return redirect()->route('summaries.index');
+    }
+
+    public function deselect()
+    {
+        $user = auth()->user();
+        $user->selected_summary_id = null;
         $user->save();
 
         return redirect()->route('summaries.index');

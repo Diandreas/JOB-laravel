@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/UserHobbyController.php
 
 namespace App\Http\Controllers;
 
@@ -7,45 +8,36 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-// app/Http/Controllers/UserHobbyController.php
-
-
 class UserHobbyController extends Controller
 {
     public function index()
     {
-        $user = auth()->user(); // Get the authenticated user
+        $user = auth()->user();
         $availableHobbies = Hobby::all();
-        // Fetch all available hobbies
-
-        // Fetch the user's hobbies (no need for conditional since auth middleware is likely in place)
         $user_hobbies = $user->hobbies;
 
-
-        return Inertia::render('CvInfos/Hobbies/Index', [ // Change from 'CvInfos/Index'
+        return Inertia::render('CvInfos/Hobbies/Index', [
             'user_hobbies' => $user_hobbies,
-            'availableHobbies' => $availableHobbies, // Correctly pass available hobbies
-
+            'availableHobbies' => $availableHobbies,
         ]);
     }
 
     public function create()
     {
         $availableHobbies = Hobby::all();
-        // Remove unnecessary 'auth' as middleware should handle it
-        return Inertia::render('CvInfos/Hobbies/Create',[
-            'availableHobbies' => $availableHobbies, // Correctly pass available hobbies
+        return Inertia::render('CvInfos/Hobbies/Create', [
+            'availableHobbies' => $availableHobbies,
         ]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'hobby_id' => 'required|exists:hobbies,id', // Validate that the hobby_id exists
+            'hobby_id' => 'required|exists:hobbies,id',
         ]);
 
         $user = auth()->user();
-        $hobby = Hobby::find($request->hobby_id); // Find the selected hobby
+        $hobby = Hobby::find($request->hobby_id);
 
         $user->hobbies()->attach($hobby);
 
@@ -65,5 +57,4 @@ class UserHobbyController extends Controller
 
         return response()->json(['message' => 'Hobby de-assigned successfully!']);
     }
-
 }
