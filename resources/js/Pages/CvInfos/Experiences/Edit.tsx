@@ -46,8 +46,8 @@ const ExperienceEdit = ({ auth, experience, categories }) => {
     };
 
     return (
-        <AuthenticatedLayout user={auth.user}>
-            <Head title="Modifier une expérience" />
+        // <AuthenticatedLayout user={auth.user}>
+        //     <Head title="Modifier une expérience" />
             <div className="container mx-auto py-8">
                 <Card className="max-w-2xl mx-auto">
                     <CardHeader>
@@ -186,7 +186,7 @@ const ExperienceEdit = ({ auth, experience, categories }) => {
                     </CardFooter>
                 </Card>
             </div>
-        </AuthenticatedLayout>
+        // {/*</AuthenticatedLayout>*/}
     );
 };
 

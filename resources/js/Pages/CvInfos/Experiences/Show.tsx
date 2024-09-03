@@ -6,8 +6,8 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/Componen
 
 const ExperienceShow = ({ auth, experience }) => {
     return (
-        <AuthenticatedLayout user={auth.user}>
-            <Head title={`Détails de l'expérience: ${experience.name}`} />
+        // <AuthenticatedLayout user={auth.user}>
+        //     <Head title={`Détails de l'expérience: ${experience.name}`} />
             <div className="container mx-auto py-8">
                 <Card className="max-w-2xl mx-auto">
                     <CardHeader>
@@ -49,7 +49,7 @@ const ExperienceShow = ({ auth, experience }) => {
                     </CardFooter>
                 </Card>
             </div>
-        </AuthenticatedLayout>
+        // </AuthenticatedLayout>
     );
 };
 

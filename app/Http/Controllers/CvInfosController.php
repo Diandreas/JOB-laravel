@@ -6,6 +6,7 @@ use App\Http\Requests\StoreCvInfoRequest;
 use App\Http\Requests\UpdateCvInfoRequest;
 use App\Models\CvInfo;
 use App\Models\Address;
+use App\Models\ExperienceCategory;
 use App\Models\Profession;
 use App\Models\Competence;
 use App\Models\Hobby;
@@ -27,6 +28,7 @@ class CvInfosController extends Controller
         $availableHobbies = Hobby::all();
         $availableProfessions = Profession::all();
         $availableSummaries = $user->summary()->get();
+        $experienceCategories = ExperienceCategory::all();
 
         $cvInformation = [
             'hobbies' => $user->hobbies()->take(3)->get()->toArray(),
@@ -53,6 +55,8 @@ class CvInfosController extends Controller
             'availableProfessions' => $availableProfessions->toArray(),
             'availableSummaries' => $availableSummaries->toArray(),
             'myProfession' => $myProfession->toArray(),
+            'experienceCategories' => $experienceCategories->toArray(),
+
 
         ];
 
@@ -67,7 +71,6 @@ class CvInfosController extends Controller
         if (!$user) {
             abort(403, 'Unauthorized');
         }
-
         // Réutiliser le code de la méthode index
         $cvInformation = [
             'hobbies' => $user->hobbies()->take(3)->get()->toArray(),

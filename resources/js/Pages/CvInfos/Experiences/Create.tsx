@@ -49,8 +49,8 @@ const ExperienceCreate = ({ auth, categories }) => {
     // @ts-ignore
     // @ts-ignore
     return (
-        <AuthenticatedLayout user={auth.user}>
-            <Head title="Créer une expérience" />
+        // <AuthenticatedLayout user={auth.user}>
+        //     <Head title="Créer une expérience" />
             <div className="container mx-auto py-8">
                 <Card className="max-w-2xl mx-auto">
                     <CardHeader>
@@ -189,7 +189,7 @@ const ExperienceCreate = ({ auth, categories }) => {
                     </CardFooter>
                 </Card>
             </div>
-        </AuthenticatedLayout>
+        // </AuthenticatedLayout>
     );
 };
 

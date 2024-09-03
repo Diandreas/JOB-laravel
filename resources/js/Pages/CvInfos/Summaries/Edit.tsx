@@ -39,8 +39,8 @@ const SummaryEdit = ({ auth, summary }) => {
     };
 
     return (
-        <AuthenticatedLayout user={auth.user}>
-            <Head title="Modifier un résumé" />
+        // <AuthenticatedLayout user={auth.user}>
+        //     <Head title="Modifier un résumé" />
             <div className="p-4">
                 <h1 className="text-2xl font-semibold mb-4">Modifier un résumé</h1>
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -69,7 +69,7 @@ const SummaryEdit = ({ auth, summary }) => {
                     </div>
                 </form>
             </div>
-        </AuthenticatedLayout>
+        // {/*</AuthenticatedLayout>*/}
     );
 };
 

@@ -1,21 +1,22 @@
-// resources/js/Pages/CvInfos/Show.tsx
 import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/Components/ui/card";
-import { Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { Button } from "@/Components/ui/button";
-import { Mail, Phone, MapPin, Linkedin, Github, Briefcase, GraduationCap, Heart, Download } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/Components/ui/tooltip";
-import { Badge } from "@/Components/ui/badge";
-import ExportableCv from './ExportableCv';
-import html2pdf from 'html2pdf.js';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/Components/ui/tabs";
+import { motion } from 'framer-motion';
 import Modal from '@/Components/ui/Modal';
 import ExperienceIndex from '@/Pages/CvInfos/Experiences/Index';
-import PersonalInformationEdit from './PersonalInformation/Edit'; // Import the edit component
-import CompetenceManager from '@/Components/CompetenceManager'; // Import the competence manager component
-import HobbyManager from '@/Components/HobbyManager'; // Import the hobby manager component
-import ProfessionManager from '@/Components/ProfessionManager'; // Import the profession manager component
-import SummaryManager from '@/Components/SummaryManager'; // Import the summary manager component
+import PersonalInformationEdit from './PersonalInformation/Edit';
+import CompetenceManager from '@/Components/CompetenceManager';
+import HobbyManager from '@/Components/HobbyManager';
+import ProfessionManager from '@/Components/ProfessionManager';
+import SummaryManager from '@/Components/SummaryManager';
+import ExperienceCreate from "@/Pages/CvInfos/Experiences/Create";
+import ExperienceShow from "@/Pages/CvInfos/Experiences/Show";
+import ExperienceEdit from "@/Pages/CvInfos/Experiences/Edit"; // Added import
+import SummaryCreate from "@/Pages/CvInfos/Summaries/Create"; // Added import
+import SummaryShow from "@/Pages/CvInfos/Summaries/Edit"; // Added import
 
 interface CvInformation {
     hobbies: { id: number; name: string }[];
@@ -30,6 +31,7 @@ interface CvInformation {
         description: string;
         output: string;
     }[];
+    experienceCategories:{name: string ; description : string ; ranking : number}[];
     professions: { id: number; name: string }[];
     myProfession: { id: number; name: string }[];
     summaries: { id: number; description: string }[];
@@ -43,12 +45,6 @@ interface CvInformation {
         linkedin: string;
         github: string;
     };
-    availableCompetences: { id: number; name: string }[];
-    availableHobbies: { id: number; name: string }[];
-    availableProfessions: { id: number; name: string }[];
-    availableSummaries: { id: number; name: string }[];
-    selectedProfession: { id: number; name: string } | null;
-    selectedSummary: { id: number; name: string } | null;
 }
 
 interface Props {
@@ -58,8 +54,14 @@ interface Props {
 
 export default function Show({ auth, cvInformation }: Props) {
     const [isEditing, setIsEditing] = useState(false);
-    const [personalInfo, setPersonalInfo] = useState(cvInformation.personalInformation);
     const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
+    const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false); // Added state for summary modal
+    const [personalInfo, setPersonalInfo] = useState(cvInformation.personalInformation);
+    const [selectedExperience, setSelectedExperience] = useState(null);
+    const [selectedSummary, setSelectedSummary] = useState(null); // Added state for selected summary
+    const [isCreatingExperience, setIsCreatingExperience] = useState(false);
+    const [isEditingExperience, setIsEditingExperience] = useState(false); // Added state for editing experience
+    const [isCreatingSummary, setIsCreatingSummary] = useState(false); // Added state for creating summary
 
     const handleEdit = () => setIsEditing(true);
     const handleCancel = () => setIsEditing(false);
@@ -68,92 +70,140 @@ export default function Show({ auth, cvInformation }: Props) {
         setIsEditing(false);
     };
 
-    const openExperienceModal = () => setIsExperienceModalOpen(true);
-    const closeExperienceModal = () => setIsExperienceModalOpen(false);
-
-    const exportToPdf = () => {
-        const element = document.getElementById('exportable-cv');
-        const opt = {
-            filename: 'mon_cv.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        html2pdf().from(element).set(opt).save();
+    const openExperienceModal = (experience) => {
+        setSelectedExperience(experience);
+        setIsCreatingExperience(!experience);
+        setIsEditingExperience(!!experience);
+        setIsExperienceModalOpen(true);
     };
 
-    const { hobbies, competences, experiences, professions, myProfession, summaries, availableCompetences, availableHobbies, availableProfessions, availableSummaries, selectedProfession, selectedSummary } = cvInformation;
+    const closeExperienceModal = () => setIsExperienceModalOpen(false);
 
-    // @ts-ignore
-    // @ts-ignore
+    const openSummaryModal = (summary) => { // Function to handle opening the summary modal
+        setSelectedSummary(summary);
+        setIsCreatingSummary(!summary);
+        setIsSummaryModalOpen(true);
+    };
+
+    const closeSummaryModal = () => setIsSummaryModalOpen(false);
+
     return (
         <AuthenticatedLayout
             user={auth.user}
             header={<h2 className="font-semibold text-2xl text-gray-800 leading-tight">Mon CV Professionnel</h2>}
         >
             <Head title="CV Professionnel" />
-            <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+
+            <motion.div
+                className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+            >
                 <Card className="mb-8">
                     <CardContent className="p-6">
-                        <div id="exportable-cv">
-                            {isEditing ? (
-                                <PersonalInformationEdit
-                                    user={personalInfo}
-                                    onUpdate={handleUpdate}
-                                    onCancel={handleCancel}
-                                />
-                            ) : (
-                                <PersonalInfoCard item={personalInfo} onEdit={handleEdit} />
-                            )}
+                        <Tabs defaultValue="personalInfo">
+                            <TabsList className="mb-6">
+                                <TabsTrigger value="personalInfo">Informations Personnelles</TabsTrigger>
+                                <TabsTrigger value="summary">Résumé</TabsTrigger>
+                                <TabsTrigger value="experience">Expériences</TabsTrigger>
+                                <TabsTrigger value="competence">Compétences</TabsTrigger>
+                                <TabsTrigger value="profession">Formations</TabsTrigger>
+                                <TabsTrigger value="hobby">Centres d'Intérêt</TabsTrigger>
+                            </TabsList>
 
-                            <SectionHeader icon={<Briefcase className="w-6 h-6" />} title="Résumé Professionnel" />
-                            <CvInfoSummarySection items={summaries} linkRoute="summaries.index" />
+                            <TabsContent value="personalInfo">
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.5 }}
+                                >
+                                    {isEditing ? (
+                                        <PersonalInformationEdit
+                                            user={personalInfo}
+                                            onUpdate={handleUpdate}
+                                            onCancel={handleCancel}
+                                        />
+                                    ) : (
+                                        <PersonalInfoCard item={personalInfo} onEdit={handleEdit} />
+                                    )}
+                                </motion.div>
+                            </TabsContent>
 
-                            <SectionHeader icon={<Briefcase className="w-6 h-6" />} title="Expériences Professionnelles" />
-                            <CvInfoExperienceSection items={experiences} linkRoute="experiences.index" openModal={openExperienceModal} />
+                            <TabsContent value="summary">
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.5 }}
+                                >
+                                    <CvInfoSummarySection items={cvInformation.summaries} openModal={openSummaryModal} selectedSummary={selectedSummary} />
+                                </motion.div>
+                            </TabsContent>
 
-                            <SectionHeader icon={<GraduationCap className="w-6 h-6" />} title="Compétences" />
-                            <CompetenceManager auth={auth} availableCompetences={availableCompetences} initialUserCompetences={competences} />
+                            <TabsContent value="experience">
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.5 }}
+                                >
+                                    <CvInfoExperienceSection items={cvInformation.experiences} openModal={openExperienceModal} />
+                                </motion.div>
+                            </TabsContent>
 
-                            <SectionHeader icon={<GraduationCap className="w-6 h-6" />} title="Formations" />
-                            <ProfessionManager auth={auth} availableProfessions={availableProfessions} initialUserProfession={myProfession} />
+                            <TabsContent value="competence">
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.5 }}
+                                >
+                                    <CompetenceManager auth={auth} availableCompetences={cvInformation.competences} initialUserCompetences={cvInformation.competences} />
+                                </motion.div>
+                            </TabsContent>
 
-                            <SectionHeader icon={<Heart className="w-6 h-6" />} title="Centres d'Intérêt" />
-                            <HobbyManager auth={auth} availableHobbies={availableHobbies} initialUserHobbies={hobbies} />
-                        </div>
+                            <TabsContent value="profession">
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.5 }}
+                                >
+                                    <ProfessionManager auth={auth} availableProfessions={cvInformation.professions} initialUserProfession={cvInformation.myProfession} />
+                                </motion.div>
+                            </TabsContent>
+
+                            <TabsContent value="hobby">
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.5 }}
+                                >
+                                    <HobbyManager auth={auth} availableHobbies={cvInformation.hobbies} initialUserHobbies={cvInformation.hobbies} />
+                                </motion.div>
+                            </TabsContent>
+                        </Tabs>
                     </CardContent>
-                    <CardFooter className="flex justify-end">
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button onClick={exportToPdf} variant="outline">
-                                        <Download className="w-4 h-4 mr-2" />
-                                        Exporter en PDF
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>Télécharger votre CV en format PDF</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    </CardFooter>
                 </Card>
-            </div>
+            </motion.div>
 
-            <Modal isOpen={isExperienceModalOpen} onClose={closeExperienceModal} title="Expériences Professionnelles" description="Détails des expériences professionnelles">
-                <ExperienceIndex auth={auth} experiences={experiences} />
+            {/* Experience Modal */}
+            <Modal isOpen={isExperienceModalOpen} onClose={closeExperienceModal} title="Expériences Professionnelles">
+                {isCreatingExperience ? (
+                    <ExperienceCreate auth={auth} categories={cvInformation.experienceCategories} />
+                ) : isEditingExperience ? (
+                    <ExperienceEdit auth={auth} experience={selectedExperience} categories={cvInformation.experienceCategories} />
+                ) : (
+                    <ExperienceShow auth={auth} experience={selectedExperience} />
+                )}
+            </Modal>
+
+            {/* Summary Modal */}
+            <Modal isOpen={isSummaryModalOpen} onClose={closeSummaryModal} title="Résumé">
+                {isCreatingSummary ? (
+                    <SummaryCreate auth={auth} />
+                ) : (
+                    <SummaryShow auth={auth} summary={selectedSummary} />
+                )}
             </Modal>
         </AuthenticatedLayout>
-    );
-}
-
-function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }) {
-    return (
-        <div className="flex items-center space-x-2 font-bold text-2xl text-gray-800 mt-8 mb-4">
-            {icon}
-            <h2 className="text-lg font-bold">{title}</h2>
-        </div>
     );
 }
 
@@ -167,78 +217,78 @@ function PersonalInfoCard({ item, onEdit }: { item: CvInformation['personalInfor
             <CardContent className="p-6">
                 <div className="grid grid-cols-2 gap-4">
                     {[
-                        { icon: Mail, value: item.email },
-                        { icon: Phone, value: item.phone },
-                        { icon: MapPin, value: item.address },
-                        { icon: Linkedin, value: item.linkedin },
-                        { icon: Github, value: item.github },
-                    ].map(({ icon: Icon, value }, index) => (
-                        <div key={index} className="flex items-center">
-                            <Icon className="w-5 h-5 mr-2 text-gray-500" />
-                            <span className="text-gray-600">{value}</span>
+                        { value: item.email, label: "Email" },
+                        { value: item.phone, label: "Téléphone" },
+                        { value: item.address, label: "Adresse" },
+                        { value: item.linkedin, label: "LinkedIn" },
+                        { value: item.github, label: "GitHub" }
+                    ].map(({ value, label }) => (
+                        <div key={label} className="flex items-center">
+                            <span className="font-semibold">{label}:</span>
+                            <span className="ml-2">{value}</span>
                         </div>
                     ))}
                 </div>
             </CardContent>
-            <CardFooter className="bg-gray-100">
-                <Button variant="outline" className="w-full" onClick={onEdit}>Modifier</Button>
+            <CardFooter>
+                <Button onClick={onEdit}>Modifier</Button>
             </CardFooter>
         </Card>
     );
 }
 
-function CvInfoExperienceSection({ items, linkRoute, openModal }: { items: CvInformation['experiences']; linkRoute: string; openModal: () => void }) {
-    return (
-        <div className="space-y-6">
-            {items.map((item) => (
-                <Card key={item.id}>
-                    <CardHeader className="bg-gray-100">
-                        <CardTitle className="text-xl font-bold">{item.title}</CardTitle>
-                        <p className="text-gray-600">{item.company_name}</p>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                        <p className="text-sm text-gray-500 mb-2">{item.date_start} - {item.date_end || 'Present'}</p>
-                        <Badge className="mb-2">{item.category_name}</Badge>
-                        <p className="mb-2">{item.description}</p>
-                        <p className="font-semibold">Réalisations:</p>
-                        <p>{item.output}</p>
-                    </CardContent>
-                    <CardFooter className="bg-gray-100">
-                        <Button onClick={openModal} variant="outline" className="w-full">Détails</Button>
-                    </CardFooter>
-                </Card>
-            ))}
-            <Button onClick={openModal} className="w-full">Voir Plus</Button>
-        </div>
-    );
-}
-
-function CvInfoListSection({ items, linkRoute, openModal }: { items: Array<{ id: number; name: string }>; linkRoute: string; openModal: () => void }) {
+function CvInfoExperienceSection({ items, openModal }: { items: ExperienceIndexProps['experiences']; openModal: (experience: Experience | null) => void }) {
     return (
         <div className="space-y-4">
-            <div className="flex flex-wrap gap-2 mb-4">
-                {items.map((item) => (
-                    <Badge key={item.id} variant="secondary">
-                        {item.name}
-                    </Badge>
+            <div className="mb-4">
+                <Button onClick={() => openModal(null)}>Ajouter une expérience</Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {items.map((experience) => (
+                    <Card key={experience.id} className="bg-white rounded-md shadow-md p-4">
+                        <CardHeader>
+                            <CardTitle className="text-lg font-semibold">{experience.name}</CardTitle>
+                            <p className="text-gray-600">
+                                {experience.date_start} - {experience.date_end || 'Présent'}
+                            </p>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-gray-800">{experience.description}</p>
+                        </CardContent>
+                        <CardFooter className="flex justify-end space-x-2">
+                            <Button variant="outline" onClick={() => openModal(experience)}>Voir</Button>
+                            <Button variant="outline" onClick={() => openModal(experience)}>Modifier</Button>
+                            <Button variant="destructive">Supprimer</Button>
+                        </CardFooter>
+                    </Card>
                 ))}
             </div>
-            <Button onClick={openModal} variant="outline" className="w-full">Gérer</Button>
         </div>
     );
 }
 
-function CvInfoSummarySection({ items, linkRoute }: { items: CvInformation['summaries']; linkRoute: string }) {
+function CvInfoSummarySection({ items, openModal, selectedSummary }: { items: { id: number; description: string }[]; openModal: (summary: { id: number; description: string } | null) => void; selectedSummary: { id: number; description: string } | null; }) {
     return (
-        <div>
-            {items.map((item) => (
-                <Card key={item.id} className="mb-4">
-                    <CardContent className="p-4">
-                        <p className="text-gray-700">{item.description}</p>
-                    </CardContent>
-                </Card>
-            ))}
-            <Link href={route(linkRoute)}>Modifier</Link>
+        <div className="space-y-4">
+            <div className="mb-4">
+                <Button onClick={() => openModal(null)}>Ajouter un résumé</Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {items.map((summary) => (
+                    <Card
+                        key={summary.id}
+                        className={`bg-white rounded-md shadow-md p-4 ${selectedSummary?.id === summary.id ? 'border-2 border-green-500' : ''}`}
+                        onClick={() => openModal(summary)}
+                    >
+                        <CardHeader>
+                            <CardTitle className="text-lg font-semibold">Résumé {summary.id}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-gray-800">{summary.description}</p>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
         </div>
     );
 }
