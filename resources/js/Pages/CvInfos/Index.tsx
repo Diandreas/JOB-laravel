@@ -5,17 +5,15 @@ import { Head } from '@inertiajs/react';
 import { Button } from "@/Components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/Components/ui/tabs";
 import { motion } from 'framer-motion';
-import Modal from '@/Components/ui/Modal';
 import PersonalInformationEdit from './PersonalInformation/Edit';
 import CompetenceManager from '@/Components/CompetenceManager';
 import HobbyManager from '@/Components/HobbyManager';
 import ProfessionManager from '@/Components/ProfessionManager';
-import SummaryManager from '@/Components/SummaryManager';
 import ExperienceManager from "@/Components/ExperienceManager";
-import SummaryCreate from "@/Pages/CvInfos/Summaries/Create";
-import SummaryShow from "@/Pages/CvInfos/Summaries/Edit";
+import SummaryManager from '@/Components/SummaryManager'; // Use this for handling the summaries directly
 
 interface CvInformation {
+    selectedSummary: any;
     hobbies: { id: number; name: string }[];
     competences: { id: number; name: string }[];
     experiences: {
@@ -32,6 +30,7 @@ interface CvInformation {
     professions: { id: number; name: string }[];
     myProfession: { id: number; name: string }[];
     summaries: { id: number; description: string }[];
+    allsummaries: { id: number; description: string }[];
     personalInformation: {
         id: number;
         firstName: string;
@@ -51,10 +50,8 @@ interface Props {
 
 export default function Show({ auth, cvInformation }: Props) {
     const [isEditing, setIsEditing] = useState(false);
-    const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
     const [personalInfo, setPersonalInfo] = useState(cvInformation.personalInformation);
     const [selectedSummary, setSelectedSummary] = useState<{ id: number; description: string } | null>(null);
-    const [isCreatingSummary, setIsCreatingSummary] = useState(false);
 
     const handleEdit = () => setIsEditing(true);
     const handleCancel = () => setIsEditing(false);
@@ -63,13 +60,7 @@ export default function Show({ auth, cvInformation }: Props) {
         setIsEditing(false);
     };
 
-    const openSummaryModal = (summary: { id: number; description: string } | null) => {
-        setSelectedSummary(summary);
-        setIsCreatingSummary(!summary);
-        setIsSummaryModalOpen(true);
-    };
-
-    const closeSummaryModal = () => setIsSummaryModalOpen(false);
+    // const handleSelectSummary = (summary) => setSelectedSummary(summary);
 
     return (
         <AuthenticatedLayout
@@ -120,7 +111,12 @@ export default function Show({ auth, cvInformation }: Props) {
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.5 }}
                                 >
-                                    <CvInfoSummarySection items={cvInformation.summaries} openModal={openSummaryModal} selectedSummary={selectedSummary} />
+                                    <SummaryManager
+                                        auth={auth}
+                                        summaries={cvInformation.allsummaries}
+                                        selectedSummary={cvInformation.summaries}
+                                        // onSelectSummary={handleSelectSummary}
+                                    />
                                 </motion.div>
                             </TabsContent>
 
@@ -171,15 +167,6 @@ export default function Show({ auth, cvInformation }: Props) {
                     </CardContent>
                 </Card>
             </motion.div>
-
-            {/* Summary Modal */}
-            <Modal isOpen={isSummaryModalOpen} onClose={closeSummaryModal} title="Résumé">
-                {isCreatingSummary ? (
-                    <SummaryCreate auth={auth} />
-                ) : (
-                    <SummaryShow auth={auth} summary={selectedSummary} />
-                )}
-            </Modal>
         </AuthenticatedLayout>
     );
 }
@@ -211,27 +198,5 @@ function PersonalInfoCard({ item, onEdit }: { item: CvInformation['personalInfor
                 <Button onClick={onEdit}>Modifier</Button>
             </CardFooter>
         </Card>
-    );
-}
-
-function CvInfoSummarySection({ items, openModal, selectedSummary }: { items: { id: number; description: string }[]; openModal: (summary: { id: number; description: string } | null) => void; selectedSummary: { id: number; description: string } | null; }) {
-    return (
-        <div className="space-y-4">
-            <div className="mb-4">
-                <Button onClick={() => openModal(null)}>Ajouter un résumé</Button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {items.map((summary) => (
-                    <Card key={summary.id} className={selectedSummary?.id === summary.id ? 'border border-green-500' : ''}>
-                        <CardContent>
-                            <p>{summary.description}</p>
-                        </CardContent>
-                        <CardFooter>
-                            <Button onClick={() => openModal(summary)}>Voir détails</Button>
-                        </CardFooter>
-                    </Card>
-                ))}
-            </div>
-        </div>
     );
 }

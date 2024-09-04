@@ -89,35 +89,8 @@ const ExperienceManager = ({ experiences = [], categories = [] }) => {
                             <Button onClick={handleNewExperience} className="bg-blue-600 hover:bg-blue-700 transition duration-300">
                                 <Plus className="w-4 h-4 mr-2" /> Ajouter une expérience
                             </Button>
-                        </div>
 
-                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                            {experiences.map((exp) => (
-                                <motion.div
-                                    key={exp.id}
-                                    whileHover={{ scale: 1.03 }}
-                                    className="bg-gray-50 rounded-lg p-6 shadow-md transition duration-300 hover:shadow-lg"
-                                >
-                                    <h2 className="text-xl font-semibold mb-2 text-gray-800">{exp.name}</h2>
-                                    <p className="text-sm text-gray-500 mb-3">
-                                        {exp.date_start} - {exp.date_end || 'Présent'}
-                                    </p>
-                                    <p className="text-gray-700 mb-3 line-clamp-3">{exp.description}</p>
-                                    <p className="text-gray-700 mb-2"><strong>Institution:</strong> {exp.InstitutionName}</p>
-                                    <p className="text-gray-700 mb-2"><strong>Résultat:</strong> {exp.output}</p>
-                                    <p className="text-gray-700 mb-4"><strong>Commentaire:</strong> {exp.comment}</p>
-                                    <div className="flex justify-end space-x-2">
-                                        <Button variant="outline" size="sm" onClick={() => handleEdit(exp)} className="text-green-600 border-green-600 hover:bg-green-50">
-                                            <Edit className="w-4 h-4 mr-2" /> Modifier
-                                        </Button>
-                                        <Button variant="outline" size="sm" onClick={() => handleDelete(exp.id)} className="text-red-600 border-red-600 hover:bg-red-50">
-                                            <Trash2 className="w-4 h-4 mr-2" /> Supprimer
-                                        </Button>
-                                    </div>
-                                </motion.div>
-                            ))}
                         </div>
-
                         <AnimatePresence>
                             {isFormVisible && (
                                 <motion.div
@@ -254,6 +227,35 @@ const ExperienceManager = ({ experiences = [], categories = [] }) => {
                                 </motion.div>
                             )}
                         </AnimatePresence>
+
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                            {experiences.map((exp) => (
+                                <motion.div
+                                    key={exp.id}
+                                    whileHover={{ scale: 1.03 }}
+                                    className="bg-gray-50 rounded-lg p-6 shadow-md transition duration-300 hover:shadow-lg"
+                                >
+                                    <h2 className="text-xl font-semibold mb-2 text-gray-800">{exp.name}</h2>
+                                    <p className="text-sm text-gray-500 mb-3">
+                                        {exp.date_start} - {exp.date_end || 'Présent'}
+                                    </p>
+                                    <p className="text-gray-700 mb-3 line-clamp-3">{exp.description}</p>
+                                    <p className="text-gray-700 mb-2"><strong>Institution:</strong> {exp.InstitutionName}</p>
+                                    <p className="text-gray-700 mb-2"><strong>Résultat:</strong> {exp.output}</p>
+                                    <p className="text-gray-700 mb-4"><strong>Commentaire:</strong> {exp.comment}</p>
+                                    <div className="flex justify-end space-x-2">
+                                        <Button variant="outline" size="sm" onClick={() => handleEdit(exp)} className="text-green-600 border-green-600 hover:bg-green-50">
+                                            <Edit className="w-4 h-4 mr-2" /> Modifier
+                                        </Button>
+                                        <Button variant="outline" size="sm" onClick={() => handleDelete(exp.id)} className="text-red-600 border-red-600 hover:bg-red-50">
+                                            <Trash2 className="w-4 h-4 mr-2" /> Supprimer
+                                        </Button>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+
+
                     </div>
                 </motion.div>
             </div>

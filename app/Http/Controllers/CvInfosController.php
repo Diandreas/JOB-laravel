@@ -41,6 +41,7 @@ class CvInfosController extends Controller
                 ->toArray(),
             'professions' => $user->profession()->take(2)->get()->toArray(),
             'summaries' => $user->selected_summary ? [$user->selected_summary->toArray()] : [],
+            'allsummaries' => $user->summaries()->get()->toArray(),
             'personalInformation' => [
                 'id' => $user->id,
                 'firstName' => $user->name,
@@ -83,6 +84,8 @@ class CvInfosController extends Controller
                 ->toArray(),
             'professions' => $user->profession()->take(2)->get()->toArray(),
             'summaries' => $user->selected_summary ? [$user->selected_summary->toArray()] : [],
+            'summaries' => $user->selected_summary ? [$user->selected_summary->toArray()] : [],
+
             'personalInformation' => [
                 'id' => $user->id,
                 'firstName' => $user->name,
