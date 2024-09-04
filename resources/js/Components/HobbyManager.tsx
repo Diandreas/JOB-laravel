@@ -1,10 +1,12 @@
-// resources/js/Components/HobbyManager.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/Components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
-import InputLabel from '@/Components/InputLabel';
-import axios from 'axios';
+import { Card, CardHeader, CardContent, CardFooter } from '@/Components/ui/card';
+import { Badge } from '@/Components/ui/badge';
+import { Input } from '@/Components/ui/input';
+import { Heart, X, Search, Plus } from 'lucide-react';
 import { useToast } from '@/Components/ui/use-toast';
+import axios from 'axios';
 
 interface Hobby {
     id: number;
@@ -17,18 +19,24 @@ interface Props {
     initialUserHobbies: Hobby[];
 }
 
-const HobbyManager = ({ auth, availableHobbies, initialUserHobbies }: Props) => {
+const HobbyManager: React.FC<Props> = ({ auth, availableHobbies, initialUserHobbies }) => {
     const [selectedHobbyId, setSelectedHobbyId] = useState<number | null>(null);
     const [userHobbies, setUserHobbies] = useState<Hobby[]>(initialUserHobbies);
+    const [searchTerm, setSearchTerm] = useState('');
     const { toast } = useToast();
 
     useEffect(() => {
         setUserHobbies(initialUserHobbies);
     }, [initialUserHobbies]);
 
-    const handleAddHobby = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const filteredHobbies = useMemo(() => {
+        return availableHobbies.filter(hobby =>
+            hobby.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+            !userHobbies.some(userHobby => userHobby.id === hobby.id)
+        );
+    }, [availableHobbies, userHobbies, searchTerm]);
 
+    const handleAddHobby = async () => {
         if (!selectedHobbyId) {
             toast({
                 title: 'Please select a hobby',
@@ -37,82 +45,116 @@ const HobbyManager = ({ auth, availableHobbies, initialUserHobbies }: Props) => 
             return;
         }
 
-        axios.post('/user-hobbies', {
-            user_id: auth.user.id,
-            hobby_id: selectedHobbyId,
-        })
-            .then((response) => {
-                toast({
-                    title: 'Hobby assigned successfully',
-                    description: 'The new hobby has been assigned to the user.'
-                });
-                // Update the list of user hobbies
-                const newHobby = availableHobbies.find(h => h.id === selectedHobbyId);
-                if (newHobby) {
-                    setUserHobbies([...userHobbies, newHobby]);
-                }
-            })
-            .catch((error) => {
-                toast({
-                    title: 'Error assigning hobby',
-                    description: error.response?.data?.message || 'An error occurred.'
-                });
-                console.error(error);
+        try {
+            await axios.post('/user-hobbies', {
+                user_id: auth.user.id,
+                hobby_id: selectedHobbyId,
             });
+
+            const newHobby = availableHobbies.find(h => h.id === selectedHobbyId);
+            if (newHobby) {
+                setUserHobbies(prev => [...prev, newHobby]);
+                setSelectedHobbyId(null);
+                toast({
+                    title: 'Hobby added successfully',
+                    description: `${newHobby.name} has been added to your hobbies.`
+                });
+            }
+        } catch (error) {
+            toast({
+                title: 'Error adding hobby',
+                description: error.response?.data?.message || 'An error occurred.',
+                variant: 'destructive'
+            });
+        }
     };
 
-    const handleRemoveHobby = (hobbyId: number) => {
-        axios.delete(`/user-hobbies/${auth.user.id}/${hobbyId}`)
-            .then((response) => {
-                toast({
-                    title: 'Hobby de-assigned successfully',
-                    description: 'The hobby has been removed from the user.'
-                });
-                // Update the list of user hobbies
-                setUserHobbies(userHobbies.filter(h => h.id !== hobbyId));
-            })
-            .catch((error) => {
-                toast({
-                    title: 'Error de-assigning hobby',
-                    description: error.response?.data?.message || 'An error occurred.'
-                });
-                console.error(error);
+    const handleRemoveHobby = async (hobbyId: number) => {
+        try {
+            await axios.delete(`/user-hobbies/${auth.user.id}/${hobbyId}`);
+            setUserHobbies(prev => prev.filter(h => h.id !== hobbyId));
+            toast({
+                title: 'Hobby removed',
+                description: 'The hobby has been removed from your profile.'
             });
+        } catch (error) {
+            toast({
+                title: 'Error removing hobby',
+                description: error.response?.data?.message || 'An error occurred.',
+                variant: 'destructive'
+            });
+        }
     };
 
     return (
-        <div className="p-4">
-            <h1 className="text-2xl font-semibold mb-4">Manage Hobbies</h1>
-            <form onSubmit={handleAddHobby}>
-                <div className="mb-4">
-                    <InputLabel htmlFor="hobby_id" value="Hobby" />
-                    <Select onValueChange={(value: string) => setSelectedHobbyId(parseInt(value))}>
+        <Card className="w-full max-w-md mx-auto">
+            <CardHeader>
+                <h2 className="text-2xl font-bold flex items-center">
+                    <Heart className="mr-2" /> Manage Your Hobbies
+                </h2>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="relative">
+                    <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <Input
+                        type="text"
+                        placeholder="Search hobbies..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                    />
+                </div>
+                <div className="flex items-center space-x-2">
+                    <Select
+                        value={selectedHobbyId?.toString() || ''}
+                        onValueChange={(value) => setSelectedHobbyId(parseInt(value))}
+                    >
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select a hobby" />
                         </SelectTrigger>
                         <SelectContent>
-                            {availableHobbies.map((hobby) => (
+                            {filteredHobbies.map((hobby) => (
                                 <SelectItem key={hobby.id} value={hobby.id.toString()}>
                                     {hobby.name}
                                 </SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
+                    <Button onClick={handleAddHobby}>
+                        <Plus className="w-4 h-4 mr-2" /> Add
+                    </Button>
                 </div>
-                <Button type="submit">Add Hobby</Button>
-            </form>
-            <div className="mt-4">
-                <h2 className="text-xl font-semibold mb-2">Your Hobbies</h2>
-                <ul>
-                    {userHobbies.map((hobby) => (
-                        <li key={hobby.id} className="flex items-center justify-between mb-2">
-                            <span>{hobby.name}</span>
-                            <Button onClick={() => handleRemoveHobby(hobby.id)} variant="destructive">Remove</Button>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </div>
+                <div className="mt-4">
+                    <h3 className="text-lg font-semibold mb-2">Your Hobbies</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {userHobbies.map((hobby) => (
+                            <Badge
+                                key={hobby.id}
+                                variant="secondary"
+                                className="flex items-center space-x-1 p-2"
+                            >
+                                <span>{hobby.name}</span>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleRemoveHobby(hobby.id)}
+                                    className="h-5 w-5 p-0 ml-2"
+                                >
+                                    <X className="h-3 w-3" />
+                                </Button>
+                            </Badge>
+                        ))}
+                    </div>
+                </div>
+            </CardContent>
+            <CardFooter>
+                <p className="text-sm text-gray-500">
+                    {userHobbies.length > 0
+                        ? `You have ${userHobbies.length} hobbies. Add more or remove existing ones.`
+                        : "Add some hobbies to personalize your profile."}
+                </p>
+            </CardFooter>
+        </Card>
     );
 };
 

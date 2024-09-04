@@ -6,17 +6,14 @@ import { Button } from "@/Components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/Components/ui/tabs";
 import { motion } from 'framer-motion';
 import Modal from '@/Components/ui/Modal';
-import ExperienceIndex from '@/Pages/CvInfos/Experiences/Index';
 import PersonalInformationEdit from './PersonalInformation/Edit';
 import CompetenceManager from '@/Components/CompetenceManager';
 import HobbyManager from '@/Components/HobbyManager';
 import ProfessionManager from '@/Components/ProfessionManager';
 import SummaryManager from '@/Components/SummaryManager';
-import ExperienceCreate from "@/Pages/CvInfos/Experiences/Create";
-import ExperienceShow from "@/Pages/CvInfos/Experiences/Show";
-import ExperienceEdit from "@/Pages/CvInfos/Experiences/Edit"; // Added import
-import SummaryCreate from "@/Pages/CvInfos/Summaries/Create"; // Added import
-import SummaryShow from "@/Pages/CvInfos/Summaries/Edit"; // Added import
+import ExperienceManager from "@/Components/ExperienceManager";
+import SummaryCreate from "@/Pages/CvInfos/Summaries/Create";
+import SummaryShow from "@/Pages/CvInfos/Summaries/Edit";
 
 interface CvInformation {
     hobbies: { id: number; name: string }[];
@@ -31,7 +28,7 @@ interface CvInformation {
         description: string;
         output: string;
     }[];
-    experienceCategories:{name: string ; description : string ; ranking : number}[];
+    experienceCategories: { name: string; description: string; ranking: number }[];
     professions: { id: number; name: string }[];
     myProfession: { id: number; name: string }[];
     summaries: { id: number; description: string }[];
@@ -54,14 +51,10 @@ interface Props {
 
 export default function Show({ auth, cvInformation }: Props) {
     const [isEditing, setIsEditing] = useState(false);
-    const [isExperienceModalOpen, setIsExperienceModalOpen] = useState(false);
-    const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false); // Added state for summary modal
+    const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
     const [personalInfo, setPersonalInfo] = useState(cvInformation.personalInformation);
-    const [selectedExperience, setSelectedExperience] = useState(null);
-    const [selectedSummary, setSelectedSummary] = useState(null); // Added state for selected summary
-    const [isCreatingExperience, setIsCreatingExperience] = useState(false);
-    const [isEditingExperience, setIsEditingExperience] = useState(false); // Added state for editing experience
-    const [isCreatingSummary, setIsCreatingSummary] = useState(false); // Added state for creating summary
+    const [selectedSummary, setSelectedSummary] = useState<{ id: number; description: string } | null>(null);
+    const [isCreatingSummary, setIsCreatingSummary] = useState(false);
 
     const handleEdit = () => setIsEditing(true);
     const handleCancel = () => setIsEditing(false);
@@ -70,16 +63,7 @@ export default function Show({ auth, cvInformation }: Props) {
         setIsEditing(false);
     };
 
-    const openExperienceModal = (experience) => {
-        setSelectedExperience(experience);
-        setIsCreatingExperience(!experience);
-        setIsEditingExperience(!!experience);
-        setIsExperienceModalOpen(true);
-    };
-
-    const closeExperienceModal = () => setIsExperienceModalOpen(false);
-
-    const openSummaryModal = (summary) => { // Function to handle opening the summary modal
+    const openSummaryModal = (summary: { id: number; description: string } | null) => {
         setSelectedSummary(summary);
         setIsCreatingSummary(!summary);
         setIsSummaryModalOpen(true);
@@ -146,7 +130,11 @@ export default function Show({ auth, cvInformation }: Props) {
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.5 }}
                                 >
-                                    <CvInfoExperienceSection items={cvInformation.experiences} openModal={openExperienceModal} />
+                                    <ExperienceManager
+                                        auth={auth}
+                                        experiences={cvInformation.experiences}
+                                        categories={cvInformation.experienceCategories}
+                                    />
                                 </motion.div>
                             </TabsContent>
 
@@ -183,17 +171,6 @@ export default function Show({ auth, cvInformation }: Props) {
                     </CardContent>
                 </Card>
             </motion.div>
-
-            {/* Experience Modal */}
-            <Modal isOpen={isExperienceModalOpen} onClose={closeExperienceModal} title="Expériences Professionnelles">
-                {isCreatingExperience ? (
-                    <ExperienceCreate auth={auth} categories={cvInformation.experienceCategories} />
-                ) : isEditingExperience ? (
-                    <ExperienceEdit auth={auth} experience={selectedExperience} categories={cvInformation.experienceCategories} />
-                ) : (
-                    <ExperienceShow auth={auth} experience={selectedExperience} />
-                )}
-            </Modal>
 
             {/* Summary Modal */}
             <Modal isOpen={isSummaryModalOpen} onClose={closeSummaryModal} title="Résumé">
@@ -237,36 +214,6 @@ function PersonalInfoCard({ item, onEdit }: { item: CvInformation['personalInfor
     );
 }
 
-function CvInfoExperienceSection({ items, openModal }: { items: ExperienceIndexProps['experiences']; openModal: (experience: Experience | null) => void }) {
-    return (
-        <div className="space-y-4">
-            <div className="mb-4">
-                <Button onClick={() => openModal(null)}>Ajouter une expérience</Button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {items.map((experience) => (
-                    <Card key={experience.id} className="bg-white rounded-md shadow-md p-4">
-                        <CardHeader>
-                            <CardTitle className="text-lg font-semibold">{experience.name}</CardTitle>
-                            <p className="text-gray-600">
-                                {experience.date_start} - {experience.date_end || 'Présent'}
-                            </p>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-gray-800">{experience.description}</p>
-                        </CardContent>
-                        <CardFooter className="flex justify-end space-x-2">
-                            <Button variant="outline" onClick={() => openModal(experience)}>Voir</Button>
-                            <Button variant="outline" onClick={() => openModal(experience)}>Modifier</Button>
-                            <Button variant="destructive">Supprimer</Button>
-                        </CardFooter>
-                    </Card>
-                ))}
-            </div>
-        </div>
-    );
-}
-
 function CvInfoSummarySection({ items, openModal, selectedSummary }: { items: { id: number; description: string }[]; openModal: (summary: { id: number; description: string } | null) => void; selectedSummary: { id: number; description: string } | null; }) {
     return (
         <div className="space-y-4">
@@ -275,17 +222,13 @@ function CvInfoSummarySection({ items, openModal, selectedSummary }: { items: { 
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {items.map((summary) => (
-                    <Card
-                        key={summary.id}
-                        className={`bg-white rounded-md shadow-md p-4 ${selectedSummary?.id === summary.id ? 'border-2 border-green-500' : ''}`}
-                        onClick={() => openModal(summary)}
-                    >
-                        <CardHeader>
-                            <CardTitle className="text-lg font-semibold">Résumé {summary.id}</CardTitle>
-                        </CardHeader>
+                    <Card key={summary.id} className={selectedSummary?.id === summary.id ? 'border border-green-500' : ''}>
                         <CardContent>
-                            <p className="text-gray-800">{summary.description}</p>
+                            <p>{summary.description}</p>
                         </CardContent>
+                        <CardFooter>
+                            <Button onClick={() => openModal(summary)}>Voir détails</Button>
+                        </CardFooter>
                     </Card>
                 ))}
             </div>

@@ -6,22 +6,21 @@ use App\Models\Experience;
 use App\Models\ExperienceCategory;
 use App\Models\Attachment;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class ExperienceController extends Controller
 {
     public function index()
     {
         $experiences = auth()->user()->experiences()->with('category')->get();
-        return Inertia::render('CvInfos/Experiences/Index', [
-            'experiences' => $experiences
+        return response()->json([
+            'experiences' => $experiences,
         ]);
     }
 
     public function create()
     {
         $categories = ExperienceCategory::all();
-        return Inertia::render('CvInfos/Experiences/Create', [
+        return response()->json([
             'categories' => $categories,
         ]);
     }
@@ -37,34 +36,35 @@ class ExperienceController extends Controller
             'experience_categories_id' => 'required|exists:experience_categories,id',
             'comment' => 'nullable|string',
             'InstitutionName' => 'nullable|string|max:255',
-            'attachment' => 'nullable|file', // Valider le fichier si présent
+            'attachment' => 'nullable|file',
         ]);
 
-        // Gestion de la pièce jointe (si nécessaire)
         if ($request->hasFile('attachment')) {
-            $path = $request->file('attachment')->store('attachments', 'public'); // Stockez le fichier
+            $path = $request->file('attachment')->store('attachments', 'public');
             $attachment = Attachment::create([
                 'name' => $request->file('attachment')->getClientOriginalName(),
                 'path' => $path,
                 'format' => $request->file('attachment')->getClientOriginalExtension(),
                 'size' => $request->file('attachment')->getSize(),
             ]);
-            $validatedData['attachment_id'] = $attachment->id; // Créez un enregistrement Attachment et récupérez son ID
+            $validatedData['attachment_id'] = $attachment->id;
         }
 
-        // Créez l'expérience avec les données validées
         $experience = Experience::create($validatedData);
-
-        // Associez l'expérience à l'utilisateur connecté (si nécessaire)
         auth()->user()->experiences()->attach($experience->id);
 
-        return redirect()->route('experiences.index');
+        return response()->json([
+            'message' => 'Expérience créée avec succès',
+            'experience' => $experience,
+        ]);
+
+        // return redirect()->route('experiences.index');
     }
 
     public function show(Experience $experience)
     {
         $experience->load('category', 'attachment');
-        return Inertia::render('CvInfos/Experiences/Show', [
+        return response()->json([
             'experience' => $experience,
         ]);
     }
@@ -72,7 +72,7 @@ class ExperienceController extends Controller
     public function edit(Experience $experience)
     {
         $categories = ExperienceCategory::all();
-        return Inertia::render('CvInfos/Experiences/Edit', [
+        return response()->json([
             'experience' => $experience,
             'categories' => $categories,
         ]);
@@ -89,31 +89,39 @@ class ExperienceController extends Controller
             'experience_categories_id' => 'required|exists:experience_categories,id',
             'comment' => 'nullable|string',
             'InstitutionName' => 'nullable|string|max:255',
-            'attachment_id' => 'nullable|exists:attachments,id', // Validation de l'attachment
-            'attachment' => 'nullable|file', // Valider le fichier si présent
+            'attachment_id' => 'nullable|exists:attachments,id',
+            'attachment' => 'nullable|file',
         ]);
 
-        // Gestion de la pièce jointe (si nécessaire)
         if ($request->hasFile('attachment')) {
-            $path = $request->file('attachment')->store('attachments', 'public'); // Stockez le fichier
+            $path = $request->file('attachment')->store('attachments', 'public');
             $attachment = Attachment::create([
                 'name' => $request->file('attachment')->getClientOriginalName(),
                 'path' => $path,
                 'format' => $request->file('attachment')->getClientOriginalExtension(),
                 'size' => $request->file('attachment')->getSize(),
             ]);
-            $validated['attachment_id'] = $attachment->id; // Créez un enregistrement Attachment et récupérez son ID
+            $validated['attachment_id'] = $attachment->id;
         }
 
         $experience->update($validated);
 
-        return redirect()->route('experiences.index');
+        return response()->json([
+            'message' => 'Expérience mise à jour avec succès',
+            'experience' => $experience,
+        ]);
+
+        // return redirect()->route('experiences.index');
     }
 
     public function destroy(Experience $experience)
     {
         $experience->delete();
 
-        return redirect()->route('experiences.index');
+        return response()->json([
+            'message' => 'Expérience supprimée avec succès',
+        ]);
+
+        // return redirect()->route('experiences.index');
     }
 }
