@@ -140,7 +140,7 @@ export default function Show({ auth, cvInformation }: Props) {
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.5 }}
                                 >
-                                    <CompetenceManager auth={auth} availableCompetences={cvInformation.competences} initialUserCompetences={cvInformation.competences} />
+                                    <CompetenceManager auth={auth} availableCompetences={cvInformation.availableCompetences} initialUserCompetences={cvInformation.competences} />
                                 </motion.div>
                             </TabsContent>
 
@@ -150,7 +150,7 @@ export default function Show({ auth, cvInformation }: Props) {
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.5 }}
                                 >
-                                    <ProfessionManager auth={auth} availableProfessions={cvInformation.professions} initialUserProfession={cvInformation.myProfession} />
+                                    <ProfessionManager auth={auth} availableProfessions={cvInformation.availableProfessions} initialUserProfession={cvInformation.myProfession} />
                                 </motion.div>
                             </TabsContent>
 
@@ -160,7 +160,7 @@ export default function Show({ auth, cvInformation }: Props) {
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.5 }}
                                 >
-                                    <HobbyManager auth={auth} availableHobbies={cvInformation.hobbies} initialUserHobbies={cvInformation.hobbies} />
+                                    <HobbyManager auth={auth} availableHobbies={cvInformation.availableHobbies} initialUserHobbies={cvInformation.hobbies} />
                                 </motion.div>
                             </TabsContent>
                         </Tabs>

@@ -13,6 +13,7 @@ use App\Models\Hobby;
 use App\Models\Summary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -35,7 +36,16 @@ class CvInfosController extends Controller
             'competences' => $user->competences()->take(3)->get()->toArray(),
             'experiences' => $user->experiences()
                 ->join('experience_categories', 'experiences.experience_categories_id', '=', 'experience_categories.id')
-                ->select('experiences.*', 'experience_categories.name as category_name')
+                ->join('attachments', 'experiences.attachment_id', '=', 'attachments.id') // Added join for attachments
+                ->select('experiences.*', 'experience_categories.name as category_name',
+                    'attachments.name as attachment_name',
+                    DB::raw('CONCAT("/storage/", attachments.path) as attachment_path'), // Generate relative URL
+//                    DB::raw('CONCAT("' . public_path() . '/storage/", attachments.path) as attachment_path'),
+//                    DB::raw('CONCAT("' . storage_path('app/public/') . '", attachments.path) as attachment_path'),
+                    'attachments.format as attachment_format',
+                    'attachments.size as attachment_size',
+
+                )
                 ->orderBy('experience_categories.ranking', 'asc')
                 ->get()
                 ->toArray(),
@@ -60,6 +70,7 @@ class CvInfosController extends Controller
 
 
         ];
+//        dd($cvInformation);
 
         return Inertia::render('CvInfos/Index', [
             'cvInformation' => $cvInformation,
@@ -78,6 +89,7 @@ class CvInfosController extends Controller
             'competences' => $user->competences()->take(3)->get()->toArray(),
             'experiences' => $user->experiences()
                 ->join('experience_categories', 'experiences.experience_categories_id', '=', 'experience_categories.id')
+                ->join('attachments', 'experiences.attachment_id', '=', 'attachments.id') // Added join for attachments
                 ->select('experiences.*', 'experience_categories.name as category_name')
                 ->orderBy('experience_categories.ranking', 'asc')
                 ->get()
@@ -99,7 +111,6 @@ class CvInfosController extends Controller
 
         // Ajouter le modèle CV sélectionné
         $selectedCvModel = $user->selected_cv_model ? $user->selected_cv_model->toArray() : null;
-
         return Inertia::render('CvInfos/Show', [
             'cvInformation' => $cvInformation,
             'selectedCvModel' => $selectedCvModel,

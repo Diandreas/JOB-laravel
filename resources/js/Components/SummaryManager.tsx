@@ -7,14 +7,22 @@ import InputError from "@/Components/InputError";
 import { useToast } from '@/Components/ui/use-toast';
 import { Textarea } from "@/Components/ui/textarea";
 import { TrashIcon, PencilIcon } from 'lucide-react';
+import axios from "axios";
+import {Card, CardContent, CardHeader, CardTitle} from "@/Components/ui/card";
+import {Label} from "@/Components/ui/label";
+import {Input} from "@/Components/ui/input";
 
-const SummaryManager = ({ auth, summaries, selectedSummary }) => {
+const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary }) => {
+    const [summaries, setSummaries] = useState(initialSummaries);
+    const [selectedSummaryId, setSelectedSummaryId] = useState(selectedSummary?.id);
     const { toast } = useToast();
     const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
         id: null,
         name: '',
         description: '',
     });
+    // const [summaries, setSummaries] = useState(summaries);
+
     const [filteredSummaries, setFilteredSummaries] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -26,43 +34,66 @@ const SummaryManager = ({ auth, summaries, selectedSummary }) => {
         );
     }, [summaries, searchQuery]);
 
+
     const handleSelectSummary = (summaryId) => {
-        post(route('summaries.select', summaryId), {
-            onSuccess: () => toast({ title: 'Résumé sélectionné avec succès' }),
-            onError: () => toast({ title: 'Erreur lors de la sélection du résumé', variant: 'destructive' }),
-        });
+        axios.post(route('summaries.select', summaryId))
+            .then(response => {
+                // Mettre à jour l'état local si nécessaire
+                toast({ title: response.data.message });
+            })
+            .catch(error => {
+                console.error(error);
+                toast({ title: 'Erreur lors de la sélection du résumé', variant: 'destructive' });
+            });
     };
+
 
     const handleCreate = (e) => {
         e.preventDefault();
-        post(route('summaries.store'), {
-            onSuccess: () => {
-                toast({ title: "Résumé créé avec succès" });
+        axios.post(route('summaries.store'), data)
+            .then(response => {
+                const newSummary = response.data.summary;
+                setSummaries([...summaries, newSummary]);
+                toast({ title: response.data.message });
                 resetForm();
-            },
-            onError: handleValidationErrors,
-        });
+            })
+            .catch(error => {
+                handleValidationErrors(error.response.data.errors);
+            });
     };
 
     const handleUpdate = (e) => {
         e.preventDefault();
-        put(route('summaries.update', data.id), {
-            onSuccess: () => {
-                toast({ title: "Résumé modifié avec succès" });
+        axios.put(route('summaries.update', data.id), data)
+            .then(response => {
+                setSummaries(prevSummaries =>
+                    prevSummaries.map(summary =>
+                        summary.id === response.data.summary.id ? response.data.summary : summary
+                    )
+                );
+                toast({ title: response.data.message });
                 resetForm();
-            },
-            onError: handleValidationErrors,
-        });
+            })
+            .catch(error => {
+                handleValidationErrors(error.response.data.errors);
+            });
     };
-
     const handleDelete = (summaryId) => {
         if (confirm('Êtes-vous sûr de vouloir supprimer ce résumé ?')) {
-            destroy(route('summaries.destroy', summaryId), {
-                onSuccess: () => toast({ title: 'Résumé supprimé avec succès' }),
-                onError: () => toast({ title: 'Erreur lors de la suppression du résumé', variant: 'destructive' }),
-            });
+            axios.delete(route('summaries.destroy', summaryId))
+                .then(response => {
+                    setSummaries(prevSummaries =>
+                        prevSummaries.filter(summary => summary.id !== summaryId)
+                    );
+                    toast({ title: response.data.message });
+                })
+                .catch(error => {
+                    console.error(error);
+                    toast({ title: 'Erreur lors de la suppression du résumé', variant: 'destructive' });
+                });
         }
     };
+
 
     const handleSelect = (summary) => {
         setData({
@@ -92,59 +123,62 @@ const SummaryManager = ({ auth, summaries, selectedSummary }) => {
     };
 
     return (
-        <div className="container mx-auto p-8 bg-white rounded-lg shadow-lg">
-            <h1 className="text-4xl font-bold text-gray-800 mb-6">Gestion des Résumés</h1>
+        <div className="container mx-auto p-8 space-y-8">
+            <h1 className="text-4xl font-bold text-gray-800">Gestion des Résumés</h1>
 
-            <form onSubmit={data.id ? handleUpdate : handleCreate} className="space-y-6 mb-8">
-                <div>
-                    <InputLabel htmlFor="name" value="Titre du résumé" />
-                    <TextInput
-                        id="name"
-                        type="text"
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
-                        className="mt-1 block w-full"
-                        placeholder="Entrez le titre du résumé"
-                    />
-                    <InputError message={errors.name} className="mt-2" />
-                </div>
+            <Card>
+                <CardHeader>
+                    <CardTitle>{data.id ? 'Modifier le résumé' : 'Créer un résumé'}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={data.id ? handleUpdate : handleCreate} className="space-y-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="name">Titre du résumé</Label>
+                            <Input
+                                id="name"
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                                placeholder="Entrez le titre du résumé"
+                            />
+                            {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+                        </div>
 
-                <div>
-                    <InputLabel htmlFor="description" value="Description" />
-                    <Textarea
-                        id="description"
-                        value={data.description}
-                        onChange={(e) => setData('description', e.target.value)}
-                        className="mt-1 block w-full"
-                        placeholder="Entrez la description du résumé"
-                    />
-                    <InputError message={errors.description} className="mt-2" />
-                </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="description">Description</Label>
+                            <Textarea
+                                id="description"
+                                value={data.description}
+                                onChange={(e) => setData('description', e.target.value)}
+                                placeholder="Entrez la description du résumé"
+                            />
+                            {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
+                        </div>
 
-                <div className="flex justify-end gap-4">
-                    <Button type="submit" disabled={processing} className="bg-indigo-600 hover:bg-indigo-700">
-                        {data.id ? 'Enregistrer les modifications' : 'Créer'}
-                    </Button>
-                    {data.id && (
-                        <Button variant="outline" onClick={resetForm} className="border border-gray-300">
-                            Annuler
-                        </Button>
-                    )}
-                </div>
-            </form>
+                        <div className="flex justify-end gap-4">
+                            <Button type="submit" disabled={processing}>
+                                {data.id ? 'Enregistrer les modifications' : 'Créer'}
+                            </Button>
+                            {data.id && (
+                                <Button variant="outline" onClick={resetForm}>
+                                    Annuler
+                                </Button>
+                            )}
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
 
             <div className="space-y-4">
                 <div className="flex justify-between items-center">
                     <h2 className="text-2xl font-semibold text-gray-700">Résumés</h2>
                     <div className="flex items-center gap-2">
-                        <input
+                        <Input
                             type="text"
                             placeholder="Rechercher..."
-                            className="px-4 py-2 border rounded-md focus:outline-none focus:ring focus:ring-indigo-500"
                             value={searchQuery}
                             onChange={handleSearch}
                         />
-                        <Button variant="default" onClick={() => setFilteredSummaries(summaries)}>
+                        <Button variant="outline" onClick={() => setFilteredSummaries(summaries)}>
                             Tout afficher
                         </Button>
                     </div>
@@ -153,50 +187,50 @@ const SummaryManager = ({ auth, summaries, selectedSummary }) => {
                 {filteredSummaries.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredSummaries.map((summary) => (
-                            <div
-                                key={summary?.id}
-                                className={`p-4 border rounded-lg shadow-sm hover:shadow-md transition ${
-                                    selectedSummary.some((s) => s?.id === summary?.id) ? 'bg-indigo-50 border-indigo-400' : 'bg-white'
-                                }`}
-                            >
-                                <div className="flex justify-between items-start mb-2">
-                                    <h3 className="text-lg font-medium text-gray-800">{summary?.name}</h3>
+                            <Card key={summary?.id} className={`${
+                                selectedSummary.some((s) => s?.id === summary?.id) ? 'bg-primary/10 border-primary' : ''
+                            }`}>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <CardTitle className="text-lg font-medium">{summary?.name}</CardTitle>
                                     <div className="flex items-center space-x-2">
                                         <Button
-                                            variant="outline"
+                                            variant="ghost"
+                                            size="icon"
                                             onClick={() => handleSelect(summary)}
-                                            className="p-2 text-gray-600 hover:text-indigo-600"
                                         >
-                                            <PencilIcon className="w-5 h-5" />
+                                            <PencilIcon className="h-4 w-4" />
                                         </Button>
                                         <Button
-                                            variant="destructive"
+                                            variant="ghost"
+                                            size="icon"
                                             onClick={() => handleDelete(summary?.id)}
-                                            className="p-2 text-red-600 hover:text-red-700"
                                         >
-                                            <TrashIcon className="w-5 h-5" />
+                                            <TrashIcon className="h-4 w-4" />
                                         </Button>
                                     </div>
-                                </div>
-                                <p className="text-gray-600 mb-4">{summary?.description}</p>
-                                <div className="flex justify-end">
-                                    <Button
-                                        variant="default"
-                                        onClick={() => handleSelectSummary(summary?.id)}
-                                        className="bg-indigo-600 text-white hover:bg-indigo-700"
-                                    >
-                                        Sélectionner
-                                    </Button>
-                                </div>
-                            </div>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground mb-4">{summary?.description}</p>
+                                    <div className="flex justify-end">
+                                        <Button
+                                            variant="secondary"
+                                            onClick={() => handleSelectSummary(summary?.id)}
+                                        >
+                                            Sélectionner
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         ))}
                     </div>
                 ) : (
-                    <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 p-4 rounded-md" role="alert">
-                        <p className="text-sm">
-                            Vous n'avez pas encore de résumés. Utilisez le formulaire ci-dessus pour en créer un.
-                        </p>
-                    </div>
+                    <Card>
+                        <CardContent className="text-center py-6">
+                            <p className="text-sm text-muted-foreground">
+                                Vous n'avez pas encore de résumés. Utilisez le formulaire ci-dessus pour en créer un.
+                            </p>
+                        </CardContent>
+                    </Card>
                 )}
             </div>
         </div>

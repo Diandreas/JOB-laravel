@@ -6,6 +6,7 @@ use App\Models\Experience;
 use App\Models\ExperienceCategory;
 use App\Models\Attachment;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ExperienceController extends Controller
 {
@@ -20,9 +21,14 @@ class ExperienceController extends Controller
     public function create()
     {
         $categories = ExperienceCategory::all();
-        return response()->json([
+
+
+        return Inertia::render('CvInfos/Experiences/Create', [
             'categories' => $categories,
         ]);
+//        return response()->json([
+//
+//        ]);
     }
 
     public function store(Request $request)

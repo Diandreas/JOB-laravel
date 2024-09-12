@@ -35,10 +35,12 @@ class SummaryController extends Controller
         ]);
 
         $summary = Summary::create($validatedData);
+        auth()->user()->summaries()->attach($summary->id);
 
-        auth()->user()->summaries()->attach($summary->id); // Associer le résumé à l'utilisateur
-
-        return redirect()->route('summaries.index');
+        return response()->json([
+            'summary' => $summary,
+            'message' => 'Résumé créé avec succès'
+        ]);
     }
 
     public function edit(Summary $summary)
@@ -55,7 +57,7 @@ class SummaryController extends Controller
 
     public function update(Request $request, Summary $summary)
     {
-        if ($summary->users->contains(auth()->user())) { // Vérifier si l'utilisateur a accès au résumé
+        if ($summary->users->contains(auth()->user())) {
             $validatedData = $request->validate([
                 'name' => 'required|string|max:100',
                 'description' => 'required|string',
@@ -63,25 +65,26 @@ class SummaryController extends Controller
 
             $summary->update($validatedData);
 
-            return redirect()->route('summaries.index');
+            return response()->json([
+                'summary' => $summary,
+                'message' => 'Résumé modifié avec succès'
+            ]);
         }
-
         abort(403, 'Unauthorized');
     }
 
     public function destroy(Summary $summary)
     {
-        if ($summary->users->contains(auth()->user())) { // Vérifier si l'utilisateur a accès au résumé
-            $summary->users()->detach(auth()->user()->id); // Supprimer l'association avec l'utilisateur
-
-            // Si aucun autre utilisateur n'est associé, supprimer le résumé
+        if ($summary->users->contains(auth()->user())) {
+            $summary->users()->detach(auth()->user()->id);
             if ($summary->users->count() === 0) {
                 $summary->delete();
             }
 
-            return redirect()->route('summaries.index');
+            return response()->json([
+                'message' => 'Résumé supprimé avec succès'
+            ]);
         }
-
         abort(403, 'Unauthorized');
     }
 
@@ -91,8 +94,13 @@ class SummaryController extends Controller
         $user->selected_summary_id = $summary->id;
         $user->save();
 
-        return redirect()->route('summaries.index');
+        return response()->json([
+            'summary' => $summary,
+            'message' => 'Résumé sélectionné avec succès'
+        ]);
     }
+
+
 
     public function deselect()
     {
@@ -100,6 +108,8 @@ class SummaryController extends Controller
         $user->selected_summary_id = null;
         $user->save();
 
-        return redirect()->route('summaries.index');
+        return response()->json([
+            'message' => 'Résumé créé avec succès'
+        ]);
     }
 }

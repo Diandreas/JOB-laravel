@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Button } from '@/Components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
-import { Input } from '@/Components/ui/input';
-import { Card, CardHeader, CardContent, CardFooter } from '@/Components/ui/card';
-import { Badge } from '@/Components/ui/badge';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Button } from "@/Components/ui/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
+import { Input } from "@/Components/ui/input"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/Components/ui/card"
+import { Badge } from "@/Components/ui/badge"
 import { Search, Plus, X } from 'lucide-react';
-import { useToast } from '@/Components/ui/use-toast';
+import { useToast } from "@/Components/ui/use-toast"
 import axios from 'axios';
 
 interface Competence {
@@ -15,7 +15,7 @@ interface Competence {
 }
 
 interface Props {
-    auth: any;
+    auth: { user: { id: number } };
     availableCompetences: Competence[];
     initialUserCompetences: Competence[];
 }
@@ -31,17 +31,19 @@ const CompetenceManager: React.FC<Props> = ({ auth, availableCompetences, initia
     }, [initialUserCompetences]);
 
     const filteredAvailableCompetences = useMemo(() => {
+        const lowercaseSearchTerm = searchTerm.toLowerCase();
+        const userCompetenceIds = new Set(userCompetences.map(c => c.id));
         return availableCompetences.filter(competence =>
-            competence.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-            !userCompetences.some(userComp => userComp.id === competence.id)
+            competence.name.toLowerCase().includes(lowercaseSearchTerm) &&
+            !userCompetenceIds.has(competence.id)
         );
     }, [availableCompetences, userCompetences, searchTerm]);
 
-    const handleAddCompetence = async () => {
+    const handleAddCompetence = useCallback(async () => {
         if (!selectedCompetenceId) {
             toast({
-                title: 'Please select a competence',
-                variant: 'destructive'
+                title: "Please select a competence",
+                variant: "destructive",
             });
             return;
         }
@@ -57,95 +59,93 @@ const CompetenceManager: React.FC<Props> = ({ auth, availableCompetences, initia
                 setUserCompetences(prev => [...prev, newCompetence]);
                 setSelectedCompetenceId(null);
                 toast({
-                    title: 'Competence assigned successfully',
-                    description: `${newCompetence.name} has been added to your competences.`
+                    title: "Competence assigned successfully",
+                    description: `${newCompetence.name} has been added to your competences.`,
                 });
             }
         } catch (error) {
             toast({
-                title: 'Error assigning competence',
+                title: "Error assigning competence",
                 description: error.response?.data?.message || 'An error occurred.',
-                variant: 'destructive'
+                variant: "destructive",
             });
         }
-    };
+    }, [selectedCompetenceId, auth.user.id, availableCompetences, toast]);
 
-    const handleRemoveCompetence = async (competenceId: number) => {
+    const handleRemoveCompetence = useCallback(async (competenceId: number) => {
         try {
             await axios.delete(`/user-competences/${auth.user.id}/${competenceId}`);
             setUserCompetences(prev => prev.filter(c => c.id !== competenceId));
             toast({
-                title: 'Competence removed',
-                description: 'The competence has been removed from your profile.'
+                title: "Competence removed",
+                description: "The competence has been removed from your profile.",
             });
         } catch (error) {
             toast({
-                title: 'Error removing competence',
+                title: "Error removing competence",
                 description: error.response?.data?.message || 'An error occurred.',
-                variant: 'destructive'
+                variant: "destructive",
             });
         }
-    };
+    }, [auth.user.id, toast]);
 
     return (
         <Card className="w-full max-w-3xl mx-auto">
             <CardHeader>
-                <h2 className="text-2xl font-bold">Manage Your Competences</h2>
+                <CardTitle className="text-2xl">Manage Your Competences</CardTitle>
             </CardHeader>
-            <CardContent>
-                <div className="space-y-4">
-                    <div className="flex items-center space-x-2">
-                        <Select
-                            value={selectedCompetenceId?.toString() || ''}
-                            onValueChange={(value) => setSelectedCompetenceId(parseInt(value))}
-                        >
-                            <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select a competence" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {filteredAvailableCompetences.map((competence) => (
-                                    <SelectItem key={competence.id} value={competence.id.toString()}>
-                                        {competence.name}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                        <Button onClick={handleAddCompetence}>
-                            <Plus className="w-4 h-4 mr-2" />
-                            Add
-                        </Button>
-                    </div>
-                    <div className="relative">
-                        <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                        <Input
-                            type="text"
-                            placeholder="Search competences..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-10"
-                        />
-                    </div>
-                    <div>
-                        <h3 className="text-lg font-semibold mb-2">Your Competences</h3>
-                        <div className="flex flex-wrap gap-2">
-                            {userCompetences.map((competence) => (
-                                <Badge
-                                    key={competence.id}
-                                    variant="secondary"
-                                    className="flex items-center space-x-1"
-                                >
-                                    <span>{competence.name}</span>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-4 w-4 p-0"
-                                        onClick={() => handleRemoveCompetence(competence.id)}
-                                    >
-                                        <X className="h-3 w-3" />
-                                    </Button>
-                                </Badge>
+            <CardContent className="space-y-4">
+                <div className="flex items-center space-x-2">
+                    <Select
+                        value={selectedCompetenceId?.toString() || ''}
+                        onValueChange={(value) => setSelectedCompetenceId(parseInt(value))}
+                    >
+                        <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a competence" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {filteredAvailableCompetences.map((competence) => (
+                                <SelectItem key={competence.id} value={competence.id.toString()}>
+                                    {competence.name}
+                                </SelectItem>
                             ))}
-                        </div>
+                        </SelectContent>
+                    </Select>
+                    <Button onClick={handleAddCompetence}>
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add
+                    </Button>
+                </div>
+                <div className="relative">
+                    <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <Input
+                        type="text"
+                        placeholder="Search competences..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                    />
+                </div>
+                <div>
+                    <h3 className="text-lg font-semibold mb-2">Your Competences</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {userCompetences.map((competence) => (
+                            <Badge
+                                key={competence.id}
+                                variant="secondary"
+                                className="flex items-center space-x-1"
+                            >
+                                <span>{competence.name}</span>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-4 w-4 p-0"
+                                    onClick={() => handleRemoveCompetence(competence.id)}
+                                >
+                                    <X className="h-3 w-3" />
+                                </Button>
+                            </Badge>
+                        ))}
                     </div>
                 </div>
             </CardContent>
