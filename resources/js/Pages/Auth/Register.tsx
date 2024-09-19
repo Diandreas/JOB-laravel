@@ -1,16 +1,16 @@
-import { useEffect, FormEventHandler, useState } from 'react';
-import GuestLayout from '@/Layouts/GuestLayout';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
+import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { User, Mail, Lock, Briefcase, Github, Linkedin, MapPin, Phone } from 'lucide-react';
+import GuestLayout from '@/Layouts/GuestLayout';
+
+import { Button } from "@/Components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/Components/ui/card"
+import { Input } from "@/Components/ui/input"
+import { Label } from "@/Components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
 
 
-// @ts-ignore
-export default function Register(props) {
-    const { data, setData, post, processing, errors, reset } = useForm({
+export default function Register({ professions }) {
+    const { data, setData, post, processing, errors } = useForm({
         name: '',
         email: '',
         password: '',
@@ -23,243 +23,181 @@ export default function Register(props) {
         phone_number: '',
     });
 
-    const [professions, setProfessions] = useState([]);
+    const [passwordStrength, setPasswordStrength] = useState(0);
 
-    useEffect(() => {
-        if (props.professions) {
-            setProfessions(props.professions);
-        }
-    }, []);
-
-    useEffect(() => {
-        return () => {
-            reset('password', 'password_confirmation');
-        };
-    }, []);
-
-    const submit: FormEventHandler = (e) => {
+    const submit = (e) => {
         e.preventDefault();
-
         post(route('register'));
     };
 
-    // @ts-ignore
-    // @ts-ignore
-    // @ts-ignore
-    // @ts-ignore
-    // @ts-ignore
-    // @ts-ignore
+    const checkPasswordStrength = (password) => {
+        let strength = 0;
+        if (password.length > 7) strength++;
+        if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+        if (password.match(/\d/)) strength++;
+        if (password.match(/[^a-zA-Z\d]/)) strength++;
+        setPasswordStrength(strength);
+    };
+
     return (
         <GuestLayout>
             <Head title="Register" />
-                <h2 className="text-2xl font-bold mb-6 text-center">Create an Account</h2>
-                <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="col-span-1">
-                        <InputLabel htmlFor="name" value="Name" />
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <User className="h-5 w-5 text-gray-400" />
-                            </div>
-                            <TextInput
-                                id="name"
-                                name="name"
-                                value={data.name}
-                                className="pl-10 block w-full"
-                                autoComplete="name"
-                                isFocused={true}
-                                onChange={(e) => setData('name', e.target.value)}
-                                required
-                            />
-                        </div>
-                        <InputError message={errors.name} className="mt-2" />
-                    </div>
 
-                    <div className="col-span-1">
-                        <InputLabel htmlFor="surname" value="Surname" />
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <User className="h-5 w-5 text-gray-400" />
+                <CardHeader>
+                    <CardTitle>Create an Account</CardTitle>
+                    <CardDescription>Fill in the form below to register</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={submit} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="name">Name</Label>
+                                <Input
+                                    id="name"
+                                    value={data.name}
+                                    onChange={(e) => setData('name', e.target.value)}
+                                    required
+                                />
+                                {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
                             </div>
-                            <TextInput
-                                id="surname"
-                                name="surname"
-                                value={data.surname}
-                                className="pl-10 block w-full"
-                                onChange={(e) => setData('surname', e.target.value)}
-                                required
-                            />
+                            <div className="space-y-2">
+                                <Label htmlFor="surname">Surname</Label>
+                                <Input
+                                    id="surname"
+                                    value={data.surname}
+                                    onChange={(e) => setData('surname', e.target.value)}
+                                    required
+                                />
+                                {errors.surname && <p className="text-sm text-red-500">{errors.surname}</p>}
+                            </div>
                         </div>
-                        <InputError message={errors.surname} className="mt-2" />
-                    </div>
 
-                    <div className="col-span-2">
-                        <InputLabel htmlFor="email" value="Email" />
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Mail className="h-5 w-5 text-gray-400" />
-                            </div>
-                            <TextInput
+                        <div className="space-y-2">
+                            <Label htmlFor="email">Email</Label>
+                            <Input
                                 id="email"
                                 type="email"
-                                name="email"
                                 value={data.email}
-                                className="pl-10 block w-full"
-                                autoComplete="username"
                                 onChange={(e) => setData('email', e.target.value)}
                                 required
                             />
+                            {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
                         </div>
-                        <InputError message={errors.email} className="mt-2" />
-                    </div>
 
-                    <div className="col-span-1">
-                        <InputLabel htmlFor="password" value="Password" />
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Lock className="h-5 w-5 text-gray-400" />
-                            </div>
-                            <TextInput
-                                id="password"
-                                type="password"
-                                name="password"
-                                value={data.password}
-                                className="pl-10 block w-full"
-                                autoComplete="new-password"
-                                onChange={(e) => setData('password', e.target.value)}
-                                required
-                            />
-                        </div>
-                        <InputError message={errors.password} className="mt-2" />
-                    </div>
-
-                    <div className="col-span-1">
-                        <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Lock className="h-5 w-5 text-gray-400" />
-                            </div>
-                            <TextInput
-                                id="password_confirmation"
-                                type="password"
-                                name="password_confirmation"
-                                value={data.password_confirmation}
-                                className="pl-10 block w-full"
-                                autoComplete="new-password"
-                                onChange={(e) => setData('password_confirmation', e.target.value)}
-                                required
-                            />
-                        </div>
-                        <InputError message={errors.password_confirmation} className="mt-2" />
-                    </div>
-
-                    {professions.length > 0 && (
-                        <div className="col-span-2">
-                            <InputLabel htmlFor="profession_id" value="Profession" />
-                            <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Briefcase className="h-5 w-5 text-gray-400" />
-                                </div>
-                                <select
-                                    id="profession_id"
-                                    name="profession_id"
-                                    value={data.profession_id}
-                                    className="pl-10 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                    onChange={(e) => setData('profession_id', e.target.value)}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="password">Password</Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    value={data.password}
+                                    onChange={(e) => {
+                                        setData('password', e.target.value);
+                                        checkPasswordStrength(e.target.value);
+                                    }}
                                     required
-                                >
-                                    <option value="">-- Select a profession --</option>
-                                    {professions.map(profession => (
-                                        <option key={profession.id} value={profession.id}>
+                                />
+                                {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+                                <div className="h-1 w-full bg-gray-200 mt-2">
+                                    <div
+                                        className={`h-full ${
+                                            ['bg-red-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500'][passwordStrength]
+                                        }`}
+                                        style={{ width: `${passwordStrength * 25}%` }}
+                                    ></div>
+                                </div>
+                                <p className="text-xs text-gray-500">
+                                    Password strength: {['Weak', 'Fair', 'Good', 'Strong'][passwordStrength]}
+                                </p>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="password_confirmation">Confirm Password</Label>
+                                <Input
+                                    id="password_confirmation"
+                                    type="password"
+                                    value={data.password_confirmation}
+                                    onChange={(e) => setData('password_confirmation', e.target.value)}
+                                    required
+                                />
+                                {errors.password_confirmation && (
+                                    <p className="text-sm text-red-500">{errors.password_confirmation}</p>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="profession">Profession</Label>
+                            <Select
+                                value={data.profession_id}
+                                onValueChange={(value) => setData('profession_id', value)}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select a profession" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {professions.map((profession) => (
+                                        <SelectItem key={profession.id} value={profession.id}>
                                             {profession.name}
-                                        </option>
+                                        </SelectItem>
                                     ))}
-                                </select>
+                                </SelectContent>
+                            </Select>
+                            {errors.profession_id && <p className="text-sm text-red-500">{errors.profession_id}</p>}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="github">GitHub</Label>
+                                <Input
+                                    id="github"
+                                    value={data.github}
+                                    onChange={(e) => setData('github', e.target.value)}
+                                />
+                                {errors.github && <p className="text-sm text-red-500">{errors.github}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="linkedin">LinkedIn</Label>
+                                <Input
+                                    id="linkedin"
+                                    value={data.linkedin}
+                                    onChange={(e) => setData('linkedin', e.target.value)}
+                                />
+                                {errors.linkedin && <p className="text-sm text-red-500">{errors.linkedin}</p>}
                             </div>
                         </div>
-                    )}
 
-                    <div className="col-span-1">
-                        <InputLabel htmlFor="github" value="GitHub" />
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Github className="h-5 w-5 text-gray-400" />
-                            </div>
-                            <TextInput
-                                id="github"
-                                name="github"
-                                value={data.github}
-                                className="pl-10 block w-full"
-                                onChange={(e) => setData('github', e.target.value)}
-                            />
-                        </div>
-                        <InputError message={errors.github} className="mt-2" />
-                    </div>
-
-                    <div className="col-span-1">
-                        <InputLabel htmlFor="linkedin" value="LinkedIn" />
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Linkedin className="h-5 w-5 text-gray-400" />
-                            </div>
-                            <TextInput
-                                id="linkedin"
-                                name="linkedin"
-                                value={data.linkedin}
-                                className="pl-10 block w-full"
-                                onChange={(e) => setData('linkedin', e.target.value)}
-                            />
-                        </div>
-                        <InputError message={errors.linkedin} className="mt-2" />
-                    </div>
-
-                    <div className="col-span-2">
-                        <InputLabel htmlFor="address" value="Address" />
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <MapPin className="h-5 w-5 text-gray-400" />
-                            </div>
-                            <TextInput
+                        <div className="space-y-2">
+                            <Label htmlFor="address">Address</Label>
+                            <Input
                                 id="address"
-                                name="address"
                                 value={data.address}
-                                className="pl-10 block w-full"
                                 onChange={(e) => setData('address', e.target.value)}
                             />
+                            {errors.address && <p className="text-sm text-red-500">{errors.address}</p>}
                         </div>
-                        <InputError message={errors.address} className="mt-2" />
-                    </div>
 
-                    <div className="col-span-2">
-                        <InputLabel htmlFor="phone_number" value="Phone Number" />
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Phone className="h-5 w-5 text-gray-400" />
-                            </div>
-                            <TextInput
+                        <div className="space-y-2">
+                            <Label htmlFor="phone_number">Phone Number</Label>
+                            <Input
                                 id="phone_number"
-                                name="phone_number"
                                 value={data.phone_number}
-                                className="pl-10 block w-full"
                                 onChange={(e) => setData('phone_number', e.target.value)}
                             />
+                            {errors.phone_number && <p className="text-sm text-red-500">{errors.phone_number}</p>}
                         </div>
-                        <InputError message={errors.phone_number} className="mt-2" />
-                    </div>
-
-                    <div className="col-span-2 flex items-center justify-between mt-6">
-                        <Link
-                            href={route('login')}
-                            className="text-sm text-indigo-600 hover:text-indigo-500"
-                        >
-                            Already have an account?
-                        </Link>
-
-                        <PrimaryButton className="ml-4" disabled={processing}>
-                            Register
-                        </PrimaryButton>
-                    </div>
-                </form>
-
+                    </form>
+                </CardContent>
+                <CardFooter className="flex justify-between">
+                    <Link href={route('login')} className="text-sm text-blue-500 hover:underline">
+                        Already have an account?
+                    </Link>
+                    <Button onClick={submit} disabled={processing}>
+                        {processing && (
+                            <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Register
+                    </Button>
+                </CardFooter>
         </GuestLayout>
     );
 }

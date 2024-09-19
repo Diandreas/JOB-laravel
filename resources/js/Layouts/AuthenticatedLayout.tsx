@@ -15,6 +15,7 @@ export default function Authenticated({ user, header, children }: PropsWithChild
     const toggleSidebar = () => setIsSidebarOpen(prevState => !prevState);
 
     // @ts-ignore
+    // @ts-ignore
     return (
         <div className="min-h-screen bg-gray-50">
             <nav className="bg-white shadow-md">
@@ -26,9 +27,11 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                         </div>
 
                         <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                            <NavLink href={route('dashboard')} active={route().current('dashboard')}>
-                                ADMIN PART
-                            </NavLink>
+                            {user.UserType === 1 && (
+                                <NavLink href={route('dashboard')} active={route().current('dashboard')}>
+                                    ADMIN PART
+                                </NavLink>
+                            )}
                             <NavLink href={route('cv-infos.index')} active={route().current('cv-infos.index')}>
                                 CV
                             </NavLink>

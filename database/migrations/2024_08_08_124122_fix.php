@@ -28,6 +28,7 @@ return new class extends Migration
         // Ajouter la colonne 'selected_cv_model_id' à la table 'users'
         Schema::table('users', function (Blueprint $table) {
             $table->unsignedBigInteger('selected_cv_model_id')->nullable()->after('selected_summary_id');
+            $table->unsignedBigInteger('selected_cv_model_id')->nullable()->after('selected_summary_id');
             $table->foreign('selected_cv_model_id')->references('id')->on('cv_models')->onDelete('set null');
         });
     }

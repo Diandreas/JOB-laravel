@@ -22,11 +22,15 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/Dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/', function () {
+    return Inertia::render('Welcome');
+})->name('WELCOME');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/Dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->name('dashboard');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -36,21 +40,13 @@ Route::middleware('auth')->group(function () {
     Route::resource('cv-infos', CvInfosController::class);
     Route::put('/cv-infos', [PersonalInformationController::class, 'update'])->name('personal-information.update');
 
-    Route::resource('experience-categories', ExperienceCategoryController::class);
-    Route::resource('hobbies', HobbyController::class);
-    Route::resource('profession-categories', ProfessionCategoryController::class);
     Route::resource('experiences', ExperienceController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy', 'show']);
-    Route::resource('professions', ProfessionController::class);
-    Route::resource('competences', CompetenceController::class);
-    Route::resource('profession-missions', ProfessionMissionController::class);
     Route::get('/user-hobbies', [UserHobbyController::class, 'index'])->name('user-hobbies.index');
     Route::get('/user-hobbies/create', [UserHobbyController::class, 'create'])->name('user-hobbies.create');
     Route::post('/user-hobbies', [UserHobbyController::class, 'store'])->name('user-hobbies.store');
     Route::delete('/user-hobbies/{user_id}/{hobby_id}', [UserHobbyController::class, 'destroy'])->name('user-hobbies.destroy');
     Route::resource('user-competences', UserCompetenceController::class)->except(['edit', 'update', 'show']);
     Route::delete('/user-competences/{user_id}/{competence_id}', [UserCompetenceController::class, 'destroy'])->name('user-competences.destroy');
-    Route::resource('CvModels', CvModelController::class);
-
 
     // experience
     Route::get('/experiences', [ExperienceController::class, 'index'])->name('experiences.index');
@@ -59,6 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/experiences/{experience}/edit', [ExperienceController::class, 'edit'])->name('experiences.edit');
     Route::put('/experiences/{experience}', [ExperienceController::class, 'update'])->name('experiences.update');
     Route::delete('/experiences/{experience}', [ExperienceController::class, 'destroy'])->name('experiences.destroy');
+
     //summary
     Route::resource('summaries', SummaryController::class);
     Route::post('summaries/{summary}/select', [SummaryController::class, 'select'])->name('summaries.select');
@@ -66,6 +63,7 @@ Route::middleware('auth')->group(function () {
     //Personnal nformation
     Route::get('/personal-information', [PersonalInformationController::class, 'index'])->name('personal-information.index');
     Route::get('/personal-information/edit', [PersonalInformationController::class, 'edit'])->name('personal-information.edit');
+
     //user profession
     Route::get('/user-professions', [UserProfessionsController::class, 'index'])->name('user-professions.index');
     Route::get('/user-professions/create', [UserProfessionsController::class, 'create'])->name('user-professions.create');
@@ -74,9 +72,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/user-cv-models/select-active', [CvModelController::class, 'selectActiveModel']);
     Route::post('/user-cv-models', [CvModelController::class, 'addCvModel']);
     Route::get('/user-cv-models', [CvModelController::class, 'userCvModels'])->name('userCvModels.index');
-    //cv - gallery
-//    Route::get('/cv-gallery', [CvGalleryController::class, 'index'])->name('cv-gallery.index');
-//    Route::get('/cv-gallery/{modelViewPath}', [CvGalleryController::class, 'show'])->name('cv-gallery.show');
 
     Route::get('/summaries', [SummaryController::class, 'index'])->name('summaries.index');
     Route::get('/summaries/create', [SummaryController::class, 'create'])->name('summaries.create');
@@ -90,11 +85,16 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('CvGallery/Canadian');
     });
 
-
+    // Admin-only routes
+    Route::middleware('can:access-admin')->group(function () {
+        Route::resource('experience-categories', ExperienceCategoryController::class);
+        Route::resource('profession-categories', ProfessionCategoryController::class);
+        Route::resource('hobbies', HobbyController::class);
+        Route::resource('professions', ProfessionController::class);
+        Route::resource('competences', CompetenceController::class);
+        Route::resource('profession-missions', ProfessionMissionController::class);
+        Route::resource('CvModels', CvModelController::class);
+    });
 });
-
-Route::get('/', function () {
-    return Inertia::render('Welcome');
-})->name('WELCOME');
 
 require __DIR__.'/auth.php';
