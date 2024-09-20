@@ -74,6 +74,7 @@ class CvInfosController extends Controller
 
         return Inertia::render('CvInfos/Index', [
             'cvInformation' => $cvInformation,
+            'translations' => trans('*'),
         ]);
     }
     public function show()

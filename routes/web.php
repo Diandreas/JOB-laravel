@@ -8,6 +8,7 @@ use App\Http\Controllers\ExperienceCategoryController;
 use App\Http\Controllers\CVController;
 use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\HobbyController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\PersonalInformationController;
 use App\Http\Controllers\ProfessionCategoryController;
 use App\Http\Controllers\ProfessionMissionController;
@@ -21,7 +22,7 @@ use App\Http\Controllers\UserProfessionsController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
+Route::get('language/{locale}', [LanguageController::class, 'switch'])->name('language.switch');
 Route::get('/', function () {
     return Inertia::render('Welcome');
 })->name('WELCOME');
