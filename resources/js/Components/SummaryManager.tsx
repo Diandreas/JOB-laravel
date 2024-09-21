@@ -12,16 +12,16 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/Components/ui/card";
 import {Label} from "@/Components/ui/label";
 import {Input} from "@/Components/ui/input";
 
-const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary }) => {
+// @ts-ignore
+const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary: initialSelectedSummary }) => {
     const [summaries, setSummaries] = useState(initialSummaries);
-    const [selectedSummaryId, setSelectedSummaryId] = useState(selectedSummary?.id);
+    const [selectedSummary, setSelectedSummary] = useState(initialSelectedSummary);
     const { toast } = useToast();
     const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
         id: null,
         name: '',
         description: '',
     });
-    // const [summaries, setSummaries] = useState(summaries);
 
     const [filteredSummaries, setFilteredSummaries] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -34,11 +34,16 @@ const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary }) 
         );
     }, [summaries, searchQuery]);
 
-
     const handleSelectSummary = (summaryId) => {
         axios.post(route('summaries.select', summaryId))
             .then(response => {
-                // Mettre à jour l'état local si nécessaire
+                const updatedSummary = response.data.summary;
+                setSelectedSummary([updatedSummary]);
+                setSummaries(prevSummaries =>
+                    prevSummaries.map(summary =>
+                        summary.id === updatedSummary.id ? updatedSummary : summary
+                    )
+                );
                 toast({ title: response.data.message });
             })
             .catch(error => {
@@ -46,7 +51,6 @@ const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary }) 
                 toast({ title: 'Erreur lors de la sélection du résumé', variant: 'destructive' });
             });
     };
-
 
     const handleCreate = (e) => {
         e.preventDefault();
@@ -78,6 +82,7 @@ const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary }) 
                 handleValidationErrors(error.response.data.errors);
             });
     };
+
     const handleDelete = (summaryId) => {
         if (confirm('Êtes-vous sûr de vouloir supprimer ce résumé ?')) {
             axios.delete(route('summaries.destroy', summaryId))
@@ -85,6 +90,9 @@ const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary }) 
                     setSummaries(prevSummaries =>
                         prevSummaries.filter(summary => summary.id !== summaryId)
                     );
+                    if (selectedSummary.some(s => s.id === summaryId)) {
+                        setSelectedSummary([]);
+                    }
                     toast({ title: response.data.message });
                 })
                 .catch(error => {
@@ -93,7 +101,6 @@ const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary }) 
                 });
         }
     };
-
 
     const handleSelect = (summary) => {
         setData({
@@ -178,7 +185,7 @@ const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary }) 
                             value={searchQuery}
                             onChange={handleSearch}
                         />
-                        <Button variant="outline" onClick={() => setFilteredSummaries(summaries)}>
+                        <Button variant="outline" onClick={() => setSearchQuery('')}>
                             Tout afficher
                         </Button>
                     </div>
@@ -213,10 +220,10 @@ const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary }) 
                                     <p className="text-sm text-muted-foreground mb-4">{summary?.description}</p>
                                     <div className="flex justify-end">
                                         <Button
-                                            variant="secondary"
+                                            variant={selectedSummary.some((s) => s?.id === summary?.id) ? "primary" : "secondary"}
                                             onClick={() => handleSelectSummary(summary?.id)}
                                         >
-                                            Sélectionner
+                                            {selectedSummary.some((s) => s?.id === summary?.id) ? 'Sélectionné' : 'Sélectionner'}
                                         </Button>
                                     </div>
                                 </CardContent>

@@ -35,6 +35,12 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                             <NavLink href={route('cv-infos.index')} active={route().current('cv-infos.index')}>
                                 CV
                             </NavLink>
+                            <NavLink href='#' active={route().current('index')}>
+                                Anounce(coming)
+                            </NavLink>
+                            <NavLink href={route('sponsorship.index')} active={route().current('sponsorship.index')}>
+                                sponsorship
+                            </NavLink>
                         </div>
 
                         <div className="hidden sm:flex sm:items-center sm:ms-6">

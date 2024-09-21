@@ -15,6 +15,7 @@ use App\Http\Controllers\ProfessionMissionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfessionController;
 use App\Http\Controllers\AddressController;
+use App\Http\Controllers\SponsorshipController;
 use App\Http\Controllers\SummaryController;
 use App\Http\Controllers\UserCompetenceController;
 use App\Http\Controllers\UserHobbyController;
@@ -85,6 +86,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/cv-gallery/canadian', function () {
         return Inertia::render('CvGallery/Canadian');
     });
+    Route::get('/sponsorship', [SponsorshipController::class, 'index'])->name('sponsorship.index');
+    Route::post('/sponsorship/generate-invitation', [SponsorshipController::class, 'generateInvitation']);
+    Route::get('/sponsorship/progress', [SponsorshipController::class, 'getProgress']);
+    Route::post('/sponsorship/support', [SponsorshipController::class, 'submitSupportTicket']);
 
     // Admin-only routes
     Route::middleware('can:access-admin')->group(function () {
