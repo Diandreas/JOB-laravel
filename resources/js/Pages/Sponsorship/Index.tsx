@@ -38,7 +38,7 @@ export default function Index({ auth, referralCode, referralCount, earnings, ref
                     <Invitation referralCode={referralCode} />
                 </TabsContent>
                 <TabsContent value="progress">
-                    <Progress />
+                    <Progress referralCount={referralCount} earnings={earnings} level={level} />
                 </TabsContent>
                 <TabsContent value="support">
                     <Support />

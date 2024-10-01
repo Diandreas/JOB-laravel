@@ -36,7 +36,7 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                                 CV
                             </NavLink>
                             <NavLink href='#' active={route().current('index')}>
-                                Anounce(coming)
+                               Job Anounce(coming)
                             </NavLink>
                             <NavLink href={route('sponsorship.index')} active={route().current('sponsorship.index')}>
                                 sponsorship

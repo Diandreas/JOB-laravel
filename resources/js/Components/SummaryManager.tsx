@@ -6,16 +6,19 @@ import TextInput from "@/Components/TextInput";
 import InputError from "@/Components/InputError";
 import { useToast } from '@/Components/ui/use-toast';
 import { Textarea } from "@/Components/ui/textarea";
-import { TrashIcon, PencilIcon } from 'lucide-react';
+import { TrashIcon, PencilIcon, PlusIcon, XIcon } from 'lucide-react';
 import axios from "axios";
 import {Card, CardContent, CardHeader, CardTitle} from "@/Components/ui/card";
 import {Label} from "@/Components/ui/label";
 import {Input} from "@/Components/ui/input";
+import { motion, AnimatePresence } from 'framer-motion';
+import Swal from 'sweetalert2';
 
-// @ts-ignore
 const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary: initialSelectedSummary }) => {
     const [summaries, setSummaries] = useState(initialSummaries);
     const [selectedSummary, setSelectedSummary] = useState(initialSelectedSummary);
+
+    const [isFormVisible, setIsFormVisible] = useState(false);
     const { toast } = useToast();
     const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
         id: null,
@@ -26,6 +29,25 @@ const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary: in
     const [filteredSummaries, setFilteredSummaries] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
 
+
+    const showAlert = (title, icon = 'success') => {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        Toast.fire({
+            icon,
+            title
+        });
+    };
     useEffect(() => {
         setFilteredSummaries(
             summaries.filter((summary) =>
@@ -33,6 +55,7 @@ const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary: in
             )
         );
     }, [summaries, searchQuery]);
+
 
     const handleSelectSummary = (summaryId) => {
         axios.post(route('summaries.select', summaryId))
@@ -44,11 +67,11 @@ const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary: in
                         summary.id === updatedSummary.id ? updatedSummary : summary
                     )
                 );
-                toast({ title: response.data.message });
+                showAlert(response.data.message);
             })
             .catch(error => {
                 console.error(error);
-                toast({ title: 'Erreur lors de la sélection du résumé', variant: 'destructive' });
+                showAlert('Erreur lors de la sélection du résumé', 'error');
             });
     };
 
@@ -58,7 +81,7 @@ const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary: in
             .then(response => {
                 const newSummary = response.data.summary;
                 setSummaries([...summaries, newSummary]);
-                toast({ title: response.data.message });
+                showAlert('Résumé créé avec succès', 'success');
                 resetForm();
             })
             .catch(error => {
@@ -75,7 +98,7 @@ const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary: in
                         summary.id === response.data.summary.id ? response.data.summary : summary
                     )
                 );
-                toast({ title: response.data.message });
+                showAlert('Résumé mis à jour avec succès', 'success');
                 resetForm();
             })
             .catch(error => {
@@ -83,23 +106,39 @@ const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary: in
             });
     };
 
+
     const handleDelete = (summaryId) => {
-        if (confirm('Êtes-vous sûr de vouloir supprimer ce résumé ?')) {
-            axios.delete(route('summaries.destroy', summaryId))
-                .then(response => {
-                    setSummaries(prevSummaries =>
-                        prevSummaries.filter(summary => summary.id !== summaryId)
-                    );
-                    if (selectedSummary.some(s => s.id === summaryId)) {
-                        setSelectedSummary([]);
-                    }
-                    toast({ title: response.data.message });
-                })
-                .catch(error => {
-                    console.error(error);
-                    toast({ title: 'Erreur lors de la suppression du résumé', variant: 'destructive' });
-                });
-        }
+        Swal.fire({
+            title: 'Supprimer ?',
+            text: "Cette action est irréversible !",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Oui',
+            cancelButtonText: 'Non',
+            toast: true,
+            position: 'top-end',
+            timer: 5000,
+            timerProgressBar: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete(route('summaries.destroy', summaryId))
+                    .then(response => {
+                        setSummaries(prevSummaries =>
+                            prevSummaries.filter(summary => summary.id !== summaryId)
+                        );
+                        if (selectedSummary.some(s => s.id === summaryId)) {
+                            setSelectedSummary([]);
+                        }
+                        showAlert('Résumé supprimé avec succès');
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        showAlert('Erreur lors de la suppression du résumé', 'error');
+                    });
+            }
+        });
     };
 
     const handleSelect = (summary) => {
@@ -108,21 +147,18 @@ const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary: in
             name: summary.name,
             description: summary.description,
         });
+        setIsFormVisible(true);
     };
 
     const resetForm = () => {
         reset();
         setData('id', null);
+        setIsFormVisible(false);
     };
 
     const handleValidationErrors = (errors) => {
-        for (const field in errors) {
-            toast({
-                title: 'Erreur de validation',
-                description: errors[field],
-                variant: 'destructive',
-            });
-        }
+        const errorMessages = Object.values(errors).join('\n');
+        showAlert(errorMessages, 'error');
     };
 
     const handleSearch = (e) => {
@@ -131,49 +167,71 @@ const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary: in
 
     return (
         <div className="container mx-auto p-8 space-y-8">
-            <h1 className="text-4xl font-bold text-gray-800">Gestion des Résumés</h1>
+            <div className="flex justify-between items-center">
+                <h1 className="text-4xl font-bold text-gray-800">Gestion des Résumés</h1>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button onClick={() => setIsFormVisible(!isFormVisible)} className="flex items-center gap-2">
+                        {isFormVisible ? (
+                            <XIcon className="h-4 w-4" />
+                        ) : (
+                            <PlusIcon className="h-4 w-4" />
+                        )}
+                        {isFormVisible ? 'Fermer' : 'Ajouter'}
+                    </Button>
+                </motion.div>
+            </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>{data.id ? 'Modifier le résumé' : 'Créer un résumé'}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={data.id ? handleUpdate : handleCreate} className="space-y-6">
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Titre du résumé</Label>
-                            <Input
-                                id="name"
-                                value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
-                                placeholder="Entrez le titre du résumé"
-                            />
-                            {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
-                        </div>
+            <AnimatePresence>
+                {isFormVisible && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <Card>
+                            <CardContent>
+                                <form onSubmit={data.id ? handleUpdate : handleCreate} className="space-y-6">
+                                    <div>
+                                        <Label htmlFor="name">Titre du résumé</Label>
+                                        <Input
+                                            id="name"
+                                            value={data.name}
+                                            onChange={(e) => setData('name', e.target.value)}
+                                            placeholder="Entrez le titre du résumé"
+                                        />
+                                        {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+                                    </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="description">Description</Label>
-                            <Textarea
-                                id="description"
-                                value={data.description}
-                                onChange={(e) => setData('description', e.target.value)}
-                                placeholder="Entrez la description du résumé"
-                            />
-                            {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
-                        </div>
+                                    <div>
+                                        <Label htmlFor="description">Description</Label>
+                                        <Textarea
+                                            id="description"
+                                            value={data.description}
+                                            onChange={(e) => setData('description', e.target.value)}
+                                            placeholder="Entrez la description"
+                                        />
+                                        {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
+                                    </div>
 
-                        <div className="flex justify-end gap-4">
-                            <Button type="submit" disabled={processing}>
-                                {data.id ? 'Enregistrer les modifications' : 'Créer'}
-                            </Button>
-                            {data.id && (
-                                <Button variant="outline" onClick={resetForm}>
-                                    Annuler
-                                </Button>
-                            )}
-                        </div>
-                    </form>
-                </CardContent>
-            </Card>
+                                    <div className="flex justify-end gap-4">
+                                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                            <Button type="submit" disabled={processing}>
+                                                {data.id ? 'Enregistrer' : 'Créer'}
+                                            </Button>
+                                        </motion.div>
+                                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                            <Button variant="outline" onClick={resetForm}>
+                                                Annuler
+                                            </Button>
+                                        </motion.div>
+                                    </div>
+                                </form>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <div className="space-y-4">
                 <div className="flex justify-between items-center">
@@ -185,60 +243,78 @@ const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary: in
                             value={searchQuery}
                             onChange={handleSearch}
                         />
-                        <Button variant="outline" onClick={() => setSearchQuery('')}>
-                            Tout afficher
-                        </Button>
                     </div>
                 </div>
 
-                {filteredSummaries.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredSummaries.map((summary) => (
-                            <Card key={summary?.id} className={`${
-                                selectedSummary.some((s) => s?.id === summary?.id) ? 'bg-primary/10 border-primary' : ''
-                            }`}>
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-lg font-medium">{summary?.name}</CardTitle>
-                                    <div className="flex items-center space-x-2">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => handleSelect(summary)}
-                                        >
-                                            <PencilIcon className="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => handleDelete(summary?.id)}
-                                        >
-                                            <TrashIcon className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-sm text-muted-foreground mb-4">{summary?.description}</p>
-                                    <div className="flex justify-end">
-                                        <Button
-                                            variant={selectedSummary.some((s) => s?.id === summary?.id) ? "primary" : "secondary"}
-                                            onClick={() => handleSelectSummary(summary?.id)}
-                                        >
-                                            {selectedSummary.some((s) => s?.id === summary?.id) ? 'Sélectionné' : 'Sélectionner'}
-                                        </Button>
-                                    </div>
+                <AnimatePresence>
+                    {filteredSummaries.length > 0 ? (
+                        <motion.div
+                            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                        >
+                            {filteredSummaries.map((summary) => (
+                                <motion.div
+                                    layout
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    transition={{ duration: 0.3 }}
+                                    key={summary?.id}
+                                >
+                                    <Card className={`${
+                                        selectedSummary.some((s) => s?.id === summary?.id) ? 'bg-primary/10 border-primary' : ''
+                                    }`}>
+                                        <CardHeader className="flex justify-between pb-2">
+                                            <CardTitle>{summary?.name}</CardTitle>
+                                            <div className="flex gap-2">
+                                                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                                    <Button variant="ghost" size="icon" onClick={() => handleSelect(summary)}>
+                                                        <PencilIcon className="h-4 w-4" />
+                                                    </Button>
+                                                </motion.div>
+                                                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(summary?.id)}>
+                                                        <TrashIcon className="h-4 w-4" />
+                                                    </Button>
+                                                </motion.div>
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <p className="text-sm text-muted-foreground">{summary?.description}</p>
+                                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                                <Button
+                                                    variant={selectedSummary.some((s) => s?.id === summary?.id) ? "primary" : "secondary"}
+                                                    onClick={() => handleSelectSummary(summary?.id)}
+                                                    className="mt-2"
+                                                >
+                                                    {selectedSummary.some((s) => s?.id === summary?.id) ? 'Sélectionné' : 'Sélectionner'}
+                                                </Button>
+                                            </motion.div>
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    ) : (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                        >
+                            <Card>
+                                <CardContent className="text-center py-6">
+                                    <p className="text-sm text-muted-foreground">
+                                        {searchQuery
+                                            ? "Aucun résumé ne correspond à votre recherche."
+                                            : "Aucun résumé pour l'instant. Utilisez le formulaire ci-dessus pour en créer un."}
+                                    </p>
                                 </CardContent>
                             </Card>
-                        ))}
-                    </div>
-                ) : (
-                    <Card>
-                        <CardContent className="text-center py-6">
-                            <p className="text-sm text-muted-foreground">
-                                Vous n'avez pas encore de résumés. Utilisez le formulaire ci-dessus pour en créer un.
-                            </p>
-                        </CardContent>
-                    </Card>
-                )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
         </div>
     );
