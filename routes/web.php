@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CareerAdvisorController;
 use App\Http\Controllers\CompetenceController;
 use App\Http\Controllers\CvGalleryController;
 use App\Http\Controllers\CvInfosController;
@@ -32,7 +33,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/Dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
-
+    Route::get('/career-advisor', [CareerAdvisorController::class, 'index'])->name('career-advisor.index');
+    Route::post('/career-advisor/advice', [CareerAdvisorController::class, 'getAdvice'])->name('career-advisor.advice');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

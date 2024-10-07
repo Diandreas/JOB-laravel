@@ -2,7 +2,7 @@ import { useState, PropsWithChildren, ReactNode } from 'react';
 import { Link } from '@inertiajs/react';
 import { User } from '@/types';
 import { Toaster } from "@/Components/ui/toaster";
-import { Folder, FileText, Eye, Menu, X, Home, User as UserIcon } from 'lucide-react';
+import { Briefcase, Folder, FileText, Eye, Menu, X, Home, User as UserIcon } from 'lucide-react';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
@@ -40,6 +40,10 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                             </NavLink>
                             <NavLink href={route('sponsorship.index')} active={route().current('sponsorship.index')}>
                                 sponsorship
+                            </NavLink>
+                            <NavLink href={route('career-advisor.index')} active={route().current('career-advisor.index')}>
+                                {/*<Briefcase className="w-5 h-5 mr-2" />*/}
+                                Career Advisor
                             </NavLink>
                         </div>
 
@@ -114,25 +118,37 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                 {/*@ts-ignore*/}
                 {['cv-infos.show', 'cv-infos.index','userCvModels.index'].includes(route().current()) && (
                     <aside className={`${isSidebarOpen ? 'block' : 'hidden'} md:block w-64 bg-white shadow-lg`}>
-                        <ul className="space-y-2 py-4">
+                        <ul className="space-y-1 py-4">
                             <Link href={route('cv-infos.index')}>
-                                <li className="flex items-center space-x-2 p-3 rounded-md hover:bg-indigo-50 transition-colors duration-200">
+                                <li className={`flex items-center space-x-2 p-3 rounded-md transition-colors duration-200 ${
+                                    route().current('cv-infos.index') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-indigo-50 text-gray-700'
+                                }`}>
                                     <Folder className="h-5 w-5 text-indigo-500" />
-                                    <span className="text-gray-700">Mon CV</span>
+                                    <span>Mon CV</span>
                                 </li>
                             </Link>
-
                             <Link href={route('userCvModels.index')}>
-                                <li className="flex items-center space-x-2 p-3 rounded-md hover:bg-indigo-50 transition-colors duration-200">
+                                <li className={`flex items-center space-x-2 p-3 rounded-md transition-colors duration-200 ${
+                                    route().current('userCvModels.index') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-indigo-50 text-gray-700'
+                                }`}>
                                     <FileText className="h-5 w-5 text-indigo-500" />
-                                    <span className="text-gray-700">Mes designs</span>
+                                    <span>Mes designs</span>
                                 </li>
                             </Link>
-
                             <Link href={'/cv-infos/show'}>
-                                <li className="flex items-center space-x-2 p-3 rounded-md hover:bg-indigo-50 transition-colors duration-200">
+                                <li className={`flex items-center space-x-2 p-3 rounded-md transition-colors duration-200 ${
+                                    route().current('cv-infos.show') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-indigo-50 text-gray-700'
+                                }`}>
                                     <Eye className="h-5 w-5 text-indigo-500" />
-                                    <span className="text-gray-700">Preview/Export</span>
+                                    <span>Preview/Export</span>
+                                </li>
+                            </Link>
+                            <Link href={'/cv-infos/show'}>
+                                <li className={`flex items-center space-x-2 p-3 rounded-md transition-colors duration-200 ${
+                                    route().current('cv-infos.show') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-indigo-50 text-gray-700'
+                                }`}>
+                                    <Briefcase className="h-5 w-5 text-indigo-500" />
+                                    <span>Portfolio</span>
                                 </li>
                             </Link>
                         </ul>
