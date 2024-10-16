@@ -11,6 +11,7 @@ use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\HobbyController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\PersonalInformationController;
+use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\ProfessionCategoryController;
 use App\Http\Controllers\ProfessionMissionController;
 use App\Http\Controllers\ProfileController;
@@ -28,11 +29,16 @@ Route::get('language/{locale}', [LanguageController::class, 'switch'])->name('la
 Route::get('/', function () {
     return Inertia::render('Welcome');
 })->name('WELCOME');
-
+Route::get('/portfolio/{username}', [PortfolioController::class, 'show'])->name('portfolio.show');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/Dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
+    Route::get('/portfolio/edit', [PortfolioController::class, 'edit'])->name('portfolio.edit');
+    Route::put('/portfolio', [PortfolioController::class, 'update'])->name('portfolio.update');
+
+
     Route::get('/career-advisor', [CareerAdvisorController::class, 'index'])->name('career-advisor.index');
     Route::post('/career-advisor/advice', [CareerAdvisorController::class, 'getAdvice'])->name('career-advisor.advice');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -103,6 +109,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('profession-missions', ProfessionMissionController::class);
         Route::resource('CvModels', CvModelController::class);
     });
+
+
 });
 
 require __DIR__.'/auth.php';
