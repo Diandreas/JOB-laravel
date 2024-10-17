@@ -1,42 +1,35 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\User;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 
 class PortfolioController extends Controller
 {
-    public function show($username)
+    public function index()
     {
-        $user = User::where('username', $username)->firstOrFail();
+        return Inertia::render('Portfolio/Index');
+    }
 
-        // Récupérer toutes les informations nécessaires pour le portfolio
-        $portfolio = [
-            'personalInfo' => $user->personalInformation,
-            'experiences' => $user->experiences,
-            'competences' => $user->competences,
-            'hobbies' => $user->hobbies,
-            'summaries' => $user->summaries,
-            // Ajoutez d'autres informations pertinentes ici
-        ];
+    public function show($identifier)
+    {
+        $user = User::where('username', $identifier)
+            ->orWhere('email', $identifier)
+            ->firstOrFail();
+
+        $portfolio = $this->getPortfolioData($user);
 
         return Inertia::render('Portfolio/Show', [
             'portfolio' => $portfolio,
-            'username' => $username,
+            'identifier' => $user->identifier,
         ]);
     }
 
     public function edit()
     {
         $user = auth()->user();
-
-        $portfolio = [
-            'personalInfo' => $user->personalInformation,
-            'design' => $user->portfolioDesign,
-            // Ajoutez d'autres informations personnalisables ici
-        ];
+        $portfolio = $this->getPortfolioData($user);
 
         return Inertia::render('Portfolio/Edit', [
             'portfolio' => $portfolio,
@@ -47,15 +40,42 @@ class PortfolioController extends Controller
     {
         $user = auth()->user();
 
-        // Validez et mettez à jour les informations du portfolio
-        $validated = $request->validate([
-            'design' => 'sometimes|array',
-            // Ajoutez d'autres règles de validation ici
+        // Validation...
+
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone_number' => $request->phone,
+            'address' => $request->address,
+            'github' => $request->github,
+            'linkedin' => $request->linkedin,
         ]);
 
-        $user->portfolioDesign()->update($validated['design']);
-        // Mettez à jour d'autres informations personnalisables ici
+        // Update experiences, competences, hobbies...
+
+        $user->selected_summary()->update([
+            'description' => $request->summary,
+        ]);
 
         return redirect()->route('portfolio.edit')->with('success', 'Portfolio mis à jour avec succès.');
+    }
+
+    private function getPortfolioData($user)
+    {
+        return [
+            'personalInfo' => [
+                'name' => $user->name,
+                'email' => $user->email,
+                'username' => $user->username,
+                'phone' => $user->phone_number,
+                'address' => $user->address,
+                'github' => $user->github,
+                'linkedin' => $user->linkedin,
+            ],
+            'experiences' => $user->experiences()->get(),
+            'competences' => $user->competences()->get(),
+            'hobbies' => $user->hobbies()->get(),
+            'summary' => $user->selected_summary,
+        ];
     }
 }

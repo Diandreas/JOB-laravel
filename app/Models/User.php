@@ -31,6 +31,7 @@ class User extends Authenticatable
         'linkedin',
         'address',
         'phone_number',
+        'username'
     ];
 
     /**
@@ -228,5 +229,34 @@ class User extends Authenticatable
     public function totalReferralEarnings()
     {
         return $this->referralEarnings()->where('status', 'paid')->sum('amount');
+    }
+    public function getRouteKeyName()
+    {
+        return 'username';
+    }
+
+    /**
+     * Get the user's portfolio design.
+     */
+    public function portfolioDesign()
+    {
+        return $this->hasOne(PortfolioDesign::class);
+    }
+    public function getUsername()
+    {
+        return $this->username ?? $this->email;
+    }
+    public function getIdentifierAttribute()
+    {
+        return $this->username ?? $this->email;
+    }
+//    public function portfolioSubscription()
+//    {
+//        return $this->hasOne(PortfolioSubscription::class);
+//    }
+
+    public function portfolioSettings()
+    {
+        return $this->hasOne(PortfolioSettings::class);
     }
 }

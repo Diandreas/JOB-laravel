@@ -23,13 +23,36 @@ use App\Http\Controllers\UserCompetenceController;
 use App\Http\Controllers\UserHobbyController;
 use App\Http\Controllers\UserProfessionsController;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+
+
+
+
+$checkPortfolioSubscription = function (Request $request, Closure $next) {
+    if (!$request->user() || !$request->user()->portfolioSubscription || !$request->user()->portfolioSubscription->isActive()) {
+        return redirect()->route('subscription.create')->with('error', 'Vous devez avoir un abonnement actif pour accéder à cette fonctionnalité.');
+    }
+    return $next($request);
+};
+
+
 Route::get('language/{locale}', [LanguageController::class, 'switch'])->name('language.switch');
 Route::get('/', function () {
     return Inertia::render('Welcome');
 })->name('WELCOME');
-Route::get('/portfolio/{username}', [PortfolioController::class, 'show'])->name('portfolio.show');
+
+Route::middleware(['auth'])->group(function () {
+//    Route::get('/portfolio/{username}', [PortfolioController::class, 'show'])->name('portfolio.show');
+    Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
+    Route::get('/portfolio/edit', [PortfolioController::class, 'edit'])->name('portfolio.edit');
+    Route::put('/portfolio', [PortfolioController::class, 'update'])->name('portfolio.update');
+});
+Route::get('/portfolio/{identifier}', [PortfolioController::class, 'show'])
+    ->name('portfolio.show')
+    ->where('identifier', '.*');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/Dashboard', function () {
         return Inertia::render('Dashboard');

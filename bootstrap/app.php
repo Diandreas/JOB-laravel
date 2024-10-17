@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
+
+        ]);
+        $middleware->alias([
+            'check.portfolio.subscription' => \App\Http\Middleware\CheckPortfolioSubscription::class,
         ]);
 
         //

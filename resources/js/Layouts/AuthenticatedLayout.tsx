@@ -35,16 +35,24 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                             <NavLink href={route('cv-infos.index')} active={route().current('cv-infos.index')}>
                                 CV
                             </NavLink>
+
+                            <NavLink
+                                href={route('portfolio.index')}
+                                active={route().current('portfolio.index')}
+                            >
+                                Mon Portfolio
+                            </NavLink>
                             <NavLink href='#' active={route().current('index')}>
                                Job Anounce(coming)
                             </NavLink>
-                            <NavLink href={route('sponsorship.index')} active={route().current('sponsorship.index')}>
-                                sponsorship
-                            </NavLink>
+
                             <NavLink href={route('career-advisor.index')} active={route().current('career-advisor.index')}>
                                 {/*<Briefcase className="w-5 h-5 mr-2" />*/}
                                 Career Advisor
                             </NavLink>
+                            <NavLink href={route('sponsorship.index')} active={route().current('sponsorship.index')}>
+                            sponsorship
+                        </NavLink>
                         </div>
 
                         <div className="hidden sm:flex sm:items-center sm:ms-6">
@@ -143,14 +151,7 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                                     <span>Preview/Export</span>
                                 </li>
                             </Link>
-                            <Link href={'/cv-infos/show'}>
-                                <li className={`flex items-center space-x-2 p-3 rounded-md transition-colors duration-200 ${
-                                    route().current('cv-infos.show') ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-indigo-50 text-gray-700'
-                                }`}>
-                                    <Briefcase className="h-5 w-5 text-indigo-500" />
-                                    <span>Portfolio</span>
-                                </li>
-                            </Link>
+
                         </ul>
                     </aside>
                 )}

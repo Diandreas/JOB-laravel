@@ -70,7 +70,7 @@ export default function Show({ auth, cvInformation }: Props) {
             <Head title="CV Professionnel" />
 
             <motion.div
-                className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8"
+                className=" mx-auto py-6 sm:px-6 lg:px-8"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
