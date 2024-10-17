@@ -1,217 +1,100 @@
 import React from 'react';
 import { Head, useForm } from '@inertiajs/react';
-import { User, Briefcase, GraduationCap, Heart } from 'lucide-react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Button } from "@/Components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
-import { Textarea } from "@/Components/ui/textarea";
-import { Label } from "@/Components/ui/label";
+import { Switch } from "@/Components/ui/switch";
 
-export default function Edit({ portfolio }) {
+export default function Edit({ auth, portfolio, settings }) {
     const { data, setData, put, processing, errors } = useForm({
-        name: portfolio.personalInfo.name,
-        email: portfolio.personalInfo.email,
-        phone: portfolio.personalInfo.phone,
-        address: portfolio.personalInfo.address,
-        github: portfolio.personalInfo.github,
-        linkedin: portfolio.personalInfo.linkedin,
-        summary: portfolio.summary?.description || '',
-        experiences: portfolio.experiences,
-        competences: portfolio.competences,
-        hobbies: portfolio.hobbies,
+        design: settings.design || 'professional',
+        show_experiences: settings.show_experiences || false,
+        show_competences: settings.show_competences || false,
+        show_hobbies: settings.show_hobbies || false,
+        show_summary: settings.show_summary || false,
+        show_contact_info: settings.show_contact_info || false,
+        profile_picture: null,
     });
 
-    const handleSubmit = (e) => {
+    const onSubmit = (e) => {
         e.preventDefault();
-        put(route('portfolio.update'));
+        console.log("Form submitted", data);  // Débogage
+        put(route('portfolio.update'), {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                console.log("Form submitted successfully");  // Débogage
+                // Vous pouvez ajouter ici une notification de succès
+            },
+            onError: (errors) => {
+                console.error("Form submission failed", errors);  // Débogage
+                // Vous pouvez ajouter ici une notification d'erreur
+            },
+        });
     };
 
     return (
-        <div className="py-12">
+        <AuthenticatedLayout
+            user={auth.user}
+            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Éditer mon Portfolio</h2>}
+        >
             <Head title="Éditer mon Portfolio" />
 
-            <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <form onSubmit={handleSubmit}>
-                    <Card className="mb-6">
+            <div className="py-12">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <Card>
                         <CardHeader>
-                            <CardTitle className="flex items-center">
-                                <User className="mr-2" /> Informations personnelles
-                            </CardTitle>
+                            <CardTitle>Paramètres du Portfolio</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <Label htmlFor="name">Nom</Label>
+                            <form onSubmit={onSubmit}>
+                                <div className="mb-4">
+                                    <label className="block mb-2">Design du Portfolio</label>
+                                    <select
+                                        value={data.design}
+                                        onChange={(e) => setData('design', e.target.value)}
+                                        className="w-full p-2 border rounded"
+                                    >
+                                        <option value="intuitive">Intuitif</option>
+                                        <option value="professional">Professionnel</option>
+                                        <option value="user-friendly">Convivial</option>
+                                    </select>
+                                    {errors.design && <div className="text-red-500">{errors.design}</div>}
+                                </div>
+
+
+                                <div className="mb-4">
+                                    <label className="block mb-2">Éléments à afficher</label>
+                                    <div className="space-y-2">
+                                        {['experiences', 'competences', 'hobbies', 'summary', 'contact_info'].map((item) => (
+                                            <div key={item} className="flex items-center">
+                                                <Switch
+                                                    checked={data[`show_${item}`]}
+                                                    onCheckedChange={(checked) => setData(`show_${item}`, checked)}
+                                                />
+                                                <span className="ml-2">Afficher les {item}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="mb-4">
+                                    <label className="block mb-2">Photo de profil</label>
                                     <Input
-                                        id="name"
-                                        value={data.name}
-                                        onChange={(e) => setData('name', e.target.value)}
+                                        type="file"
+                                        onChange={(e) => setData('profile_picture', e.target.files[0])}
                                     />
                                 </div>
-                                <div>
-                                    <Label htmlFor="email">Email</Label>
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        value={data.email}
-                                        onChange={(e) => setData('email', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="phone">Téléphone</Label>
-                                    <Input
-                                        id="phone"
-                                        value={data.phone}
-                                        onChange={(e) => setData('phone', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="address">Adresse</Label>
-                                    <Input
-                                        id="address"
-                                        value={data.address}
-                                        onChange={(e) => setData('address', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="github">GitHub</Label>
-                                    <Input
-                                        id="github"
-                                        value={data.github}
-                                        onChange={(e) => setData('github', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="linkedin">LinkedIn</Label>
-                                    <Input
-                                        id="linkedin"
-                                        value={data.linkedin}
-                                        onChange={(e) => setData('linkedin', e.target.value)}
-                                    />
-                                </div>
-                            </div>
+
+                                <Button type="submit" disabled={processing}>
+                                    Enregistrer les modifications
+                                </Button>
+                            </form>
                         </CardContent>
                     </Card>
-
-                    <Card className="mb-6">
-                        <CardHeader>
-                            <CardTitle className="flex items-center">
-                                <Briefcase className="mr-2" /> Résumé professionnel
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <Textarea
-                                value={data.summary}
-                                onChange={(e) => setData('summary', e.target.value)}
-                                rows={4}
-                            />
-                        </CardContent>
-                    </Card>
-
-                    {/* Expériences */}
-                    <Card className="mb-6">
-                        <CardHeader>
-                            <CardTitle className="flex items-center">
-                                <Briefcase className="mr-2" /> Expériences
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {data.experiences.map((exp, index) => (
-                                <div key={index} className="mb-4">
-                                    <Input
-                                        value={exp.title}
-                                        onChange={(e) => {
-                                            const newExperiences = [...data.experiences];
-                                            newExperiences[index].title = e.target.value;
-                                            setData('experiences', newExperiences);
-                                        }}
-                                        placeholder="Titre"
-                                        className="mb-2"
-                                    />
-                                    <Textarea
-                                        value={exp.description}
-                                        onChange={(e) => {
-                                            const newExperiences = [...data.experiences];
-                                            newExperiences[index].description = e.target.value;
-                                            setData('experiences', newExperiences);
-                                        }}
-                                        placeholder="Description"
-                                        rows={3}
-                                    />
-                                </div>
-                            ))}
-                            <Button
-                                type="button"
-                                onClick={() => setData('experiences', [...data.experiences, { title: '', description: '' }])}
-                            >
-                                Ajouter une expérience
-                            </Button>
-                        </CardContent>
-                    </Card>
-
-                    {/* Compétences */}
-                    <Card className="mb-6">
-                        <CardHeader>
-                            <CardTitle className="flex items-center">
-                                <GraduationCap className="mr-2" /> Compétences
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {data.competences.map((comp, index) => (
-                                <Input
-                                    key={index}
-                                    value={comp.name}
-                                    onChange={(e) => {
-                                        const newCompetences = [...data.competences];
-                                        newCompetences[index].name = e.target.value;
-                                        setData('competences', newCompetences);
-                                    }}
-                                    className="mb-2"
-                                />
-                            ))}
-                            <Button
-                                type="button"
-                                onClick={() => setData('competences', [...data.competences, { name: '' }])}
-                            >
-                                Ajouter une compétence
-                            </Button>
-                        </CardContent>
-                    </Card>
-
-                    {/* Loisirs */}
-                    <Card className="mb-6">
-                        <CardHeader>
-                            <CardTitle className="flex items-center">
-                                <Heart className="mr-2" /> Loisirs
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {data.hobbies.map((hobby, index) => (
-                                <Input
-                                    key={index}
-                                    value={hobby.name}
-                                    onChange={(e) => {
-                                        const newHobbies = [...data.hobbies];
-                                        newHobbies[index].name = e.target.value;
-                                        setData('hobbies', newHobbies);
-                                    }}
-                                    className="mb-2"
-                                />
-                            ))}
-                            <Button
-                                type="button"
-                                onClick={() => setData('hobbies', [...data.hobbies, { name: '' }])}
-                            >
-                                Ajouter un loisir
-                            </Button>
-                        </CardContent>
-                    </Card>
-
-                    <Button type="submit" disabled={processing}>
-                        Enregistrer les modifications
-                    </Button>
-                </form>
+                </div>
             </div>
-        </div>
+        </AuthenticatedLayout>
     );
 }

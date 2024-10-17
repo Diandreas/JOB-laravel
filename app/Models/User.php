@@ -31,7 +31,8 @@ class User extends Authenticatable
         'linkedin',
         'address',
         'phone_number',
-        'username'
+        'username',
+        'profile_picture'
     ];
 
     /**

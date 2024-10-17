@@ -49,6 +49,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
     Route::get('/portfolio/edit', [PortfolioController::class, 'edit'])->name('portfolio.edit');
     Route::put('/portfolio', [PortfolioController::class, 'update'])->name('portfolio.update');
+    Route::get('/portfolio/{identifier}', [PortfolioController::class, 'show'])->name('portfolio.show');
 });
 Route::get('/portfolio/{identifier}', [PortfolioController::class, 'show'])
     ->name('portfolio.show')
