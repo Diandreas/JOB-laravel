@@ -91,7 +91,15 @@ class CvInfosController extends Controller
             'experiences' => $user->experiences()
                 ->join('experience_categories', 'experiences.experience_categories_id', '=', 'experience_categories.id')
                 ->join('attachments', 'experiences.attachment_id', '=', 'attachments.id') // Added join for attachments
-                ->select('experiences.*', 'experience_categories.name as category_name')
+                ->select('experiences.*', 'experience_categories.name as category_name',
+                    'attachments.name as attachment_name',
+                    DB::raw('CONCAT("/storage/", attachments.path) as attachment_path'), // Generate relative URL
+//                    DB::raw('CONCAT("' . public_path() . '/storage/", attachments.path) as attachment_path'),
+//                    DB::raw('CONCAT("' . storage_path('app/public/') . '", attachments.path) as attachment_path'),
+                    'attachments.format as attachment_format',
+                    'attachments.size as attachment_size',
+
+                )
                 ->orderBy('experience_categories.ranking', 'asc')
                 ->get()
                 ->toArray(),

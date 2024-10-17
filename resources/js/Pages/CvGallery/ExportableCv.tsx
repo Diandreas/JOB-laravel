@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { Separator } from "@/Components/ui/separator";
+import {Paperclip} from "lucide-react";
 
 export default function ExportableCv({ cvInformation, experiencesByCategory }) {
     const { hobbies, competences, professions, summaries, personalInformation } = cvInformation;
@@ -55,15 +56,25 @@ export default function ExportableCv({ cvInformation, experiencesByCategory }) {
                                 {experiences.map((exp) => (
                                     <div key={exp.id} className="mb-4 last:mb-0">
                                         <h4 className="font-semibold text-primary">{exp.title}</h4>
-                                        <p className="text-sm text-muted-foreground italic">{exp.company_name} | {exp.date_start} - {exp.date_end || 'Present'}</p>
+                                        <p className="text-sm text-muted-foreground italic">
+                                            {exp.InstitutionName} | {exp.date_start} - {exp.date_end || 'Present'}
+                                        </p>
                                         <p className="text-sm mt-1">{exp.description}</p>
                                         <p className="text-sm mt-1"><strong>Réalisations:</strong> {exp.output}</p>
+                                        {exp.comment && (
+                                            <p className="text-sm mt-1"><strong>Commentaire:</strong> {exp.comment}</p>
+                                        )}
+                                        {exp.attachment_id && (
+                                            <p className="text-sm mt-1 flex items-center">
+                                                <Paperclip className="w-4 h-4 mr-1" />
+                                                Pièce jointe
+                                            </p>
+                                        )}
                                     </div>
                                 ))}
                             </CardContent>
                         </Card>
-                    ))}
-                </section>
+                    ))}</section>
 
                 <aside className="col-span-1">
                     <Card className="mb-6">
