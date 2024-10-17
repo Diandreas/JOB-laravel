@@ -3,7 +3,14 @@ import { Head } from '@inertiajs/react';
 import { User, GraduationCap, Briefcase, Heart, Mail, Phone, MapPin, Github, Linkedin, FileText, Eye } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from "@/Components/ui/button";
-import { Dialog, DialogContent } from "@/Components/ui/dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle
+} from "@/Components/ui/dialog";
 
 const PortfolioLayout = ({ children, design }) => {
     const layouts = {
@@ -44,15 +51,28 @@ const Section = ({ title, icon, children, design }) => {
 };
 
 const PDFPreviewModal = ({ isOpen, onClose, pdfPath }) => {
+    console.log("PDFPreviewModal rendered with:", { isOpen, pdfPath });
+
+    if (!isOpen || !pdfPath) {
+        console.log("PDFPreviewModal not showing because:", { isOpen, pdfPath });
+        return null;
+    }
+
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="w-full max-w-4xl h-[80vh]">
-                <iframe src={pdfPath} className="w-full h-full" />
+
+                    <DialogTitle>Prévisualisation du document</DialogTitle>
+                    <DialogDescription>
+                        Si le document ne s'affiche pas, <a href={pdfPath} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">cliquez ici pour l'ouvrir dans un nouvel onglet</a>.
+                    </DialogDescription>
+
+                <iframe src={pdfPath} className="m-0 w-full h-full" />
+
             </DialogContent>
         </Dialog>
     );
 };
-
 export default function Show({ portfolio, identifier }) {
     const { personalInfo, experiences, competences, hobbies, summary, design } = portfolio;
     const [previewPDF, setPreviewPDF] = useState(null);

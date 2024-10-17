@@ -22,7 +22,7 @@ class PortfolioController extends Controller
             ->firstOrFail();
 
         $portfolio = $this->getPortfolioData($user);
-
+//dd($portfolio);
         return Inertia::render('Portfolio/Show', [
             'portfolio' => $portfolio,
             'identifier' => $user->identifier,
@@ -80,10 +80,11 @@ class PortfolioController extends Controller
 
     private function getPortfolioData($user)
     {
-        $settings = $user->portfolioSettings;
+        $settings = $user->portfolioSettings ?? $this->createDefaultSettings($user);
 
         return [
             'personalInfo' => [
+                'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
                 'username' => $user->username,
@@ -93,10 +94,26 @@ class PortfolioController extends Controller
                 'linkedin' => $user->linkedin,
                 'profile_picture' => $user->profile_picture ? Storage::url($user->profile_picture) : null,
             ],
-            'experiences' => $settings->show_experiences ? $user->experiences : [],
-            'competences' => $settings->show_competences ? $user->competences : [],
-            'hobbies' => $settings->show_hobbies ? $user->hobbies : [],
-            'summary' => $settings->show_summary ? $user->selected_summary : null,
+            'experiences' => $settings->show_experiences ? $user->experiences()
+                ->join('experience_categories', 'experiences.experience_categories_id', '=', 'experience_categories.id')
+                ->join('attachments', 'experiences.attachment_id', '=', 'attachments.id')
+                ->select('experiences.*',
+                    'experience_categories.name as category_name',
+                    'attachments.name as attachment_name',
+                    'attachments.path as attachment_path',
+                    'attachments.format as attachment_format',
+                    'attachments.size as attachment_size')
+                ->orderBy('experience_categories.ranking', 'asc')
+                ->get()
+                ->map(function ($experience) {
+                    $experience->attachment_path = $experience->attachment_path ? Storage::url($experience->attachment_path) : null;
+                    return $experience;
+                })
+                ->toArray() : [],
+            'competences' => $settings->show_competences ? $user->competences()->take(3)->get()->toArray() : [],
+            'hobbies' => $settings->show_hobbies ? $user->hobbies()->take(3)->get()->toArray() : [],
+            'summary' => $settings->show_summary ? ($user->selected_summary ? [$user->selected_summary->toArray()] : []) : [],
+            'professions' => $user->profession()->take(2)->get()->toArray(),
             'design' => $settings->design,
             'show_contact_info' => $settings->show_contact_info,
             'show_experiences' => $settings->show_experiences,
