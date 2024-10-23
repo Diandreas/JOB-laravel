@@ -20,7 +20,7 @@ const CvModelCreate = () => {
         formData.append('price', data.price);
         formData.append('previewImage', data.previewImage);
 
-        post(route('CvModels.store'), formData);
+        post(route('cv-models.store'), formData);
     };
 
     const handleFileChange = (e) => {

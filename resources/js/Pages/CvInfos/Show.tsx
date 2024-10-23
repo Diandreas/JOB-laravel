@@ -1,126 +1,118 @@
-import React, { Suspense, lazy } from 'react';
+import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/Components/ui/card";
-import { Head, Link } from '@inertiajs/react';
+import { Card, CardHeader, CardTitle, CardContent } from "@/Components/ui/card";
+import { Head } from '@inertiajs/react';
 import { Button } from "@/Components/ui/button";
-import { Mail, Phone, MapPin, Linkedin, Github, Briefcase, GraduationCap, Heart } from 'lucide-react';
-// @ts-ignore
-import html2pdf from 'html2pdf.js';
-import printJS from "print-js";
+import { Download, Eye, Printer } from 'lucide-react';
+import { useToast } from "@/Components/ui/use-toast";
 
-interface CvInformationProps {
-    cvInformation: {
-        hobbies: { id: number, name: string }[];
-        competences: { id: number, name: string }[];
-        experiences: {
-            id: number,
-            title: string,
-            company_name: string,
-            date_start: string,
-            date_end: string | null,
-            category_name: string,
-            description: string,
-            output: string
-        }[];
-        professions: { id: number, name: string }[];
-        summaries: { id: number, description: string }[];
-        personalInformation: {
-            id: number,
-            firstName: string;
-            lastName: string;
-            email: string;
-            phone: string;
-            address: string;
-            linkedin: string;
-            github: string;
-        };
-    };
-    selectedCvModel: {
-        viewPath: string;
-    } | null;
+interface CvModelProps {
+    id: number;
+    viewPath: string;
 }
 
-const exportToPdf = () => {
-    const element = document.getElementById('exportable-cv');
-    const opt = {
-        margin: [0, 10, 10, 0], // top, right, bottom, left
-        filename: 'cv.pdf',
-        image: { type: 'jpeg', quality: 2 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+interface Props {
+    auth: {
+        user: any;
     };
-    html2pdf().set(opt).from(element).save();
-};
+    cvInformation: any;
+    selectedCvModel: CvModelProps | null;
+}
 
-export default function Show({ auth, cvInformation, selectedCvModel }: CvInformationProps) {
-    const { hobbies, competences, experiences, professions, summaries, personalInformation } = cvInformation;
-    const experiencesByCategory = experiences.reduce((acc, curr) => {
-        if (!acc[curr.category_name]) {
-            acc[curr.category_name] = [];
-        }
-        acc[curr.category_name].push(curr);
-        return acc;
-    }, {});
+export default function Show({ auth, cvInformation, selectedCvModel }: Props) {
+    const { toast } = useToast();
+    const [isLoading, setIsLoading] = useState(false);
 
-    let DynamicCvView = null;
-    if (selectedCvModel && selectedCvModel.viewPath) {
-        DynamicCvView = lazy(() => import(`../../Pages/CvGallery/${selectedCvModel.viewPath}`));
+    if (!selectedCvModel) {
+        return (
+            <AuthenticatedLayout
+                user={auth.user}
+                header={<h2 className="font-semibold text-2xl text-gray-800 leading-tight">Mon CV Professionnel</h2>}
+            >
+                <Head title="CV Professionnel" />
+                <div className="w-full p-6">
+                    <Card>
+                        <CardContent className="p-6">
+                            <p className="text-center text-gray-600">
+                                Veuillez sélectionner un modèle de CV dans la section "Mes designs" avant de continuer.
+                            </p>
+                        </CardContent>
+                    </Card>
+                </div>
+            </AuthenticatedLayout>
+        );
     }
 
-    // @ts-ignore
+    const handlePreview = () => {
+        const previewUrl = route('cv.preview', { id: selectedCvModel.id });
+        window.open(previewUrl, '_blank');
+    };
+
+    const handlePrint = () => {
+        const printUrl = route('cv.preview', { id: selectedCvModel.id });
+        const printWindow = window.open(printUrl, '_blank');
+        printWindow?.addEventListener('load', () => {
+            printWindow.print();
+        });
+    };
+
+    const handleDownload = async () => {
+        try {
+            setIsLoading(true);
+            window.location.href = route('cv.download', { id: selectedCvModel.id });
+        } catch (error) {
+            toast({
+                title: "Erreur",
+                description: "Une erreur est survenue lors du téléchargement du CV.",
+                variant: "destructive",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <AuthenticatedLayout
             user={auth.user}
-            header={
-                <h2 className="font-semibold text-2xl text-gray-800 leading-tight">Mon CV Professionnel</h2>
-            }
+            header={<h2 className="font-semibold text-2xl text-gray-800 leading-tight">Mon CV Professionnel</h2>}
         >
             <Head title="CV Professionnel" />
-            <div className="w-full">
-                <div className="w-full">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-2xl font-bold">Exporter Mon CV</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-gray-600 mb-4">
-                                Visualisez votre CV professionnel et exportez-le en format PDF pour le partager facilement.
-                            </p>
-                            <Button
-                                onClick={exportToPdf}
-                                className="mb-6"
-                                size="lg"
-
-                            >
-                                <GraduationCap className="mr-2 h-4 w-4" /> Exporter en PDF
-                            </Button>
-                            <div className=" w-full border rounded-lg p-6 bg-white shadow-sm">
-                                <Suspense fallback={<div>Chargement...</div>}>
-                                    {Object.keys(experiencesByCategory).length > 0 ? (
-                                        DynamicCvView ? (
-                                            <DynamicCvView cvInformation={cvInformation} experiencesByCategory={experiencesByCategory} />
-                                        ) : (
-                                            <p>Aucune vue de CV sélectionnée.</p>
-                                        )
-                                    ) : (
-                                        <p>Aucune expérience à afficher.</p>
-                                    )}
-                                </Suspense>
+            <div className="w-full p-6">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-2xl font-bold">Exporter Mon CV</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-6">
+                            <div className="flex gap-4">
+                                <Button
+                                    onClick={handleDownload}
+                                    className="bg-primary"
+                                    disabled={isLoading}
+                                >
+                                    <Download className="mr-2 h-4 w-4" />
+                                    {isLoading ? 'Téléchargement...' : 'Télécharger PDF'}
+                                </Button>
+                                <Button onClick={handlePreview} variant="outline">
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    Prévisualiser
+                                </Button>
+                                <Button onClick={handlePrint} variant="outline">
+                                    <Printer className="mr-2 h-4 w-4" />
+                                    Imprimer
+                                </Button>
                             </div>
-                        </CardContent>
-                        <CardFooter className="flex justify-between">
-                            {/*<Link*/}
-                            {/*    href={route('dashboard')}*/}
-                            {/*    className="text-sm text-gray-600 hover:text-gray-900 transition duration-150 ease-in-out"*/}
-                            {/*>*/}
-                            {/*    Retour au tableau de bord*/}
-                            {/*</Link>*/}
-                            {/*<Button variant="outline" onClick={() => window.print()}>*/}
-                            {/*    Imprimer*/}
-                            {/*</Button>*/}
-                        </CardFooter>
-                    </Card>
-                </div>
+
+                            <div className="w-full border rounded-lg bg-white shadow-sm">
+                                <iframe
+                                    src={route('cv.preview', { id: selectedCvModel.id })}
+                                    className="w-full h-[800px] border-0 rounded-lg"
+                                    title="CV Preview"
+                                />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
         </AuthenticatedLayout>
     );
