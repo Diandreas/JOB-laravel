@@ -68,7 +68,7 @@ class CvInfosController extends Controller
             'availableHobbies' => $availableHobbies->toArray(),
             'availableProfessions' => $availableProfessions->toArray(),
             'availableSummaries' => $availableSummaries->toArray(),
-            'myProfession' => $myProfession->toArray(),
+            'myProfession' => $myProfession?->toArray() ?? null,
             'experienceCategories' => $experienceCategories->toArray(),
 
 

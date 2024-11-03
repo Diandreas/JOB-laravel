@@ -47,8 +47,8 @@ return new class extends Migration
 
         Schema::table('users', function (Blueprint $table) {
             $table->string('surname', 45)->nullable();
-            $table->foreignId('address_id')->constrained()->onDelete('cascade');
-            $table->foreignId('profession_id')->constrained()->onDelete('cascade');
+//            $table->foreignId('address_id')->constrained()->onDelete('cascade');
+            $table->foreignId('profession_id')->nullable();;
             $table->integer('numberOfChild')->nullable();
             $table->string('maritalStatus', 1)->nullable();
 
@@ -78,7 +78,7 @@ return new class extends Migration
         Schema::create('competences', function (Blueprint $table) {
             $table->id();
             $table->string('name', 45)->nullable();
-            $table->string('description', 45)->nullable();
+            $table->string('description', 255)->nullable();
             $table->timestamps();
         });
 
