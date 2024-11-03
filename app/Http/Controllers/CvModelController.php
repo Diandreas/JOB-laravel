@@ -67,7 +67,7 @@ class CvModelController extends Controller
         $cvModel->viewPath = $viewName; // Sauvegarder juste le nom de la vue
         $cvModel->save();
 
-        return redirect()->route('CvModels.index')->with('message', 'CV Model created successfully.');
+        return redirect()->route('cv-models.index')->with('success', 'CV Model créé avec succès.');
     }
 
     private function getDefaultBladeTemplate()

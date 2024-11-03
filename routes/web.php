@@ -70,7 +70,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/user-hobbies/{user_id}/{hobby_id}', [UserHobbyController::class, 'destroy'])->name('user-hobbies.destroy');
 
     // User Competences
-    Route::resource('user-competences', UserCompetenceController::class)->except(['edit', 'update', 'show']);
+//    Route::resource('user-competences', UserCompetenceController::class)->except(['edit', 'update', 'show']);
 
     // Summaries
     Route::resource('summaries', SummaryController::class);
@@ -96,6 +96,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/cv-gallery/canadian', function () {
         return Inertia::render('CvGallery/Canadian');
     });
+
+    Route::delete('/user-competences/{user_id}/{competence_id}', [UserCompetenceController::class, 'destroy'])->name('user-competences.destroy');
+    Route::resource('user-competences', UserCompetenceController::class)->except(['destroy']);
+
 
     // Sponsorship
     Route::get('/sponsorship', [SponsorshipController::class, 'index'])->name('sponsorship.index');

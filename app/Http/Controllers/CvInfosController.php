@@ -35,20 +35,24 @@ class CvInfosController extends Controller
         $experienceCategories = ExperienceCategory::all();
 
         $cvInformation = [
-            'hobbies' => $user->hobbies()->take(3)->get()->toArray(),
-            'competences' => $user->competences()->take(3)->get()->toArray(),
+            'hobbies' => $user->hobbies()->get()->toArray(),
+            'competences' => $user->competences()->get()->toArray(),
             'experiences' => $user->experiences()
                 ->join('experience_categories', 'experiences.experience_categories_id', '=', 'experience_categories.id')
-                ->join('attachments', 'experiences.attachment_id', '=', 'attachments.id') // Added join for attachments
-                ->select('experiences.*', 'experience_categories.name as category_name',
-                    'attachments.name as attachment_name',
-                    DB::raw('CONCAT("/storage/", attachments.path) as attachment_path'), // Generate relative URL
-//                    DB::raw('CONCAT("' . public_path() . '/storage/", attachments.path) as attachment_path'),
-//                    DB::raw('CONCAT("' . storage_path('app/public/') . '", attachments.path) as attachment_path'),
-                    'attachments.format as attachment_format',
-                    'attachments.size as attachment_size',
-
-                )
+                ->leftJoin('attachments', 'experiences.attachment_id', '=', 'attachments.id') // Changed to leftJoin
+                ->select([
+                    'experiences.*',
+                    'experience_categories.name as category_name',
+                    // Attachment fields with COALESCE to handle NULL values
+                    DB::raw('COALESCE(attachments.name, NULL) as attachment_name'),
+                    DB::raw('CASE
+                WHEN attachments.path IS NOT NULL
+                THEN CONCAT("/storage/", attachments.path)
+                ELSE NULL
+            END as attachment_path'),
+                    DB::raw('COALESCE(attachments.format, NULL) as attachment_format'),
+                    DB::raw('COALESCE(attachments.size, NULL) as attachment_size')
+                ])
                 ->orderBy('experience_categories.ranking', 'asc')
                 ->get()
                 ->toArray(),

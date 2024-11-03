@@ -66,11 +66,11 @@ return new class extends Migration
 
         Schema::create('cv_models', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 45)->nullable();
-            $table->string('description', 45)->nullable();
-            $table->string('viewPath', 45)->nullable()->unique();
+            $table->string('name', 255)->nullable();
+            $table->string('description', 255)->nullable();
+            $table->string('viewPath', 255)->nullable()->unique();
             $table->integer('price')->nullable();
-            $table->string('previewImagePath', 45)->nullable();
+            $table->string('previewImagePath', 255)->nullable();
             $table->unique('name');
             $table->timestamps();
         });
@@ -130,11 +130,11 @@ return new class extends Migration
 
         Schema::create('experiences', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 45)->nullable();
-            $table->string('description', 45)->nullable();
+            $table->string('name', 255)->nullable();
+            $table->string('description', 255)->nullable();
             $table->date('date_start')->nullable();
             $table->date('date_end')->nullable();
-            $table->string('output', 45)->nullable();
+            $table->string('output', 255)->nullable();
             $table->foreignId('experience_categories_id')->constrained('experience_categories')->onDelete('cascade');
             $table->text('comment')->nullable();
             $table->string('InstitutionName')->nullable();

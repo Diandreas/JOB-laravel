@@ -31,14 +31,13 @@ class ExperienceController extends Controller
 //        ]);
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         $validatedData = $request->validate([
-            'name' => 'required|string|max:45',
-            'description' => 'nullable|string|max:45',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
             'date_start' => 'nullable|date',
             'date_end' => 'nullable|date|after_or_equal:date_start',
-            'output' => 'nullable|string|max:45',
+            'output' => 'nullable|string|max:255',
             'experience_categories_id' => 'required|exists:experience_categories,id',
             'comment' => 'nullable|string',
             'InstitutionName' => 'nullable|string|max:255',
@@ -59,12 +58,13 @@ class ExperienceController extends Controller
         $experience = Experience::create($validatedData);
         auth()->user()->experiences()->attach($experience->id);
 
+        // Charger les relations nécessaires
+        $experience->load(['category', 'attachment']);
+
         return response()->json([
             'message' => 'Expérience créée avec succès',
             'experience' => $experience,
         ]);
-
-        // return redirect()->route('experiences.index');
     }
 
     public function show(Experience $experience)
