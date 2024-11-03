@@ -83,8 +83,8 @@
         }
 
         .cv-container {
-            max-width: 210mm;
-            margin: 0 auto;
+            width: calc(210mm - 10px); /* A4 width minus margins */
+            min-height: calc(297mm - 10px); /* A4 height minus margins */
             padding: 3rem;
             font-family: 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;

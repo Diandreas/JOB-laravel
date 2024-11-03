@@ -1,35 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/Components/ui/card';
 import { useToast } from '@/Components/ui/use-toast';
 import axios from 'axios';
-import { CheckCircle, PlusCircle, X, Search, Filter, ArrowUpDown } from 'lucide-react';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/Components/ui/dialog";
+import { Search, CheckCircle } from 'lucide-react';
 import { Input } from '@/Components/ui/input';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/Components/ui/select";
-import { Progress } from '@/Components/ui/progress';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/Components/ui/tooltip";
+import { Alert, AlertDescription } from "@/Components/ui/alert";
 
 interface CvModel {
     id: number;
@@ -49,265 +26,190 @@ interface Props {
 const CvModelsIndex = ({ auth, userCvModels, availableCvModels, maxAllowedModels }: Props) => {
     const { toast } = useToast();
     const [selectedModelId, setSelectedModelId] = useState<number>(auth.user.selected_cv_model_id);
-    const [modalImage, setModalImage] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
     const [searchTerm, setSearchTerm] = useState<string>('');
-    const [sortBy, setSortBy] = useState<string>('name');
-    const [filterCategory, setFilterCategory] = useState<string>('all');
-    const [showConfirmDialog, setShowConfirmDialog] = useState<boolean>(false);
-    const [actionToConfirm, setActionToConfirm] = useState<() => void>(() => {});
+    const [loading, setLoading] = useState<boolean>(false);
+    const [previewModel, setPreviewModel] = useState<CvModel | null>(null);
 
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                closeModal();
-            }
-        };
-        document.addEventListener('keydown', handleKeyDown);
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-        };
-    }, []);
-
-    const handleSelectActiveModel = (cvModelId: number) => {
-        setActionToConfirm(() => () => {
+    const handleSelectModel = async (cvModelId: number) => {
+        try {
             setLoading(true);
-            axios.post('/user-cv-models/select-active', {
+            await axios.post('/user-cv-models/select-active', {
                 user_id: auth.user.id,
                 cv_model_id: cvModelId,
-            })
-                .then(() => {
-                    setSelectedModelId(cvModelId);
-                    toast({
-                        title: 'Active CV model updated',
-                        description: 'The active CV model has been updated.'
-                    });
-                })
-                .catch((error) => {
-                    toast({
-                        title: 'Error updating active CV model',
-                        description: error.response?.data?.message || 'An error occurred.',
-                        variant: 'destructive'
-                    });
-                })
-                .finally(() => setLoading(false));
-        });
-        setShowConfirmDialog(true);
-    };
-
-    const handleAddCvModel = (cvModelId: number) => {
-        setActionToConfirm(() => () => {
-            setLoading(true);
-            axios.post('/user-cv-models', {
-                user_id: auth.user.id,
-                cv_model_id: cvModelId,
-            })
-                .then(() => {
-                    toast({
-                        title: 'CV model added',
-                        description: 'The new CV model has been added to your list.'
-                    });
-                    window.location.reload();
-                })
-                .catch((error) => {
-                    toast({
-                        title: 'Error adding CV model',
-                        description: error.response?.data?.message || 'An error occurred.',
-                        variant: 'destructive'
-                    });
-                })
-                .finally(() => setLoading(false));
-        });
-        setShowConfirmDialog(true);
-    };
-
-    const openModal = (imagePath: string) => {
-        setModalImage(`/storage/${imagePath}`);
-    };
-
-    const closeModal = () => {
-        setModalImage(null);
-    };
-
-    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(event.target.value);
-    };
-
-    const handleSort = (value: string) => {
-        setSortBy(value);
-    };
-
-    const handleFilter = (value: string) => {
-        setFilterCategory(value);
-    };
-
-    const filteredAndSortedModels = (models: CvModel[]) => {
-        return models
-            .filter(model =>
-                model.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-                (filterCategory === 'all' || model.category === filterCategory)
-            )
-            .sort((a, b) => {
-                if (sortBy === 'name') {
-                    return a.name.localeCompare(b.name);
-                } else if (sortBy === 'price') {
-                    return a.price - b.price;
-                }
-                return 0;
             });
+            setSelectedModelId(cvModelId);
+            toast({
+                title: 'Modèle sélectionné',
+                description: 'Votre modèle de CV actif a été mis à jour.'
+            });
+        } catch (error: any) {
+            toast({
+                title: 'Erreur',
+                description: error.response?.data?.message || 'Une erreur est survenue.',
+                variant: 'destructive'
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const renderCvModelCard = (cvModel: CvModel, isUserModel: boolean) => (
-        <Card key={cvModel.id} className="hover:shadow-lg transition-shadow duration-300">
-            <CardHeader>
-                <CardTitle className="text-lg font-semibold">{cvModel.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-                {cvModel.previewImagePath && (
-                    <div className="relative overflow-hidden rounded-md cursor-pointer" onClick={() => openModal(cvModel.previewImagePath)}>
-                        <img
-                            src={`/storage/${cvModel.previewImagePath}`}
-                            alt={`Preview of ${cvModel.name}`}
-                            className="w-full h-48 object-cover transition-transform duration-300 hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-opacity duration-300 flex items-center justify-center">
-                            <span className="text-white opacity-0 hover:opacity-100 transition-opacity duration-300">Click to enlarge</span>
-                        </div>
-                    </div>
-                )}
-                <p className="mt-4 font-medium">
-                    Price: {cvModel.price === 0 ? 'Free' : `${cvModel.price.toLocaleString()} FCFA`}
-                </p>
-                <p className="mt-2">Category: {cvModel.category}</p>
-            </CardContent>
-            <CardFooter>
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                onClick={() => isUserModel ? handleSelectActiveModel(cvModel.id) : handleAddCvModel(cvModel.id)}
-                                className={`w-full ${isUserModel && selectedModelId === cvModel.id ? 'bg-green-500 hover:bg-green-600' : ''}`}
-                                disabled={isUserModel && selectedModelId === cvModel.id || loading}
-                            >
-                                {isUserModel ? (selectedModelId === cvModel.id ? 'Selected' : 'Select as Active') : 'Add Model'}
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            {isUserModel ? 'Set as your active CV model' : 'Add this model to your collection'}
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-            </CardFooter>
-        </Card>
-    );
+    const handleAddModel = async (cvModel: CvModel) => {
+        if (userCvModels.length >= maxAllowedModels) {
+            toast({
+                title: 'Limite atteinte',
+                description: `Vous ne pouvez pas ajouter plus de ${maxAllowedModels} modèles.`,
+                variant: 'destructive'
+            });
+            return;
+        }
+
+        try {
+            setLoading(true);
+            await axios.post('/user-cv-models', {
+                user_id: auth.user.id,
+                cv_model_id: cvModel.id,
+            });
+            window.location.reload();
+        } catch (error: any) {
+            toast({
+                title: 'Erreur',
+                description: error.response?.data?.message || 'Une erreur est survenue.',
+                variant: 'destructive'
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const filteredModels = (models: CvModel[]) => {
+        return models.filter(model =>
+            model.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    };
 
     return (
         <AuthenticatedLayout user={auth.user}>
-            <Head title="Manage CV Models" />
-            <div className="container mx-auto p-6 max-w-7xl">
-                <h1 className="text-4xl font-bold mb-12 text-center text-gray-800">Manage CV Models</h1>
+            <Head title="Mes modèles de CV" />
 
-                <div className="mb-6 flex flex-wrap gap-4 items-center justify-between">
+            <div className="max-w-6xl mx-auto px-4 py-8">
+                <div className="flex justify-between items-center mb-8">
+                    <h1 className="text-2xl font-semibold">Mes modèles de CV</h1>
                     <div className="flex items-center gap-2">
-                        <Search className="text-gray-400" />
+                        <Search className="text-gray-400 w-5 h-5" />
                         <Input
                             type="text"
-                            placeholder="Search models..."
+                            placeholder="Rechercher un modèle..."
                             value={searchTerm}
-                            onChange={handleSearch}
-                            className="max-w-xs"
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-64"
                         />
                     </div>
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            <Filter className="text-gray-400" />
-                            <Select onValueChange={handleFilter}>
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="Select category" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Categories</SelectItem>
-                                    <SelectItem value="professional">Professional</SelectItem>
-                                    <SelectItem value="creative">Creative</SelectItem>
-                                    <SelectItem value="academic">Academic</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <ArrowUpDown className="text-gray-400" />
-                            <Select onValueChange={handleSort}>
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="Sort by" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="name">Sort by Name</SelectItem>
-                                    <SelectItem value="price">Sort by Price</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
+                </div>
+
+                {/* Modèles actifs */}
+                <div className="space-y-6 mb-12">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-lg font-medium flex items-center gap-2">
+                            <CheckCircle className="text-green-500 w-5 h-5" />
+                            Modèles actifs
+                        </h2>
+                        <span className="text-sm text-gray-500">
+                            {userCvModels.length}/{maxAllowedModels} modèles
+                        </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {filteredModels(userCvModels).map((model) => (
+                            <div key={model.id}
+                                 className={`p-4 rounded-lg border transition-all ${
+                                     selectedModelId === model.id
+                                         ? 'border-green-500 bg-green-50'
+                                         : 'border-gray-200 hover:border-gray-300'
+                                 }`}
+                            >
+                                <div className="relative aspect-video mb-4 overflow-hidden rounded-md">
+                                    <img
+                                        src={`/storage/${model.previewImagePath}`}
+                                        alt={model.name}
+                                        className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
+                                        onClick={() => setPreviewModel(model)}
+                                    />
+                                </div>
+                                <div className="flex items-start justify-between gap-4">
+                                    <div>
+                                        <h3 className="font-medium">{model.name}</h3>
+                                        <p className="text-sm text-gray-500 mt-1">{model.category}</p>
+                                    </div>
+                                    <Button
+                                        variant={selectedModelId === model.id ? "secondary" : "outline"}
+                                        size="sm"
+                                        disabled={selectedModelId === model.id || loading}
+                                        onClick={() => handleSelectModel(model.id)}
+                                    >
+                                        {selectedModelId === model.id ? 'Actif' : 'Utiliser'}
+                                    </Button>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
 
-                <div className="space-y-12">
-                    <section>
-                        <h2 className="text-2xl font-semibold mb-6 flex items-center text-gray-700">
-                            <CheckCircle className="mr-2 text-green-500" />
-                            Your CV Models
-                        </h2>
-                        <Progress value={(userCvModels.length / maxAllowedModels) * 100} className="mb-4" />
-                        <p className="mb-4 text-sm text-gray-600">{userCvModels.length} of {maxAllowedModels} models selected</p>
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {filteredAndSortedModels(userCvModels).map((cvModel) => renderCvModelCard(cvModel, true))}
+                {/* Modèles disponibles */}
+                {availableCvModels.length > 0 && (
+                    <div className="space-y-6">
+                        <h2 className="text-lg font-medium">Modèles disponibles</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {filteredModels(availableCvModels).map((model) => (
+                                <div key={model.id} className="p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-all">
+                                    <div className="relative aspect-video mb-4 overflow-hidden rounded-md">
+                                        <img
+                                            src={`/storage/${model.previewImagePath}`}
+                                            alt={model.name}
+                                            className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
+                                            onClick={() => setPreviewModel(model)}
+                                        />
+                                    </div>
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div>
+                                            <h3 className="font-medium">{model.name}</h3>
+                                            <p className="text-sm text-gray-500 mt-1">{model.category}</p>
+                                            <p className="text-sm font-medium mt-2">
+                                                {model.price === 0 ? 'Gratuit' : `${model.price.toLocaleString()} FCFA`}
+                                            </p>
+                                        </div>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            disabled={loading}
+                                            onClick={() => handleAddModel(model)}
+                                        >
+                                            Ajouter
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    </section>
+                    </div>
+                )}
 
-                    <section>
-                        <h2 className="text-2xl font-semibold mb-6 flex items-center text-gray-700">
-                            <PlusCircle className="mr-2 text-blue-500" />
-                            Available CV Models
-                        </h2>
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {filteredAndSortedModels(availableCvModels).map((cvModel) => renderCvModelCard(cvModel, false))}
+                {/* Modal de prévisualisation */}
+                {previewModel && (
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setPreviewModel(null)}>
+                        <div className="bg-white p-4 rounded-lg max-w-4xl max-h-[90vh] overflow-auto" onClick={e => e.stopPropagation()}>
+                            <img
+                                src={`/storage/${previewModel.previewImagePath}`}
+                                alt={previewModel.name}
+                                className="max-w-full h-auto"
+                            />
+                            <div className="mt-4 flex justify-end">
+                                <Button variant="outline" onClick={() => setPreviewModel(null)}>
+                                    Fermer
+                                </Button>
+                            </div>
                         </div>
-                    </section>
-                </div>
+                    </div>
+                )}
             </div>
-
-            {modalImage && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={closeModal}>
-                    <div className="relative max-w-4xl max-h-[90vh] overflow-auto">
-                        <img src={modalImage} alt="CV Model Preview" className="max-w-full max-h-full object-contain" />
-                        <button
-                            onClick={closeModal}
-                            className="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-75 transition-colors duration-300"
-                        >
-                            <X size={24} />
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Confirm Action</DialogTitle>
-                        <DialogDescription>
-                            Are you sure you want to perform this action?
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
-                            Cancel
-                        </Button>
-                        <Button onClick={() => {
-                            actionToConfirm();
-                            setShowConfirmDialog(false);
-                        }}>
-                            Confirm
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </AuthenticatedLayout>
     );
 };

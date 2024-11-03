@@ -58,7 +58,7 @@
         <!-- Professional Experience -->
         @foreach($experiencesByCategory as $category => $experiences)
             <section class="experience-section">
-                <h2>Professional Experience</h2>
+                <h2>{{ $category }}</h2>
                 @foreach($experiences as $experience)
                     <div class="experience-item">
                         <div class="experience-header">
@@ -74,12 +74,9 @@
                             </div>
                         </div>
                         <div class="experience-content">
-                            <!-- Key Responsibilities -->
                             <div class="responsibilities">
                                 <p>{{ $experience['description'] }}</p>
                             </div>
-
-                            <!-- Key Accomplishments -->
                             @if($experience['output'])
                                 <div class="accomplishments">
                                     <h4>Key Accomplishments:</h4>

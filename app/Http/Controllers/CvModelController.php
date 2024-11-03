@@ -287,30 +287,67 @@ BLADE;
         ]);
     }
 
-    public function update(UpdateCvModelRequest $request, CvModel $cvModel)
+    public function update(Request $request, CvModel $cvModel)
     {
-        $cvModel->name = $request->name;
-        $cvModel->description = $request->description;
-        $cvModel->price = $request->price;
+        try {
+            // Validation basique
+            $request->validate([
+                'name' => 'required|string|max:45',
+                'description' => 'required|string|max:255',
+                'price' => 'required',
+                'previewImage' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            ]);
 
-        // Télécharger l'image de prévisualisation si elle est fournie
-        if ($request->hasFile('previewImage')) {
-            // Supprimer l'ancienne image si elle existe
-            if ($cvModel->previewImagePath) {
-                Storage::disk('public')->delete($cvModel->previewImagePath);
+            // Traiter le nom du modèle
+            $newName = Str::slug($request->name);
+            $oldViewPath = $cvModel->viewPath;
+
+            // Mise à jour des champs de base
+            $cvModel->name = $request->name;
+            $cvModel->description = $request->description;
+            $cvModel->price = preg_replace('/[^0-9]/', '', $request->price);
+
+            // Gestion de l'image
+            if ($request->hasFile('previewImage')) {
+                // Supprimer l'ancienne image si elle existe
+                if ($cvModel->previewImagePath) {
+                    Storage::disk('public')->delete($cvModel->previewImagePath);
+                }
+
+                // Stocker la nouvelle image
+                $imagePath = $request->file('previewImage')
+                    ->store('cvModel_previews', 'public');
+                $cvModel->previewImagePath = $imagePath;
             }
-            $imagePath = $request->file('previewImage')->store('cvModel_previews', 'public');
-            $cvModel->previewImagePath = $imagePath;
+
+            // Gérer le template Blade
+            if ($oldViewPath !== $newName) {
+                $oldBladePath = resource_path("views/cv-templates/{$oldViewPath}.blade.php");
+                $newBladePath = resource_path("views/cv-templates/{$newName}.blade.php");
+
+                // Renommer le fichier s'il existe, sinon créer un nouveau
+                if (file_exists($oldBladePath)) {
+                    rename($oldBladePath, $newBladePath);
+                } else {
+                    file_put_contents($newBladePath, $this->getDefaultBladeTemplate());
+                }
+
+                $cvModel->viewPath = $newName;
+            }
+
+            $cvModel->save();
+
+            return redirect()
+                ->route('cv-models.index')
+                ->with('success', 'Le modèle de CV a été mis à jour avec succès.');
+
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors de la mise à jour du modèle CV: ' . $e->getMessage());
+
+            return back()
+                ->withInput()
+                ->with('error', 'Une erreur est survenue lors de la mise à jour du modèle.');
         }
-
-        // Mettre à jour le chemin du fichier dans le dossier cvgallery
-        $viewPath = 'cvgallery/' . $request->name . '.tsx';
-        Storage::disk('public')->put($viewPath, '');
-        $cvModel->viewPath = $viewPath;
-
-        $cvModel->save();
-
-        return response()->json(['message' => 'CV Model updated successfully']);
     }
 
     public function destroy(CvModel $cvModel)
