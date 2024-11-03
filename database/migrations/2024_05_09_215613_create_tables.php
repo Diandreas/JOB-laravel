@@ -47,7 +47,6 @@ return new class extends Migration
 
         Schema::table('users', function (Blueprint $table) {
             $table->string('surname', 45)->nullable();
-            $table->timestamp('create_time')->nullable()->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->foreignId('address_id')->constrained()->onDelete('cascade');
             $table->foreignId('profession_id')->constrained()->onDelete('cascade');
             $table->integer('numberOfChild')->nullable();
@@ -55,7 +54,7 @@ return new class extends Migration
 
             // Nouveaux champs
             $table->string('github')->nullable();
-            $table->string('email')->unique()->nullable();
+//            $table->string('email')->unique()->nullable();
             $table->string('linkedin')->nullable();
             $table->string('address')->nullable();
             $table->string('phone_number')->nullable();

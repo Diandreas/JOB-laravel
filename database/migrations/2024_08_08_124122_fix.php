@@ -13,24 +13,24 @@ return new class extends Migration
     public function up(): void
     {
         // Renommer la table 'models' en 'cv_models'
-        Schema::rename('models', 'cv_models');
-
-        // Renommer la table 'user_model' en 'user_cv_model'
-        Schema::rename('user_model', 'user_cv_model');
-
-        // Mettre à jour les contraintes de clé étrangère dans la table 'user_cv_model'
-        Schema::table('user_cv_model', function (Blueprint $table) {
-            $table->dropForeign(['model_id']);
-            $table->renameColumn('model_id', 'cv_model_id');
-            $table->foreign('cv_model_id')->references('id')->on('cv_models')->onDelete('cascade');
-        });
+//        Schema::rename('models', 'cv_models');
+//
+//        // Renommer la table 'user_model' en 'user_cv_model'
+//        Schema::rename('user_model', 'user_cv_model');
+//
+//        // Mettre à jour les contraintes de clé étrangère dans la table 'user_cv_model'
+//        Schema::table('user_cv_model', function (Blueprint $table) {
+//            $table->dropForeign(['model_id']);
+//            $table->renameColumn('model_id', 'cv_model_id');
+//            $table->foreign('cv_model_id')->references('id')->on('cv_models')->onDelete('cascade');
+//        });
 
         // Ajouter la colonne 'selected_cv_model_id' à la table 'users'
-        Schema::table('users', function (Blueprint $table) {
-            $table->unsignedBigInteger('selected_cv_model_id')->nullable()->after('selected_summary_id');
-            $table->unsignedBigInteger('selected_cv_model_id')->nullable()->after('selected_summary_id');
-            $table->foreign('selected_cv_model_id')->references('id')->on('cv_models')->onDelete('set null');
-        });
+//        Schema::table('users', function (Blueprint $table) {
+//            $table->unsignedBigInteger('selected_cv_model_id')->nullable()->after('selected_summary_id');
+//            $table->unsignedBigInteger('selected_cv_model_id')->nullable()->after('selected_summary_id');
+//            $table->foreign('selected_cv_model_id')->references('id')->on('cv_models')->onDelete('set null');
+//        });
     }
 
     /**
