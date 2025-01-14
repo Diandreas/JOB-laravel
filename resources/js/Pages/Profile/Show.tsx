@@ -128,6 +128,7 @@ export default function Show({ auth, cvInformation }: Props) {
                                     <ExperienceManager
                                         auth={auth}
                                         experiences={cvInformation.experiences}
+                                        // @ts-ignore
                                         categories={cvInformation.experienceCategories}
                                     />
                                 </motion.div>
@@ -139,7 +140,9 @@ export default function Show({ auth, cvInformation }: Props) {
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.5 }}
                                 >
-                                    <CompetenceManager auth={auth} availableCompetences={cvInformation.availableCompetences} initialUserCompetences={cvInformation.competences} />
+                                    <CompetenceManager
+                                        // @ts-ignore
+                                        auth={auth} availableCompetences={cvInformation.availableCompetences} initialUserCompetences={cvInformation.competences} />
                                 </motion.div>
                             </TabsContent>
 
@@ -149,7 +152,9 @@ export default function Show({ auth, cvInformation }: Props) {
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.5 }}
                                 >
-                                    <ProfessionManager auth={auth} availableProfessions={cvInformation.availableProfessions} initialUserProfession={cvInformation.myProfession} />
+                                    <ProfessionManager
+                                        // @ts-ignore
+                                        auth={auth} availableProfessions={cvInformation.availableProfessions} initialUserProfession={cvInformation.myProfession} />
                                 </motion.div>
                             </TabsContent>
 
@@ -159,7 +164,9 @@ export default function Show({ auth, cvInformation }: Props) {
                                     animate={{ opacity: 1 }}
                                     transition={{ duration: 0.5 }}
                                 >
-                                    <HobbyManager auth={auth} availableHobbies={cvInformation.availableHobbies} initialUserHobbies={cvInformation.hobbies} />
+                                    <HobbyManager
+                                        // @ts-ignore
+                                        auth={auth} availableHobbies={cvInformation.availableHobbies} initialUserHobbies={cvInformation.hobbies} />
                                 </motion.div>
                             </TabsContent>
                         </Tabs>

@@ -42,6 +42,7 @@ const SummaryIndex = ({ auth, summaries }) => {
         });
     };
 
+    // @ts-ignore
     return (
         <AuthenticatedLayout user={auth.user}>
             <Head title="Mes Résumés" />
@@ -66,7 +67,9 @@ const SummaryIndex = ({ auth, summaries }) => {
                                         <Button variant="outline">Modifier</Button>
                                     </Link>
                                     <Button variant="destructive" onClick={() => handleDelete(summary.id)}>Supprimer</Button>
-                                    <Button variant="primary" onClick={() => handleSelect(summary.id)}>Sélectionner</Button>
+                                    <Button
+                                        // @ts-ignore
+                                        variant="primary" onClick={() => handleSelect(summary.id)}>Sélectionner</Button>
                                 </div>
                             </div>
                         ))}

@@ -24,6 +24,7 @@ export default function Index({ auth }) {
         });
     };
 
+    // @ts-ignore
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -97,7 +98,8 @@ export default function Index({ auth }) {
                                             asChild
                                             className="w-full justify-start"
                                         >
-                                            <NavLink href={route('portfolio.edit')}>
+
+                                            <NavLink href={route('portfolio.edit')} active>
                                                 <Edit className="mr-2 h-4 w-4" />
                                                 Personnaliser mon portfolio
                                             </NavLink>
@@ -113,7 +115,7 @@ export default function Index({ auth }) {
                                                     identifier: auth.user.username || auth.user.email
                                                 })}
                                                 target="_blank"
-                                            >
+                                             active>
                                                 <ExternalLink className="mr-2 h-4 w-4" />
                                                 Voir mon portfolio
                                             </NavLink>

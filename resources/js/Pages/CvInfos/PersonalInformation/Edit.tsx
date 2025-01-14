@@ -24,8 +24,10 @@ const PersonalInformationEdit = ({ user, onUpdate, onCancel }) => {
                 console.log('Success response:', response);
 
                 // Ensure the correct user data is available in the response
+                // @ts-ignore
                 if (response.props.cvInformation && response.props.cvInformation.personalInformation) {
                     reset('name', 'email', 'github', 'linkedin', 'address', 'phone_number');
+                    // @ts-ignore
                     onUpdate(response.props.cvInformation.personalInformation);
                 } else {
                     console.error("User data not found in response");

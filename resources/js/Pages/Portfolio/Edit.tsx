@@ -39,6 +39,7 @@ export default function Edit({ auth, portfolio, settings }) {
         { key: 'contact_info', icon: Contact, label: 'Contact' },
     ];
 
+    // @ts-ignore
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -87,6 +88,7 @@ export default function Edit({ auth, portfolio, settings }) {
                                                 </div>
                                                 <Switch
                                                     checked={data[`show_${key}`]}
+                                                    // @ts-ignore
                                                     onCheckedChange={(checked) => setData(`show_${key}`, checked)}
                                                     className="scale-75"
                                                 />

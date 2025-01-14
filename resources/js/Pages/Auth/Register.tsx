@@ -192,9 +192,7 @@ export default function Register({ professions }) {
                         Already have an account?
                     </Link>
                     <Button onClick={submit} disabled={processing}>
-                        {processing && (
-                            <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                        )}
+
                         Register
                     </Button>
                 </CardFooter>

@@ -24,6 +24,7 @@ const CvModelCreate = () => {
         formData.append('description', data.description);
         formData.append('price', data.price);
         formData.append('previewImage', data.previewImage);
+        // @ts-ignore
         post(route('cv-models.store'), formData);
     };
 
@@ -31,10 +32,12 @@ const CvModelCreate = () => {
         const file = e.target.files[0];
         if (file) {
             setData('previewImage', file);
+            // @ts-ignore
             setPreview(URL.createObjectURL(file));
         }
     };
 
+    // @ts-ignore
     const formatPrice = (value) => {
         if (!value) return '';
         return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');

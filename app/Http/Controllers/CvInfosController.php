@@ -12,6 +12,7 @@ use App\Models\Profession;
 use App\Models\Competence;
 use App\Models\Hobby;
 use App\Models\Summary;
+
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

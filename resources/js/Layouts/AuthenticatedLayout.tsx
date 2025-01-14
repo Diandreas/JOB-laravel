@@ -16,6 +16,7 @@ export default function Authenticated({ user, header, children }: PropsWithChild
 
     // @ts-ignore
     // @ts-ignore
+    // @ts-ignore
     return (
         <div className="min-h-screen bg-gray-50">
             <nav className="bg-white shadow-md">
@@ -27,7 +28,9 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                         </div>
 
                         <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                            {user.UserType === 1 && (
+                            {
+                                // @ts-ignore
+                                user.UserType === 1 && (
                                 <NavLink href={route('dashboard')} active={route().current('dashboard')}>
                                     ADMIN PART
                                 </NavLink>

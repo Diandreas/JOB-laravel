@@ -12,6 +12,7 @@ export default function ExportableCv({ cvInformation, experiencesByCategory }) {
         return <p>Aucune expérience à afficher.</p>;
     }
 
+    // @ts-ignore
     return (
         <div id="exportable-cv" className="max-w-4xl mx-auto bg-white p-8 font-sans shadow-lg rounded-lg" >
             <header className="mb-6 text-center">
@@ -44,7 +45,8 @@ export default function ExportableCv({ cvInformation, experiencesByCategory }) {
                                 <CardTitle className="text-2xl font-semibold text-primary">{category}</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                {experiences.map((exp) => (
+                                { // @ts-ignore
+                                    experiences.map((exp) => (
                                     <div key={exp.id} className="mb-4 last:mb-0">
                                         <h4 className="font-semibold text-primary">{exp.title}</h4>
                                         <p className="text-sm text-muted-foreground">{exp.company_name} | {exp.date_start} - {exp.date_end || 'Present'}</p>

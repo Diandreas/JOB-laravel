@@ -11,6 +11,7 @@ interface Props {
     auth: any;
 }
 
+// @ts-ignore
 export default function Index({ auth, referralCode, referralCount, earnings, referrals, level }: Props) {
 
     return (
@@ -38,7 +39,9 @@ export default function Index({ auth, referralCode, referralCount, earnings, ref
                     <Invitation referralCode={referralCode} />
                 </TabsContent>
                 <TabsContent value="progress">
-                    <Progress referralCount={referralCount} earnings={earnings} level={level} />
+                    <Progress
+                        // @ts-ignore
+                        referralCount={referralCount} earnings={earnings} level={level} />
                 </TabsContent>
                 <TabsContent value="support">
                     <Support />

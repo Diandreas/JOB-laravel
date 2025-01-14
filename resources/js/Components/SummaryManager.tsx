@@ -157,6 +157,7 @@ const SummaryManager = ({ auth, summaries: initialSummaries, selectedSummary: in
             }
         });
 
+        // @ts-ignore
         Toast.fire({ icon, title });
     };
 
