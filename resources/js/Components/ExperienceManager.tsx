@@ -7,11 +7,17 @@ import { Label } from '@/Components/ui/label';
 import { Textarea } from "@/Components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select";
 import { useToast } from '@/Components/ui/use-toast';
-import { Briefcase, Edit, Trash2, Eye, FileUp, Search, GraduationCap, Building2, Flag } from 'lucide-react';
+import {
+    Briefcase, Edit, Trash2, Eye, FileUp, Search,
+    GraduationCap, Building2, Flag, X, ChevronRight,
+    Menu, Plus
+} from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/Components/ui/accordion";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/Components/ui/resizable";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/Components/ui/sheet";
 import axios from "axios";
 import Swal from 'sweetalert2';
+import { Badge } from "@/Components/ui/badge";
+import { Skeleton } from "@/Components/ui/skeleton";
 
 // Base de données des expériences
 const experienceData = {
@@ -158,6 +164,7 @@ const generatePredefinedExperience = (type) => {
             return null;
     }
 };
+
 const ExperienceManager = ({ experiences: initialExperiences = [], categories = experienceData.categories }) => {
     const { toast } = useToast();
     const [experiences, setExperiences] = useState(initialExperiences);
@@ -165,6 +172,10 @@ const ExperienceManager = ({ experiences: initialExperiences = [], categories = 
     const [isEditing, setIsEditing] = useState(false);
     const [expandedCategories, setExpandedCategories] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState('all');
+
     const { data, setData, reset, errors, processing } = useForm({
         id: '',
         name: '',
@@ -178,67 +189,43 @@ const ExperienceManager = ({ experiences: initialExperiences = [], categories = 
         attachment: null,
     });
 
-    const handlePreviewPDF = (attachmentUrl) => {
-        if (!attachmentUrl) {
-            toast({
-                title: 'Pas de fichier',
-                description: 'Aucune pièce jointe disponible.',
-                variant: 'destructive',
-            });
-            return;
-        }
-        window.open(attachmentUrl, '_blank')?.focus();
-    };
-
-    const handleTemplateSelection = (type) => {
-        const template = generatePredefinedExperience(type);
-        if (template) {
-            setData(prev => ({
-                ...prev,
-                ...template
-            }));
-            toast({
-                title: "Modèle appliqué",
-                description: "Vous pouvez maintenant personnaliser les informations.",
-            });
-        }
-    };
-
+    // Filtrage amélioré avec catégories
     useEffect(() => {
-        const filtered = experiences.filter(exp =>
-            exp.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            exp.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            exp.InstitutionName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            exp.output?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            exp.comment?.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setFilteredExperiences(filtered);
-    }, [searchTerm, experiences]);
+        let filtered = experiences;
 
-    const experiencesByCategory = filteredExperiences.reduce((acc, exp) => {
-        const categoryId = exp.experience_categories_id;
-        if (!acc[categoryId]) {
-            acc[categoryId] = [];
+        if (searchTerm) {
+            filtered = filtered.filter(exp =>
+                exp.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                exp.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                exp.InstitutionName?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
         }
-        acc[categoryId].push(exp);
-        return acc;
-    }, {});
+
+        if (selectedCategory !== 'all') {
+            filtered = filtered.filter(exp =>
+                exp.experience_categories_id.toString() === selectedCategory
+            );
+        }
+
+        setFilteredExperiences(filtered);
+    }, [searchTerm, experiences, selectedCategory]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const formData = new FormData();
-        Object.keys(data).forEach(key => {
-            if (data[key] !== null && data[key] !== undefined) {
-                if (key === 'attachment' && data[key] instanceof File) {
-                    formData.append('attachment', data[key]);
-                } else if (key !== 'attachment') {
-                    formData.append(key, data[key]);
-                }
-            }
-        });
+        setIsLoading(true);
 
         try {
+            const formData = new FormData();
+            Object.keys(data).forEach(key => {
+                if (data[key] !== null && data[key] !== undefined) {
+                    if (key === 'attachment' && data[key] instanceof File) {
+                        formData.append('attachment', data[key]);
+                    } else if (key !== 'attachment') {
+                        formData.append(key, data[key]);
+                    }
+                }
+            });
+
             const response = isEditing
                 ? await axios.post(`/experiences/${data.id}`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' },
@@ -248,28 +235,26 @@ const ExperienceManager = ({ experiences: initialExperiences = [], categories = 
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
 
-            if (isEditing) {
-                setExperiences(prevExperiences =>
-                    prevExperiences.map(exp =>
-                        exp.id === response.data.experience.id ? response.data.experience : exp
-                    )
-                );
-            } else {
-                setExperiences(prevExperiences => [...prevExperiences, response.data.experience]);
-            }
+            setExperiences(prev => isEditing
+                ? prev.map(exp => exp.id === response.data.experience.id ? response.data.experience : exp)
+                : [...prev, response.data.experience]
+            );
 
             toast({
                 title: isEditing ? "Expérience mise à jour" : "Expérience créée",
                 description: "L'opération a été effectuée avec succès.",
             });
+
             resetForm();
+            setIsFormOpen(false);
         } catch (error) {
-            console.error(error);
             toast({
                 title: "Erreur",
                 description: error.response?.data?.message || "Une erreur est survenue.",
                 variant: "destructive",
             });
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -321,59 +306,176 @@ const ExperienceManager = ({ experiences: initialExperiences = [], categories = 
         setIsEditing(false);
     };
 
-    return (
-        <div className="container mx-auto py-8">
-            <div className="flex items-center mb-6">
-                <Briefcase className="mr-3 text-primary" />
-                <h1 className="text-2xl font-bold">Gestion des Expériences</h1>
-            </div>
+    const handlePreviewPDF = (attachmentUrl) => {
+        if (!attachmentUrl) {
+            toast({
+                title: 'Pas de fichier',
+                description: 'Aucune pièce jointe disponible.',
+                variant: 'destructive',
+            });
+            return;
+        }
+        window.open(attachmentUrl, '_blank')?.focus();
+    };
 
-            <ResizablePanelGroup direction="horizontal" className="min-h-[800px] rounded-lg border">
-                <ResizablePanel defaultSize={30} minSize={20}>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>
-                                {isEditing ? 'Modifier l\'expérience' : 'Ajouter une expérience'}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {/* Section des modèles */}
-                            <div className="mb-6 space-y-4 border-b pb-4">
-                                <div className="space-y-2">
-                                    <Label>Choisir un modèle</Label>
-                                    <div className="grid grid-cols-1 gap-2">
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() => handleTemplateSelection('professional')}
-                                            className="flex items-center justify-start"
-                                        >
-                                            <Briefcase className="w-4 h-4 mr-2" />
-                                            Expérience Professionnelle
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() => handleTemplateSelection('academic')}
-                                            className="flex items-center justify-start"
-                                        >
-                                            <GraduationCap className="w-4 h-4 mr-2" />
-                                            Expérience Académique
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() => handleTemplateSelection('research')}
-                                            className="flex items-center justify-start"
-                                        >
-                                            <Flag className="w-4 h-4 mr-2" />
-                                            Expérience de Recherche
-                                        </Button>
+    const handleTemplateSelection = (type) => {
+        const template = generatePredefinedExperience(type);
+        if (template) {
+            setData(prev => ({
+                ...prev,
+                ...template
+            }));
+            toast({
+                title: "Modèle appliqué",
+                description: "Vous pouvez maintenant personnaliser les informations.",
+            });
+        }
+    };
+
+    const ExperienceCard = ({ experience: exp }) => (
+        <Card className="transition-all hover:shadow-md">
+            <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                    <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-lg font-semibold">{exp.name}</h3>
+                            <Badge variant="outline" className="hidden sm:inline-flex">
+                                {categories.find(c => c.id === parseInt(exp.experience_categories_id))?.name}
+                            </Badge>
+                        </div>
+
+                        <div className="flex items-center text-sm text-muted-foreground mt-1">
+                            <Building2 className="w-4 h-4 mr-2" />
+                            <span>{exp.InstitutionName}</span>
+                        </div>
+
+                        <div className="text-sm text-muted-foreground mt-1">
+                            {new Date(exp.date_start).toLocaleDateString('fr-FR')} -
+                            {exp.date_end ? new Date(exp.date_end).toLocaleDateString('fr-FR') : 'Présent'}
+                        </div>
+                    </div>
+
+                    <div className="flex gap-2 self-end sm:self-start">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                                handleEdit(exp);
+                                setIsFormOpen(true);
+                            }}
+                            className="hover:bg-primary/10"
+                        >
+                            <Edit className="w-4 h-4" />
+                            <span className="sr-only">Modifier</span>
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(exp.id)}
+                            className="hover:bg-destructive/10"
+                        >
+                            <Trash2 className="w-4 h-4" />
+                            <span className="sr-only">Supprimer</span>
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="mt-4 space-y-3">
+                    <p className="text-sm line-clamp-3">{exp.description}</p>
+
+                    {exp.output && (
+                        <div className="bg-primary/5 p-3 rounded-md">
+                            <p className="text-sm font-medium">Résultat:</p>
+                            <p className="text-sm">{exp.output}</p>
+                        </div>
+                    )}
+
+                    {exp.attachment_path && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePreviewPDF(exp.attachment_path)}
+                            className="w-full sm:w-auto"
+                        >
+                            <FileUp className="w-4 h-4 mr-2" />
+                            Voir la pièce jointe
+                        </Button>
+                    )}
+                </div>
+            </CardContent>
+        </Card>
+    );
+
+    return (
+        <div className="container mx-auto p-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div className="flex items-center gap-3">
+                    <Briefcase className="text-primary hidden sm:block" />
+                    <h1 className="text-2xl font-bold">Expériences</h1>
+                </div>
+
+                <div className="w-full sm:w-auto flex gap-2">
+                    <div className="flex-1 sm:w-64">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            <Input
+                                type="text"
+                                placeholder="Rechercher..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-10"
+                            />
+                        </div>
+                    </div>
+
+                    <Sheet open={isFormOpen} onOpenChange={setIsFormOpen}>
+                        <SheetTrigger asChild>
+                            <Button className="whitespace-nowrap">
+                                <Plus className="w-4 h-4 mr-2" />
+                                Ajouter
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent className="w-full sm:max-w-xl overflow-y-auto">
+                            <SheetHeader>
+                                <SheetTitle>{isEditing ? 'Modifier l\'expérience' : 'Nouvelle expérience'}</SheetTitle>
+                            </SheetHeader>
+                            <form onSubmit={handleSubmit} className="space-y-4 p-4">
+                                {/* Section des modèles */}
+                                <div className="mb-6 space-y-4 border-b pb-4">
+                                    <div className="space-y-2">
+                                        <Label>Choisir un modèle</Label>
+                                        <div className="grid grid-cols-1 gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => handleTemplateSelection('professional')}
+                                                className="flex items-center justify-start"
+                                            >
+                                                <Briefcase className="w-4 h-4 mr-2" />
+                                                Expérience Professionnelle
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => handleTemplateSelection('academic')}
+                                                className="flex items-center justify-start"
+                                            >
+                                                <GraduationCap className="w-4 h-4 mr-2" />
+                                                Expérience Académique
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => handleTemplateSelection('research')}
+                                                className="flex items-center justify-start"
+                                            >
+                                                <Flag className="w-4 h-4 mr-2" />
+                                                Expérience de Recherche
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            {/* Formulaire */}
-                            <form onSubmit={handleSubmit} className="space-y-4">
+                                {/* Formulaire */}
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="name">Intitulé</Label>
@@ -496,143 +598,61 @@ const ExperienceManager = ({ experiences: initialExperiences = [], categories = 
                                     )}
                                 </div>
                             </form>
-                        </CardContent>
-                    </Card>
-                </ResizablePanel>
+                        </SheetContent>
+                    </Sheet>
+                </div>
+            </div>
 
-                <ResizableHandle />
-
-                <ResizablePanel defaultSize={70}>
-                    <div className="p-6 h-full overflow-y-auto">
-                        <div className="mb-6">
-                            <Label htmlFor="search" className="mb-2 block">Rechercher une expérience</Label>
-                            <div className="relative">
-                                <Input
-                                    id="search"
-                                    type="text"
-                                    placeholder="Rechercher par nom, description, établissement..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-10"
-                                />
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                            </div>
-                        </div>
-
-                        <Accordion
-                            type="multiple"
-                            value={expandedCategories}
-                            onValueChange={setExpandedCategories}
+            <div className="space-y-4">
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                    <Button
+                        variant={selectedCategory === 'all' ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => setSelectedCategory('all')}
+                    >
+                        Toutes
+                    </Button>
+                    {categories.map((cat) => (
+                        <Button
+                            key={cat.id}
+                            variant={selectedCategory === cat.id.toString() ? "default" : "ghost"}
+                            size="sm"
+                            onClick={() => setSelectedCategory(cat.id.toString())}
                         >
-                            {categories.map((category) => (
-                                <AccordionItem key={category.id} value={category.id.toString()}>
-                                    <AccordionTrigger>
-                                        {category.name} ({experiencesByCategory[category.id]?.length || 0})
-                                    </AccordionTrigger>
-                                    <AccordionContent>
-                                        <div className="space-y-4">
-                                            {experiencesByCategory[category.id]?.map((exp) => (
-                                                <Card key={exp.id}>
-                                                    <CardContent className="p-6">
-                                                        <div className="flex justify-between items-start">
-                                                            <div>
-                                                                <h3 className="text-xl font-semibold mb-2">{exp.name}</h3>
-                                                                <p className="text-sm text-muted-foreground">
-                                                                    {new Date(exp.date_start).toLocaleDateString('fr-FR')} -
-                                                                    {exp.date_end ? new Date(exp.date_end).toLocaleDateString('fr-FR') : 'Présent'}
-                                                                </p>
-                                                            </div>
-                                                            <div className="flex gap-2">
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="sm"
-                                                                    onClick={() => handleEdit(exp)}
-                                                                    className="hover:bg-primary/10"
-                                                                >
-                                                                    <Edit className="w-4 h-4" />
-                                                                </Button>
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="sm"
-                                                                    onClick={() => handleDelete(exp.id)}
-                                                                    className="hover:bg-destructive/10"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4" />
-                                                                </Button>
-                                                            </div>
-                                                        </div>
+                            {cat.name}
+                        </Button>
+                    ))}
+                </div>
 
-                                                        <div className="mt-4 space-y-2">
-                                                            <div className="flex items-center text-sm">
-                                                                <Building2 className="w-4 h-4 mr-2 text-muted-foreground" />
-                                                                <span className="font-medium">{exp.InstitutionName}</span>
-                                                            </div>
-
-                                                            <div className="bg-muted/50 p-3 rounded-md mt-2">
-                                                                <p className="text-sm">{exp.description}</p>
-                                                            </div>
-
-                                                            {exp.output && (
-                                                                <div className="bg-primary/5 p-3 rounded-md">
-                                                                    <p className="text-sm font-medium">Résultat/Réalisation:</p>
-                                                                    <p className="text-sm">{exp.output}</p>
-                                                                </div>
-                                                            )}
-
-                                                            {exp.comment && (
-                                                                <div className="text-sm text-muted-foreground italic">
-                                                                    <p>{exp.comment}</p>
-                                                                </div>
-                                                            )}
-
-                                                            {exp.attachment_path && (
-                                                                <div className="flex items-center justify-between mt-4 bg-accent/10 p-2 rounded">
-                                                                    <div className="flex items-center text-sm">
-                                                                        <FileUp className="w-4 h-4 mr-2" />
-                                                                        <span>{exp.attachment_name}</span>
-                                                                    </div>
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="sm"
-                                                                        onClick={() => handlePreviewPDF(exp.attachment_path)}
-                                                                        className="hover:bg-primary/10"
-                                                                    >
-                                                                        <Eye className="w-4 h-4 mr-2" />
-                                                                        Voir
-                                                                    </Button>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </CardContent>
-                                                </Card>
-                                            ))}
-
-                                            {!experiencesByCategory[category.id]?.length && (
-                                                <div className="text-center py-8 text-muted-foreground">
-                                                    <p>Aucune expérience dans cette catégorie</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            ))}
-                        </Accordion>
-
-                        {filteredExperiences.length === 0 && (
-                            <Card>
-                                <CardContent className="text-center py-8">
-                                    <p className="text-muted-foreground">
-                                        {searchTerm
-                                            ? "Aucune expérience ne correspond à votre recherche"
-                                            : "Commencez par ajouter votre première expérience"
-                                        }
-                                    </p>
+                <div className="grid grid-cols-1 gap-4">
+                    {isLoading ? (
+                        Array(3).fill(0).map((_, i) => (
+                            <Card key={i}>
+                                <CardContent className="p-6">
+                                    <Skeleton className="h-6 w-2/3 mb-4" />
+                                    <Skeleton className="h-4 w-1/3 mb-2" />
+                                    <Skeleton className="h-20 w-full" />
                                 </CardContent>
                             </Card>
-                        )}
-                    </div>
-                </ResizablePanel>
-            </ResizablePanelGroup>
+                        ))
+                    ) : filteredExperiences.length > 0 ? (
+                        filteredExperiences.map((exp) => (
+                            <ExperienceCard key={exp.id} experience={exp} />
+                        ))
+                    ) : (
+                        <Card>
+                            <CardContent className="p-12 text-center">
+                                <p className="text-muted-foreground">
+                                    {searchTerm
+                                        ? "Aucune expérience ne correspond à votre recherche"
+                                        : "Commencez par ajouter votre première expérience"
+                                    }
+                                </p>
+                            </CardContent>
+                        </Card>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };

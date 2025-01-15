@@ -84,29 +84,29 @@ export default function Show({ auth, cvInformation, selectedCvModel }: Props) {
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-6">
-                            <div className="flex gap-4">
+                            <div className="flex flex-col md:flex-row gap-4">
                                 <Button
                                     onClick={handleDownload}
-                                    className="bg-primary"
+                                    className="bg-primary w-full md:w-auto"
                                     disabled={isLoading}
                                 >
                                     <Download className="mr-2 h-4 w-4" />
                                     {isLoading ? 'Téléchargement...' : 'Télécharger PDF'}
                                 </Button>
-                                <Button onClick={handlePreview} variant="outline">
+                                <Button onClick={handlePreview} variant="outline" className="w-full md:w-auto">
                                     <Eye className="mr-2 h-4 w-4" />
                                     Prévisualiser
                                 </Button>
-                                <Button onClick={handlePrint} variant="outline">
+                                <Button onClick={handlePrint} variant="outline" className="w-full md:w-auto">
                                     <Printer className="mr-2 h-4 w-4" />
                                     Imprimer
                                 </Button>
                             </div>
 
-                            <div className="w-full border rounded-lg bg-white shadow-sm">
+                            <div className="w-full border rounded-lg bg-white shadow-sm overflow-auto">
                                 <iframe
                                     src={route('cv.preview', { id: selectedCvModel.id })}
-                                    className="w-full h-[800px] border-0 rounded-lg"
+                                    className="w-full h-[800px] md:h-[600px] border-0 rounded-lg"
                                     title="CV Preview"
                                 />
                             </div>
